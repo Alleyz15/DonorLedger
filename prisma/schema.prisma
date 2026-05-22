@@ -1,0 +1,308 @@
+// DonorLedger — Prisma schema
+//
+// Off-chain persistence layer. The blockchain is the source of truth for
+// financial enforcement (donations, disbursements, approvals). PostgreSQL
+// stores the personally identifiable data (PDPA: never on-chain), document
+// file paths (only hashes go on-chain), AI analysis output, queue state,
+// and operational metadata.
+//
+// Pairing rule:
+//   donorHash       on-chain key  →  Donation.donorHash here
+//   campaignAddress on-chain key  →  Campaign.contractAddress here
+//   evidenceId      on-chain key  →  Evidence.onChainId here
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// NGOs
+// ---------------------------------------------------------------------------
+
+enum NGOStatus {
+  PENDING_KYC
+  APPROVED
+  REJECTED
+  REVOKED
+  EXPIRED
+}
+
+enum RiskTier {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model NGO {
+  id              String     @id @default(cuid())
+  name            String
+  registrationNum String     @unique // SSM or ROS number
+  walletAddress   String     @unique // address registered on Registry.sol
+  contactEmail    String
+  contactPhone    String?
+  riskTier        RiskTier   @default(MEDIUM)
+  status          NGOStatus  @default(PENDING_KYC)
+
+  // Bank Islam KYC audit trail (Section 11)
+  kycNotes        String?    @db.Text
+  kycApprovedBy   String?    // Bank Islam admin user id
+  kycApprovedAt   DateTime?
+  onChainExpiry   DateTime?  // Registry.sol expiryDate — annual renewal
+  revokedReason   String?
+
+  campaigns       Campaign[]
+  vendors         Vendor[]
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([status])
+  @@index([walletAddress])
+}
+
+// ---------------------------------------------------------------------------
+// Campaigns
+// ---------------------------------------------------------------------------
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  UNDER_REVIEW   // AI review window (60-85 confidence) — Bank Islam reviewing
+  FROZEN         // AI auto-freeze fired (>85) — pauseCampaign() was called
+  COMPLETED
+}
+
+model Campaign {
+  id               String         @id @default(cuid())
+  ngoId            String
+  ngo              NGO            @relation(fields: [ngoId], references: [id])
+
+  name             String
+  causeType        String         // e.g. "Banjir Kelantan Relief 2026"
+  description      String         @db.Text
+
+  // Allocation rules — these are locked in the contract's constructor.
+  // We mirror them here so the frontend can display the donor's promise
+  // without making an extra RPC call. Must sum to 100.
+  aidPercent       Int
+  logisticsPercent Int
+  adminPercent     Int
+
+  targetAmount     Decimal        @db.Decimal(18, 2)
+  raisedAmount     Decimal        @default(0) @db.Decimal(18, 2)
+  donorCount       Int            @default(0)
+  endDate          DateTime
+
+  contractAddress  String         @unique // Campaign.sol deployed instance
+  deployTxHash     String?
+  status           CampaignStatus @default(DRAFT)
+  pausedReason     String?
+
+  donations        Donation[]
+  evidence         Evidence[]
+  vendors          Vendor[]       @relation("CampaignVendors")
+  alerts           Alert[]
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([status])
+  @@index([ngoId])
+}
+
+// ---------------------------------------------------------------------------
+// Vendors  (Section 12 — shell vendor prevention)
+// ---------------------------------------------------------------------------
+
+enum VendorStatus {
+  PENDING_KYC
+  APPROVED
+  REJECTED
+}
+
+enum VendorServiceType {
+  FOOD
+  LOGISTICS
+  MEDICAL
+  CONSTRUCTION
+  OTHER
+}
+
+model Vendor {
+  id               String            @id @default(cuid())
+  ngoId            String
+  ngo              NGO               @relation(fields: [ngoId], references: [id])
+
+  name             String
+  ssmNumber        String
+  serviceType      VendorServiceType
+  bankAccount      String            // PDPA: not on-chain
+  walletAddress    String            @unique // address added via addApprovedVendor()
+  registrationDoc  String?           // uploads/vendor-registration/...
+
+  status           VendorStatus      @default(PENDING_KYC)
+  kycNotes         String?           @db.Text
+  approvedBy       String?
+  approvedAt       DateTime?
+  rejectedReason   String?
+
+  campaigns        Campaign[]        @relation("CampaignVendors")
+  donations        Donation[]
+  evidence         Evidence[]
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([status])
+  @@index([ngoId])
+}
+
+// ---------------------------------------------------------------------------
+// Donations  (donor PII lives only here — never on-chain)
+// ---------------------------------------------------------------------------
+
+model Donation {
+  id            String   @id @default(cuid())
+
+  // donorHash = SHA256(email + campaignId + timestamp + salt) — this hash
+  // is the bridge between off-chain identity and the public on-chain record.
+  donorHash     String   @unique
+  donorEmail    String   // PDPA-protected
+  donorName     String?
+
+  campaignId    String
+  campaign      Campaign @relation(fields: [campaignId], references: [id])
+
+  // Donor's earmarked vendor (Section 12)
+  vendorId      String?
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id])
+
+  amount        Decimal  @db.Decimal(18, 2)
+  duitNowRef    String?  // DuitNow transaction reference from Bank Islam
+  txHash        String?  // Sepolia tx hash returned by Campaign.donate()
+  trackerUrl    String   // returned to frontend in Step 10 of the bridge flow
+
+  createdAt     DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([donorEmail])
+}
+
+// ---------------------------------------------------------------------------
+// Evidence (Section 13 — 5-document package)
+// ---------------------------------------------------------------------------
+
+enum EvidenceStatus {
+  PENDING_AI       // Bull job queued — Gemini has not finished
+  PENDING_REVIEW   // Gemini returned, Bank Islam needs to decide
+  APPROVED         // Bank Islam called approveDisbursement()
+  REJECTED         // Bank Islam called rejectDisbursement()
+  AUTO_FROZEN      // AI > 85 — pauseCampaign() fired automatically
+}
+
+model Evidence {
+  id                 String         @id @default(cuid())
+  onChainId          Int?           // evidenceId returned by EvidenceSubmitted event
+
+  campaignId         String
+  campaign           Campaign       @relation(fields: [campaignId], references: [id])
+
+  vendorId           String
+  vendor             Vendor         @relation(fields: [vendorId], references: [id])
+
+  category           String         // "aid" | "logistics" | "admin"
+  amount             Decimal        @db.Decimal(18, 2)
+
+  // Five-document package — file paths under uploads/. Only the combined
+  // SHA-256 hash is sent on-chain (Section 13).
+  ssmDoc             String?
+  serviceAgreement   String?
+  invoice            String?
+  deliveryProof      String?
+  recipientConfirm   String?
+  packageHash        String         // SHA-256 of the bundle
+
+  status             EvidenceStatus @default(PENDING_AI)
+
+  // AI analysis output (Section 14)
+  aiConfidenceScore  Int?
+  aiReason           String?        @db.Text
+  aiRecommendation   String?        // "approve" | "review" | "freeze"
+  aiFlaggedPatterns  Json?
+
+  // Bank Islam decision
+  approvedBy         String?
+  approvedAt         DateTime?
+  rejectedReason     String?
+
+  alerts             Alert[]
+
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([campaignId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Alerts — MACC webhook + Bank Islam dashboard notifications
+// ---------------------------------------------------------------------------
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertChannel {
+  BANK_ISLAM_DASHBOARD
+  MACC_WEBHOOK
+}
+
+model Alert {
+  id          String        @id @default(cuid())
+
+  campaignId  String?
+  campaign    Campaign?     @relation(fields: [campaignId], references: [id])
+  evidenceId  String?
+  evidence    Evidence?     @relation(fields: [evidenceId], references: [id])
+
+  channel     AlertChannel
+  severity    AlertSeverity
+  message     String        @db.Text
+  payload     Json?         // full Gemini reasoning, on-chain refs, etc.
+
+  delivered   Boolean       @default(false)
+  deliveredAt DateTime?
+
+  createdAt   DateTime      @default(now())
+
+  @@index([channel, delivered])
+}
+
+// ---------------------------------------------------------------------------
+// Admin users — Bank Islam staff (JWT-protected admin routes)
+// ---------------------------------------------------------------------------
+
+enum AdminRole {
+  KYC_REVIEWER
+  DISBURSEMENT_APPROVER
+  SUPER_ADMIN
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         AdminRole @default(KYC_REVIEWER)
+  isActive     Boolean   @default(true)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

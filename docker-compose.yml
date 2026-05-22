@@ -1,0 +1,50 @@
+# docker-compose.yml
+#
+# Local infrastructure for DonorLedger backend development.
+# One command brings up Postgres + Redis with credentials matching
+# the defaults in `.env.example`.
+#
+# Usage:
+#   docker compose up -d
+#   docker compose down            # stop
+#   docker compose down -v         # stop + WIPE DATABASE (be careful)
+#
+# Both services bind to localhost only — they are not exposed to LAN.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: donorledger-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: donorledger
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: donorledger
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - donorledger-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U donorledger -d donorledger"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: donorledger-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - donorledger-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  donorledger-postgres:
+  donorledger-redis:
