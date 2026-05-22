@@ -45,8 +45,19 @@ export const env = {
   },
 
   blockchain: {
-    sepoliaRpcUrl: required('SEPOLIA_RPC_URL'),
-    chainId: asInt(optional('CHAIN_ID', '11155111'), 11155111),
+    // Chain-agnostic — works with any EVM testnet. Default in
+    // .env.example is Monad testnet (chainId 10143). For Sepolia switch
+    // BLOCKCHAIN_RPC_URL + CHAIN_ID + BLOCKCHAIN_NETWORK_NAME together.
+    rpcUrl: required('BLOCKCHAIN_RPC_URL'),
+    chainId: asInt(optional('CHAIN_ID', '10143'), 10143),
+    networkName: optional('BLOCKCHAIN_NETWORK_NAME', 'monad'),
+    // Monad's public RPC is write/read capable but restrictive for live
+    // event filters. Routes already reconcile DB writes after tx success,
+    // so listeners are opt-in on Monad for demo stability.
+    enableListeners: asBool(
+      process.env.ENABLE_CONTRACT_LISTENERS,
+      optional('BLOCKCHAIN_NETWORK_NAME', 'monad').toLowerCase() !== 'monad'
+    ),
 
     // Section 9 — security separation. Bank Islam wallet has higher
     // privilege; server wallet runs continuously with lower privilege.
@@ -62,7 +73,7 @@ export const env = {
 
   gemini: {
     apiKey: required('GEMINI_API_KEY'),
-    model: optional('GEMINI_MODEL', 'gemini-1.5-flash'),
+    model: optional('GEMINI_MODEL', 'gemini-2.5-flash'),
     // Section 14 — confidence thresholds from env, never hardcoded
     reviewThreshold: asInt(optional('AI_REVIEW_THRESHOLD', '60'), 60),
     freezeThreshold: asInt(optional('AI_FREEZE_THRESHOLD', '85'), 85),

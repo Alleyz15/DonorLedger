@@ -1,7 +1,7 @@
 {
   "name": "donorledger-backend",
   "version": "1.0.0",
-  "description": "DonorLedger — Blockchain-powered donation transparency platform. Hackathon X Fintech Forward 2026, Track 1 Reimagine Money (Be U by Bank Islam x UMPSA).",
+  "description": "DonorLedger - Blockchain-powered donation transparency platform for Hackathon X Fintech Forward 2026, Track 1 Reimagine Money (Be U by Bank Islam x UMPSA).",
   "type": "module",
   "main": "backend/src/server.js",
   "scripts": {
@@ -14,8 +14,8 @@
     "prisma:seed": "node prisma/seed.js",
     "contracts:compile": "cd contracts && npx hardhat compile",
     "contracts:test": "cd contracts && npx hardhat test",
-    "contracts:deploy": "cd contracts && npx hardhat run scripts/deploy.js --network sepolia",
-    "contracts:seed": "cd contracts && npx hardhat run scripts/seed.js --network sepolia",
+    "contracts:deploy": "cd contracts && npx hardhat run scripts/deploy.js --network monad",
+    "contracts:seed": "cd contracts && npx hardhat run scripts/seed.js --network monad",
     "smoke": "node scripts/smoke-test.js"
   },
   "dependencies": {

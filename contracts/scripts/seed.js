@@ -1,15 +1,18 @@
 // scripts/seed.js
 //
-// Seeds Sepolia with one demo NGO credential, one demo Campaign instance,
-// and one approved demo vendor — so judges can hit the full happy path
-// and the fraud demo immediately after deploy without manual setup.
+// Seeds the current testnet (Monad by default) with one demo NGO
+// credential, one demo Campaign instance, and one approved demo vendor —
+// so judges can hit the full happy path and the fraud demo immediately
+// after deploy without manual setup.
 //
 // Prerequisites:
 //   1. scripts/deploy.js has been run and addresses pasted into .env
-//   2. Both server + bank islam wallets have at least 0.05 Sepolia ETH
+//   2. Both server + bank islam wallets hold a small amount of the gas
+//      token (MON for Monad, ETH for Sepolia) — ~0.1 of either is plenty
 //
 // Usage:
-//   cd contracts && npm run seed:sepolia
+//   cd contracts && npm run seed            # uses Monad (default)
+//   cd contracts && npm run seed:sepolia    # uses Sepolia
 
 import hre from 'hardhat'
 import * as dotenv from 'dotenv'
@@ -44,7 +47,7 @@ async function main() {
     bankIslam
   )
   const oneYearFromNow = Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60
-  console.log('\n→ Registry.addNGO …')
+  console.log('\n-> Registry.addNGO ...')
   const tx1 = await registry.addNGO(
     demoNgo,
     'Yayasan Demo Kebajikan Malaysia',
@@ -56,7 +59,7 @@ async function main() {
   console.log('  tx:', tx1.hash)
 
   // ---- 2. Deploy a demo Campaign (Bank Islam owner) ------------------
-  console.log('\n→ Deploying demo Campaign…')
+  console.log('\n-> Deploying demo Campaign...')
   const endDate = Math.floor(Date.now() / 1000) + 60 * 24 * 60 * 60 // 60 days
   const Campaign = await hre.ethers.getContractFactory('Campaign', bankIslam)
   const campaign = await Campaign.deploy(
@@ -67,7 +70,7 @@ async function main() {
     70,                            // aidPercent
     20,                            // logisticsPercent
     10,                            // adminPercent
-    10_000_000n,                   // targetAmount = RM100,000 (in sen)
+    10000000n,                     // targetAmount = RM100,000 (in sen)
     endDate,
     REGISTRY,
     serverWallet.address           // aiFreezeWallet (Section 9)
@@ -80,7 +83,7 @@ async function main() {
   // Vendor wallet — for the demo we use the bank islam wallet (any address
   // is fine; on production this is the vendor's actual wallet).
   const demoVendor = bankIslam.address
-  console.log('\n→ Campaign.addApprovedVendor …')
+  console.log('\n-> Campaign.addApprovedVendor ...')
   const tx3 = await campaign.addApprovedVendor(demoVendor)
   await tx3.wait()
   console.log('  tx:', tx3.hash)

@@ -1,11 +1,13 @@
 // hardhat.config.js
 //
-// Sepolia testnet only (Section 5 — "Completely free. Sepolia ETH from
-// faucet costs nothing"). Solidity 0.8.20 matches what every contract
-// pins via pragma.
+// Default network: Monad testnet (chainId 10143, MON as gas token).
+// The contracts are pure EVM Solidity 0.8.20 + OpenZeppelin v5 — they
+// compile and run unchanged on Sepolia (11155111), Polygon Amoy, BSC
+// testnet, etc. To switch networks, change BLOCKCHAIN_RPC_URL +
+// CHAIN_ID in `.env` and use `--network monad` or add another block here.
 //
-// Deployer key: SERVER_WALLET_PRIVATE_KEY is used to deploy infrastructure
-// contracts (Registry, DonorTracker). Per-campaign Campaign.sol is
+// Deployer key: SERVER_WALLET_PRIVATE_KEY deploys infrastructure
+// contracts (Registry + DonorTracker). Per-campaign Campaign.sol is
 // deployed at runtime by the backend signed with BANK_ISLAM_PRIVATE_KEY,
 // because Bank Islam is the owner of every Campaign instance.
 
@@ -18,10 +20,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Load the root .env (one level up from contracts/)
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
-const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || ''
+const BLOCKCHAIN_RPC_URL = process.env.BLOCKCHAIN_RPC_URL || ''
+const CHAIN_ID = parseInt(process.env.CHAIN_ID || '10143', 10)
 const SERVER_WALLET_PRIVATE_KEY = process.env.SERVER_WALLET_PRIVATE_KEY || ''
 const BANK_ISLAM_PRIVATE_KEY = process.env.BANK_ISLAM_PRIVATE_KEY || ''
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 
 const accounts = [SERVER_WALLET_PRIVATE_KEY, BANK_ISLAM_PRIVATE_KEY].filter(
   (k) => k && /^0x[0-9a-fA-F]{64}$/.test(k)
@@ -33,19 +35,31 @@ export default {
     version: '0.8.20',
     settings: {
       optimizer: { enabled: true, runs: 200 },
-      // Hardhat's default EVM version is fine for Sepolia.
     },
   },
   networks: {
     hardhat: {},
+
+    // Default Monad testnet — matches the .env defaults
+    monad: {
+      url: BLOCKCHAIN_RPC_URL || 'https://testnet-rpc.monad.xyz',
+      chainId: CHAIN_ID || 10143,
+      accounts,
+    },
+
+    // Generic "testnet" alias — reads whatever .env says
+    testnet: {
+      url: BLOCKCHAIN_RPC_URL,
+      chainId: CHAIN_ID,
+      accounts,
+    },
+
+    // Kept as a legacy option in case you switch back to Sepolia later
     sepolia: {
-      url: SEPOLIA_RPC_URL,
+      url: BLOCKCHAIN_RPC_URL,
       chainId: 11155111,
       accounts,
     },
-  },
-  etherscan: {
-    apiKey: { sepolia: ETHERSCAN_API_KEY },
   },
   paths: {
     sources: './contracts',

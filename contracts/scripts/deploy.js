@@ -7,8 +7,13 @@
 // Campaigns deploy per-campaign from the backend (POST /api/admin/campaign/create)
 // so they are NOT deployed here.
 //
+// Default network: Monad testnet (chainId 10143). To deploy elsewhere,
+// pass `--network sepolia` or any other network defined in hardhat.config.js.
+//
 // Usage:
-//   cd contracts && npm run deploy:sepolia
+//   cd contracts && npm run deploy           # uses Monad (default)
+//   cd contracts && npm run deploy:sepolia   # uses Sepolia
+//
 // After running, copy the printed addresses into the root .env:
 //   REGISTRY_CONTRACT_ADDRESS=...
 //   DONOR_TRACKER_CONTRACT_ADDRESS=...
@@ -24,7 +29,7 @@ async function main() {
   console.log('Bank Islam wallet           :', bankIslamAddress)
 
   // --- Registry — owner is Bank Islam wallet
-  console.log('\nDeploying Registry…')
+  console.log('\nDeploying Registry...')
   const Registry = await hre.ethers.getContractFactory('Registry', deployer)
   const registry = await Registry.deploy(bankIslamAddress)
   await registry.waitForDeployment()
@@ -32,7 +37,7 @@ async function main() {
   console.log('Registry deployed at        :', registryAddr)
 
   // --- DonorTracker — owner is the server wallet (deployer)
-  console.log('\nDeploying DonorTracker…')
+  console.log('\nDeploying DonorTracker...')
   const Tracker = await hre.ethers.getContractFactory('DonorTracker', deployer)
   const tracker = await Tracker.deploy(deployer.address)
   await tracker.waitForDeployment()

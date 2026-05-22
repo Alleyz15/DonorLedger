@@ -7,9 +7,14 @@
   "scripts": {
     "compile": "hardhat compile",
     "clean": "hardhat clean",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js --network monad",
+    "deploy:monad": "hardhat run scripts/deploy.js --network monad",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "seed": "hardhat run scripts/seed.js --network monad",
+    "seed:monad": "hardhat run scripts/seed.js --network monad",
     "seed:sepolia": "hardhat run scripts/seed.js --network sepolia",
-    "verify": "hardhat verify --network sepolia"
+    "verify": "hardhat verify"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

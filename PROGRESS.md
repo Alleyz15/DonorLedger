@@ -184,6 +184,84 @@ All paths are relative to `D:\Hackerthon Project\DonorLedger\`.
 
 ---
 
+## Update — round 4 (Monad testnet switch)
+
+CLAUDE.md was written assuming Sepolia. The project now defaults to
+**Monad testnet** (chainId 10143, MON as gas) because the user already
+held MON balance and Sepolia faucets were inaccessible. The contracts
+themselves DID NOT CHANGE — they are pure EVM Solidity 0.8.20 +
+OpenZeppelin v5 and run on any EVM chain.
+
+### Files changed
+- `.env.example` — `SEPOLIA_RPC_URL` → `BLOCKCHAIN_RPC_URL`,
+  `CHAIN_ID=10143`, added `BLOCKCHAIN_NETWORK_NAME=monad`. The Sepolia
+  values are kept as a commented alternative.
+- `backend/src/config/env.js` — `sepoliaRpcUrl` → `rpcUrl`, added
+  `networkName`. Defaults are Monad's chainId and name.
+- `backend/src/config/blockchain.js` — `JsonRpcProvider` now uses
+  `env.blockchain.rpcUrl` + `networkName` (instead of hard-coded
+  `'sepolia'`) and forces polling because Monad's public RPC does not
+  support `eth_newFilter`.
+- `backend/src/config/env.js` + `backend/src/listeners/contract.listener.js`
+  — added `ENABLE_CONTRACT_LISTENERS`; listeners default off on Monad
+  because the public RPC limits `eth_getLogs` to 100-block ranges, which
+  can crash long-running polling listeners during demo writes.
+- `backend/src/config/env.js` / `.env.example` / `QUICKSTART.md` —
+  default Gemini model updated from retired `gemini-1.5-flash` to
+  `gemini-2.5-flash`.
+- `contracts/hardhat.config.js` — three networks now defined:
+  `monad` (default), `testnet` (generic, follows env), and `sepolia`
+  (kept as fallback).
+- `contracts/package.json` — npm scripts split into `deploy` /
+  `deploy:monad` / `deploy:sepolia` (same for seed). Use these from
+  inside `contracts/`; the root package only exposes the Monad default
+  convenience scripts.
+- Root `package.json` — `contracts:deploy` and `contracts:seed` now
+  target `--network monad`.
+- `contracts/scripts/deploy.js` + `seed.js` — header comments updated.
+- `QUICKSTART.md` — fully rewritten for Monad. Includes a complete
+  example `.env`, Monad faucet link, Monad explorer link, and a
+  "switching back to Sepolia" section.
+
+### Files explicitly NOT changed
+- `*.sol` — contracts are chain-agnostic, no edit required.
+- `*.test.js` — Hardhat tests run on the local `hardhat` network, not
+  Monad/Sepolia. Test suite still applies as-is.
+- `CLAUDE.md` — preserved verbatim per instructions. The Sepolia
+  references in CLAUDE.md are historical/spec-only; the live code is
+  Monad. Judges asking "why Monad?" have the canned answer in
+  QUICKSTART.md → "Judge asks" troubleshooting entry.
+
+### Verification performed after cleanup
+- Root `package.json` and `contracts/package.json` parse as valid JSON.
+- `git diff --check` reports no whitespace errors (only existing LF/CRLF
+  conversion warnings from Git on Windows).
+- All backend, contract script, Prisma seed, and smoke-test `.js` files
+  pass `node --check`.
+- Live config/docs no longer reference the old `SEPOLIA_RPC_URL` /
+  `sepoliaRpcUrl` names.
+- Local Docker infrastructure was started successfully:
+  `donorledger-postgres` and `donorledger-redis` are healthy.
+- Hardhat compiled all Solidity contracts and the contract suite passed
+  27 tests.
+- Registry deployed to Monad:
+  `0xcfecb750B3916526e2169B423E14a9Ce7fbF779a`.
+- DonorTracker deployed to Monad:
+  `0x69501E5F55b14e878679ca684600a900ae5116D6`.
+- Prisma migration `20260522171921_init` was created/applied and the
+  SUPER_ADMIN seed user was created.
+- Backend health check passes at `http://localhost:3001/health`.
+- `npm run smoke` passes end to end: NGO approval, campaign deploy,
+  vendor approval, simulated DuitNow donation, donor tracker read,
+  fraud freeze, and MACC webhook alert persistence.
+- Smoke script now verifies MACC webhook rows directly via Prisma,
+  instead of looking for MACC rows in the Bank Islam dashboard endpoint.
+- Gemini model is now `gemini-2.5-flash`. One run produced a real fraud
+  reason/patterns; a later run hit Google `503 Service Unavailable`
+  high-demand fallback, which the app handled correctly.
+
+---
+
 ## Update — round 3 (tests + docker + smoke + PM2 + quickstart)
 
 ### Newly COMPLETED
@@ -279,15 +357,16 @@ npm run compile              # produces contracts/artifacts/ — contract.servic
 cd ..
 ```
 
-### 2. Fund the two wallets on Sepolia
-- Faucet: https://sepoliafaucet.com or Alchemy/Infura faucets
-- Need at least 0.05 ETH each for `SERVER_WALLET_PRIVATE_KEY` and
-  `BANK_ISLAM_PRIVATE_KEY` (deploy gas + per-campaign deploy gas).
+### 2. Fund the two wallets on Monad testnet
+- Faucet: https://faucet.monad.xyz
+- Need testnet MON in both `SERVER_WALLET_PRIVATE_KEY` and
+  `BANK_ISLAM_PRIVATE_KEY` wallets (infrastructure deploy gas +
+  per-campaign deploy gas).
 
 ### 3. Deploy infrastructure contracts (Registry + DonorTracker)
 ```bash
 cd contracts
-npm run deploy:sepolia
+npm run deploy:monad
 ```
 Copy the two addresses it prints into `.env`:
 ```
@@ -307,7 +386,7 @@ npm run prisma:seed
 ### 5. (Optional) seed a demo campaign on-chain
 ```bash
 cd contracts
-npm run seed:sepolia
+npm run seed:monad
 ```
 This deploys one demo Campaign.sol; persist it via
 `POST /api/admin/campaign/create` (or insert a row manually) so the
@@ -327,7 +406,7 @@ npm run dev
    show AI score < 60 in dashboard.
 5. `POST /api/demo/simulate-fraud` — the wow moment. Show:
    - score ≥ 92, reason text from Gemini
-   - campaign status flipped to FROZEN on-chain (verify on Etherscan)
+   - campaign status flipped to FROZEN on-chain (verify on Monad explorer)
    - MACC webhook hit (verify on webhook.site)
    - donor tracker now says "Under Review — funds paused while we
      investigate" with no scores/patterns leaked.
@@ -378,6 +457,7 @@ npm run dev
 
 ## Last completed step
 
-Sandbox verification: all dependencies resolve, all .js files parse,
-Solidity compiles clean. The next move is on **your** machine —
-QUICKSTART.md walks through it in eight numbered steps.
+Monad handoff cleanup verified the switch points and repaired the stale
+Sepolia next-step instructions in this file. The next move is on **your**
+machine: fill `.env`, install dependencies, compile contracts, deploy to
+Monad, run Prisma migrate/seed, boot the backend, and run `npm run smoke`.

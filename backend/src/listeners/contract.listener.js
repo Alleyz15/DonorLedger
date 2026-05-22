@@ -103,6 +103,7 @@ function attachRegistryListeners() {
 // ---------------- Campaign listener (per-campaign) ----------------------
 
 export function attachCampaignListener(campaignAddress, campaignId) {
+  if (!env.blockchain.enableListeners) return
   if (attachedCampaigns.has(campaignAddress)) return
   attachedCampaigns.add(campaignAddress)
 
@@ -188,6 +189,13 @@ export function attachCampaignListener(campaignAddress, campaignId) {
 // ---------------- Boot --------------------------------------------------
 
 export async function startContractListeners() {
+  if (!env.blockchain.enableListeners) {
+    console.log(
+      `[listener] disabled for ${env.blockchain.networkName}; set ENABLE_CONTRACT_LISTENERS=true to opt in`
+    )
+    return
+  }
+
   attachRegistryListeners()
 
   // Subscribe to every deployed Campaign on boot

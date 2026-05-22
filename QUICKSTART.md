@@ -4,20 +4,26 @@ Read `CLAUDE.md` first (full architecture spec). This is the **how to run
 it locally** guide. Setup time: ~30 minutes once you have the manual
 items below.
 
+> **Network note:** CLAUDE.md was written assuming Sepolia testnet. The
+> project actually deploys to **Monad testnet** by default (EVM-compatible,
+> chainId 10143, MON as gas token). The contracts are 100% EVM — they
+> compile and run unchanged on either network. Swap by editing
+> `BLOCKCHAIN_RPC_URL`, `CHAIN_ID`, `BLOCKCHAIN_NETWORK_NAME` in `.env`.
+
 ---
 
-## 0. Manual items you must collect yourself (10 min)
+## 0. Manual items you must collect yourself (~10 min)
 
 These are the things only you can get — Claude cannot acquire them.
 
 | Item | Where to get it | What it goes into |
 |---|---|---|
-| Sepolia RPC URL | https://infura.io (free) → create project → copy the Sepolia endpoint | `SEPOLIA_RPC_URL` |
-| Two test wallets | MetaMask → Create Account ×2. Export both private keys. | `SERVER_WALLET_PRIVATE_KEY`, `BANK_ISLAM_PRIVATE_KEY` |
-| Sepolia ETH | https://sepoliafaucet.com (need ~0.1 ETH on each wallet) | n/a |
+| Monad testnet RPC URL | Use the default `https://testnet-rpc.monad.xyz`, OR copy from MetaMask → Networks → Monad Testnet → "RPC URL" | `BLOCKCHAIN_RPC_URL` |
+| Two MetaMask wallets | MetaMask → Account menu → Create Account (×2). Click each → Account Details → Show Private Key | `SERVER_WALLET_PRIVATE_KEY`, `BANK_ISLAM_PRIVATE_KEY` |
+| Monad testnet MON | https://faucet.monad.xyz (one-click claim; also Phantom / Quicknode have faucets) | n/a — fund both wallets |
 | Gemini API key | https://aistudio.google.com/apikey (free tier OK) | `GEMINI_API_KEY` |
-| Donor hash salt | `openssl rand -hex 32` or any 32-byte random hex | `DONOR_HASH_SALT` |
-| JWT secret | `openssl rand -hex 32` | `JWT_SECRET` |
+| Donor hash salt | Run in PowerShell: `[guid]::NewGuid().ToString('N') + [guid]::NewGuid().ToString('N')` (gives 64 hex chars) | `DONOR_HASH_SALT` |
+| JWT secret | Same as above, any 64-hex-char string | `JWT_SECRET` |
 | MACC webhook URL | https://webhook.site → copy "Your unique URL" | `MACC_WEBHOOK_URL` |
 
 Once you have all of the above, copy `.env.example` to `.env` and fill
@@ -25,7 +31,54 @@ them in.
 
 ```powershell
 copy .env.example .env
-# then edit .env
+notepad .env
+```
+
+### Example completed `.env` (Monad)
+
+```
+NODE_ENV=development
+PORT=3001
+FRONTEND_ORIGIN=http://localhost:5173
+
+DATABASE_URL=postgresql://donorledger:password@localhost:5432/donorledger?schema=public
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+BLOCKCHAIN_RPC_URL=https://testnet-rpc.monad.xyz
+CHAIN_ID=10143
+BLOCKCHAIN_NETWORK_NAME=monad
+ENABLE_CONTRACT_LISTENERS=false
+
+BANK_ISLAM_PRIVATE_KEY=0xabc...   # from MetaMask Account 2
+SERVER_WALLET_PRIVATE_KEY=0xdef... # from MetaMask Account 1
+
+REGISTRY_CONTRACT_ADDRESS=           # filled in after step 4
+DONOR_TRACKER_CONTRACT_ADDRESS=      # filled in after step 4
+
+DONOR_HASH_SALT=replace-with-64-hex-chars
+GEMINI_API_KEY=AIza...
+GEMINI_MODEL=gemini-2.5-flash
+AI_REVIEW_THRESHOLD=60
+AI_FREEZE_THRESHOLD=85
+
+JWT_SECRET=replace-with-64-hex-chars
+JWT_EXPIRES_IN=12h
+
+MACC_WEBHOOK_URL=https://webhook.site/your-unique-uuid
+MACC_WEBHOOK_SECRET=any-string-bank-islam-and-macc-share
+
+UPLOAD_DIR=./uploads
+MAX_UPLOAD_BYTES=10485760
+
+DEMO_MODE=true
+RECIPIENT_CONFIRM_DELAY_MS=5000
+
+SEED_ADMIN_EMAIL=admin@bankislam.demo
+SEED_ADMIN_PASSWORD=donorledger-demo-2026
+SEED_ADMIN_NAME=Bank Islam Super Admin
 ```
 
 ---
@@ -68,11 +121,16 @@ npm run contracts:test
 
 After compile, `contracts/artifacts/` exists and the backend will prefer
 those real ABIs over the hand-written fallback ABIs in
-`contract.service.js`.
+`contract.service.js`. The test suite has 25 tests covering allocation
+enforcement, vendor allowlist, NGO expiry, and the dual-trigger pause
+invariant (Section 9).
 
 ---
 
-## 4. Deploy Registry + DonorTracker to Sepolia (~30 s)
+## 4. Deploy Registry + DonorTracker to Monad (~30 s)
+
+Make sure both your wallets show MON on the Monad Testnet network first
+(the faucet usually credits in seconds). Then:
 
 ```powershell
 npm run contracts:deploy
@@ -89,6 +147,9 @@ DONOR_TRACKER_CONTRACT_ADDRESS=0x...
 > `POST /api/admin/campaign/create` — there is no separate "campaign
 > address" in `.env`.
 
+Check the deploy on the Monad explorer:
+- https://testnet.monadexplorer.com/address/<your-wallet-address>
+
 ---
 
 ## 5. Migrate + seed Postgres (1 min)
@@ -104,7 +165,7 @@ The seed creates a SUPER_ADMIN admin user. Credentials come from
 
 ---
 
-## 6. Run the backend (forever-loop)
+## 6. Run the backend
 
 ```powershell
 npm run dev
@@ -178,6 +239,21 @@ hit `http://VPS_IP:3001`.
 
 ---
 
+## Switching from Monad back to Sepolia (if you ever need to)
+
+Just edit `.env`:
+
+```
+BLOCKCHAIN_RPC_URL=https://sepolia.infura.io/v3/<your_infura_project_id>
+CHAIN_ID=11155111
+BLOCKCHAIN_NETWORK_NAME=sepolia
+```
+
+...then run `cd contracts && npm run deploy:sepolia` and paste the new
+contract addresses into `.env`. No code changes needed.
+
+---
+
 ## Troubleshooting
 
 **"Workspace still starting"** — n/a, that's the Claude sandbox; ignore.
@@ -201,5 +277,15 @@ expiry. Call `POST /api/admin/ngo/:id/renew`.
 (vendor approve) ran for this specific campaign. Each campaign has its
 own allowlist.
 
-**Tx underpriced / nonce issues on Sepolia** — both wallets need fresh
-Sepolia ETH. Top them up from the faucet.
+**`insufficient funds for intrinsic transaction cost`** — your wallet
+ran out of MON (or ETH on Sepolia). Hit the faucet again.
+
+**`network does not support ENS`** when running the seed script — this
+is a non-fatal warning from ethers on testnets without ENS resolvers
+(Monad doesn't have one). The script still completes successfully.
+
+**Judge asks "why Monad and not Sepolia?"** — *"Monad is an EVM-compatible
+testnet with chainId 10143. The architecture and contracts are identical
+to Sepolia — we picked Monad because the faucet was accessible during
+the hackathon. For Bank Islam production, this deploys on a permissioned
+Hyperledger network anyway (CLAUDE.md Section 6, Layer 1)."*

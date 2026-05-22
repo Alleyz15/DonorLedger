@@ -1,7 +1,7 @@
 // config/gemini.js
 //
 // Single Gemini client. ai.service.js is the only consumer.
-// Section 14 — model is read from env (default gemini-1.5-flash, free tier).
+// Section 14 — model is read from env (default gemini-2.5-flash).
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { env } from './env.js'

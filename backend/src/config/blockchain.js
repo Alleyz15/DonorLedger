@@ -15,10 +15,15 @@ import { ethers } from 'ethers'
 import { env } from './env.js'
 
 export const provider = new ethers.JsonRpcProvider(
-  env.blockchain.sepoliaRpcUrl,
+  env.blockchain.rpcUrl,
   {
     chainId: env.blockchain.chainId,
-    name: 'sepolia',
+    name: env.blockchain.networkName,
+  },
+  {
+    // Monad's public RPC does not support eth_newFilter. Polling keeps
+    // event listeners working without noisy filter-id retries.
+    polling: true,
   }
 )
 

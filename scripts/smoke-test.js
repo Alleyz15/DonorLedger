@@ -26,11 +26,13 @@
 //   API_BASE_URL=http://localhost:3001 node scripts/smoke-test.js
 
 import * as dotenv from 'dotenv'
+import { PrismaClient } from '@prisma/client'
 dotenv.config()
 
 const BASE = process.env.API_BASE_URL || 'http://localhost:3001'
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@bankislam.demo'
 const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'donorledger-demo-2026'
+const prisma = new PrismaClient()
 
 // Demo wallet addresses — these don't need to be funded for the smoke test
 // because the backend does the on-chain signing. They just need to be valid
@@ -238,13 +240,20 @@ async function main() {
   }
 
   // 11
-  step(11, 'GET /api/admin/alerts')
+  step(11, 'GET /api/admin/alerts + confirm MACC row')
   {
     const r = await http('GET', '/api/admin/alerts')
     if (!r.ok) fail('alerts fetch failed', r)
-    const macc = (r.body || []).filter((a) => a.channel === 'MACC_WEBHOOK')
-    ok(`alert rows total : ${r.body.length}`)
-    ok(`MACC alerts      : ${macc.length}`)
+    ok(`Bank Islam dashboard alerts: ${r.body.length}`)
+
+    const macc = await prisma.alert.findMany({
+      where: { channel: 'MACC_WEBHOOK' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    })
+    if (!macc.length) fail('MACC webhook alert row was not persisted')
+    ok(`MACC webhook alerts       : ${macc.length}`)
+    ok(`latest MACC delivered     : ${macc[0].delivered}`)
   }
 
   console.log(`\n${c.green}All steps passed.${c.reset}`)
@@ -252,7 +261,11 @@ async function main() {
   console.log(`open it now — the auto-freeze alert was delivered there.${c.reset}\n`)
 }
 
-main().catch((e) => {
-  console.error(`\n${c.red}smoke test crashed:${c.reset}`, e.message)
-  process.exit(1)
-})
+main()
+  .catch((e) => {
+    console.error(`\n${c.red}smoke test crashed:${c.reset}`, e.message)
+    process.exitCode = 1
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
