@@ -39,6 +39,18 @@ function scoreRiskTier({ yearsActive, prevCampaigns, auditedFinancials }) {
  * Bank Islam reviewer picks it up from the admin dashboard.
  */
 export async function submitNGOApplication(applicant) {
+  const existingNGO = await prisma.nGO.findUnique({
+    where: { registrationNum: applicant.registrationNum },
+    select: { id: true },
+  })
+  if (existingNGO) {
+    const err = new Error(
+      'This NGO registration number is already registered. Use a different number, or continue with the existing NGO account.'
+    )
+    err.status = 409
+    throw err
+  }
+
   const screen = await preScreen(applicant)
 
   if (!screen.ssm.active) {

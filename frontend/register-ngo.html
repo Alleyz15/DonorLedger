@@ -13,48 +13,168 @@
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./pages/register-ngo/register-ngo-page.js"></script>
   </head>
-  <body class="login-screen">
-    <main class="login-page register-ngo-page">
-      <nav class="login-nav" aria-label="Primary navigation">
-        <a class="login-brand" href="./introduction.html">
-          <span class="brand-mark">D</span>
-          <span>DonorLedger</span>
-        </a>
-      </nav>
+  <body class="register-ngo-screen">
+    <main class="register-ngo-page">
+      <form class="register-ngo-card" novalidate>
+        <header class="register-ngo-header">
+          <h1 id="register-ngo-title">Register Your NGO</h1>
+          <p>
+            Join the most transparent social impact network. Onboard your
+            organization to start receiving verified ledger-tracked donations.
+          </p>
+        </header>
 
-      <section class="login-hero register-ngo-hero" aria-labelledby="register-ngo-title">
-        <form class="login-card register-ngo-card" novalidate>
-          <h1 id="register-ngo-title">Register For NGO</h1>
-          <p>Submit your organization details for Bank Islam KYC review.</p>
+        <section class="form-section" aria-labelledby="organisation-info-title">
+          <h2 id="organisation-info-title">Organisation Info</h2>
+          <label class="field field-full">
+            <span>Legal Organisation Name</span>
+            <input
+              name="name"
+              type="text"
+              placeholder="e.g. Hope Foundation International"
+            />
+          </label>
 
-          <div class="register-ngo-grid">
+          <div class="form-row">
+            <fieldset class="radio-field">
+              <legend>Registration Type</legend>
+              <label><input type="radio" name="registrationType" value="ROS" /> ROS</label>
+              <label><input type="radio" name="registrationType" value="SSM" /> SSM</label>
+            </fieldset>
+
             <label class="field">
-              <span>Organization name</span>
-              <input name="name" type="text" placeholder="Yayasan Example Malaysia" />
-            </label>
-
-            <label class="field">
-              <span>Registration number</span>
-              <input name="registrationNum" type="text" placeholder="SSM / ROS number" />
-            </label>
-
-            <label class="field">
-              <span>Contact email</span>
-              <input name="contactEmail" type="email" placeholder="admin@organization.org" />
-            </label>
-
-            <label class="field">
-              <span>Contact phone</span>
-              <input name="contactPhone" type="tel" placeholder="+60 12 345 6789" />
+              <span>Registration Number</span>
+              <input
+                name="registrationNum"
+                type="text"
+                placeholder="e.g. 199001012345"
+              />
             </label>
           </div>
 
-          <button class="login-button register-ngo-button" type="submit">
-            Continue To Sign Up
-          </button>
-          <div class="form-status" role="status" aria-live="polite"></div>
-        </form>
-      </section>
+          <label class="field field-full">
+            <span>Registered Address</span>
+            <textarea
+              name="registeredAddress"
+              rows="4"
+              placeholder="Enter complete physical address..."
+            ></textarea>
+          </label>
+        </section>
+
+        <section class="form-section" aria-labelledby="directors-title">
+          <div class="section-heading-row">
+            <h2 id="directors-title">Board Of Directors</h2>
+            <button class="text-action" type="button">Add Director</button>
+          </div>
+
+          <div class="director-box">
+            <label class="field">
+              <span>Director 1 Full Name</span>
+              <input
+                name="directorName"
+                type="text"
+                placeholder="Name as per MyKad"
+              />
+            </label>
+
+            <label class="field">
+              <span>MyKad Number</span>
+              <input name="directorMyKad" type="text" placeholder="XXXXXX-XX-XXXX" />
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="banking-title">
+          <h2 id="banking-title">Banking Details</h2>
+          <div class="form-row">
+            <label class="field">
+              <span>Account Number</span>
+              <input name="bankAccount" type="text" placeholder="Enter NGO bank account" />
+            </label>
+
+            <label class="field">
+              <span>Bank Name</span>
+              <select name="bankName">
+                <option>Bank Islam</option>
+                <option>Maybank</option>
+                <option>CIMB Bank</option>
+                <option>Public Bank</option>
+                <option>RHB Bank</option>
+                <option>Hong Leong Bank</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="mission-title">
+          <h2 id="mission-title">Cause & Mission</h2>
+          <label class="field field-full">
+            <span>Primary Category</span>
+            <select name="causeType">
+              <option>Poverty Alleviation</option>
+              <option>Disaster Relief</option>
+              <option>Food Aid</option>
+              <option>Medical Aid</option>
+              <option>Education</option>
+              <option>Community Development</option>
+            </select>
+          </label>
+
+          <label class="field field-full">
+            <span>Mission Statement</span>
+            <textarea
+              name="description"
+              rows="5"
+              placeholder="Briefly describe your organization's core mission and impact..."
+            ></textarea>
+          </label>
+        </section>
+
+        <section class="allocation-card" aria-labelledby="allocation-title">
+          <h2 id="allocation-title">Fund Allocation</h2>
+          <p>Define how every $1 donated is spent. This will be visible on your public ledger profile.</p>
+
+          <div class="allocation-grid">
+            <label class="field">
+              <span>Direct Aid %</span>
+              <input name="aidPercent" type="number" value="80" min="0" max="100" />
+            </label>
+            <label class="field">
+              <span>Logistics %</span>
+              <input name="logisticsPercent" type="number" value="10" min="0" max="100" />
+            </label>
+            <label class="field">
+              <span>Admin %</span>
+              <input name="adminPercent" type="number" value="10" min="0" max="100" />
+            </label>
+          </div>
+
+          <p class="allocation-total">Total Allocation: <strong>100% / 100%</strong></p>
+        </section>
+
+        <section class="form-section" aria-labelledby="documents-title">
+          <h2 id="documents-title">Required Documents</h2>
+          <div class="document-grid">
+            <label class="document-drop">
+              <input name="registrationDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+              <span>SSM/ROS Certificate</span>
+              <small>PDF only, max 10MB</small>
+            </label>
+            <label class="document-drop">
+              <input name="financialDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+              <span>Audited Financial Statement</span>
+              <small>PDF only, max 10MB</small>
+            </label>
+          </div>
+        </section>
+
+        <button class="register-ngo-button" type="submit">Submit Application</button>
+        <div class="form-status" role="status" aria-live="polite"></div>
+        <p class="terms-note">
+          By submitting, you agree to DonorLedger's Radical Transparency Terms.
+        </p>
+      </form>
     </main>
   </body>
 </html>

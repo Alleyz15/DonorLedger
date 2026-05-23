@@ -89,31 +89,25 @@ router.post('/login', validate(loginSchema), async (req, res, next) => {
 
 router.post('/signup', validate(signupSchema), async (req, res, next) => {
   try {
-    const email = normalizeEmail(req.body.email)
-
-    if (isBankIslamEmail(email)) {
-      const err = new Error('Bank Islam accounts are provisioned by the system administrator')
-      err.status = 403
-      throw err
-    }
-
-    const existing = await prisma.user.findUnique({ where: { email } })
-    if (existing) {
-      const err = new Error('An account with this email already exists')
-      err.status = 409
-      throw err
-    }
-
     if (req.body.ngoId) {
+      const email = normalizeEmail(req.body.email)
+      if (isBankIslamEmail(email)) {
+        const err = new Error('Bank Islam accounts are provisioned by the system administrator')
+        err.status = 403
+        throw err
+      }
+
+      const existing = await prisma.user.findUnique({ where: { email } })
+      if (existing) {
+        const err = new Error('An account with this email already exists')
+        err.status = 409
+        throw err
+      }
+
       const ngo = await prisma.nGO.findUnique({ where: { id: req.body.ngoId } })
       if (!ngo) {
         const err = new Error('NGO application not found')
         err.status = 404
-        throw err
-      }
-      if (normalizeEmail(ngo.contactEmail) !== email) {
-        const err = new Error('Signup email must match the NGO application email')
-        err.status = 400
         throw err
       }
 
@@ -121,7 +115,10 @@ router.post('/signup', validate(signupSchema), async (req, res, next) => {
       const user = await prisma.$transaction(async (tx) => {
         await tx.nGO.update({
           where: { id: ngo.id },
-          data: { passwordHash },
+          data: {
+            contactEmail: email,
+            passwordHash,
+          },
         })
         return tx.user.create({
           data: {
@@ -141,20 +138,11 @@ router.post('/signup', validate(signupSchema), async (req, res, next) => {
       })
     }
 
-    const user = await prisma.user.create({
-      data: {
-        name: req.body.name,
-        email,
-        passwordHash: hashPassword(req.body.password),
-        role: 'DONOR',
-      },
-    })
-
-    res.status(201).json({
-      id: user.id,
-      role: user.role,
-      message: 'Donor account created. You can now log in.',
-    })
+    const err = new Error(
+      'Demo donor accounts are pre-seeded. Use donor01@example.com to donor10@example.com with Password123!.'
+    )
+    err.status = 403
+    throw err
   } catch (e) {
     next(e)
   }
