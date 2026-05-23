@@ -3,7 +3,7 @@
 }
 
 .signup-card .login-form {
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 @media (max-height: 760px) and (min-width: 641px) {

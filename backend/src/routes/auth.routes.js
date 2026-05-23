@@ -22,7 +22,6 @@ const loginSchema = {
 }
 
 const signupSchema = {
-  name: { type: 'string', required: true, min: 2, max: 200 },
   email: { type: 'email', required: true },
   password: { type: 'string', required: true, min: 8, max: 128 },
   ngoId: { type: 'string', required: false, max: 200 },
@@ -122,7 +121,7 @@ router.post('/signup', validate(signupSchema), async (req, res, next) => {
         })
         return tx.user.create({
           data: {
-            name: req.body.name,
+            name: ngo.name,
             email,
             passwordHash,
             role: 'ORGANIZER',
