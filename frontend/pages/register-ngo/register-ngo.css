@@ -1,33 +1,280 @@
-.register-ngo-page {
-  min-height: 720px;
+.register-ngo-screen {
+  min-height: 100vh;
+  overflow: auto;
+  background: #f7f7fb;
 }
 
-.register-ngo-hero {
-  align-items: center;
+.register-ngo-page {
+  min-height: 100vh;
+  padding: 64px 24px;
 }
 
 .register-ngo-card {
-  width: min(100%, 760px);
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 44px 40px 46px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.04);
 }
 
-.register-ngo-grid {
+.register-ngo-header {
+  max-width: 420px;
+  margin: 0 auto 42px;
+  text-align: center;
+}
+
+.register-ngo-header h1 {
+  margin: 0 0 10px;
+  color: #064e3b;
+  font-size: 40px;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.register-ngo-header p,
+.allocation-card p,
+.terms-note {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.form-section {
+  margin-top: 28px;
+}
+
+.form-section h2,
+.allocation-card h2 {
+  margin: 0 0 16px;
+  color: #6b7280;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.text-action {
+  border: 0;
+  background: transparent;
+  color: #10b981;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form-row,
+.allocation-grid,
+.director-box,
+.document-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  padding: 28px 0 24px;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.field-full {
+  margin-top: 16px;
+}
+
+.field span,
+.radio-field legend {
+  color: #111827;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #111827;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.radio-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 10px 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.radio-field legend {
+  flex: 1 0 100%;
+  margin-bottom: 4px;
+}
+
+.radio-field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #374151;
+  font-size: 13px;
+}
+
+.director-box {
+  padding: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #f1f5ff;
+}
+
+.allocation-card {
+  margin-top: 32px;
+  padding: 26px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+}
+
+.allocation-card h2 {
+  color: #6b7280;
+}
+
+.allocation-grid {
+  margin-top: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.allocation-total {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.allocation-total strong {
+  color: #10b981;
+  font-size: 18px;
+}
+
+.allocation-total strong.is-invalid {
+  color: #dc2626;
+}
+
+.document-grid {
+  margin-top: 16px;
+}
+
+.document-drop {
+  position: relative;
+  display: flex;
+  min-height: 122px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px;
+  border: 1px dashed #94a3b8;
+  border-radius: 8px;
+  background: #fbfbff;
+  color: #111827;
+  text-align: center;
+  cursor: pointer;
+}
+
+.document-drop input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.document-drop span {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.document-drop small {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.register-ngo-button {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: #34d399;
+  color: #ffffff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 30px rgba(16, 185, 129, 0.2);
+}
+
+.register-ngo-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .register-ngo-card .form-status {
-  margin-top: 12px;
+  margin-top: 14px;
+}
+
+.terms-note {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 11px;
 }
 
 @media (max-width: 720px) {
   .register-ngo-page {
-    height: auto;
-    min-height: 100vh;
+    padding: 32px 16px;
   }
 
-  .register-ngo-grid {
+  .register-ngo-card {
+    padding: 32px 22px 36px;
+  }
+
+  .register-ngo-header h1 {
+    font-size: 32px;
+  }
+
+  .form-row,
+  .allocation-grid,
+  .director-box,
+  .document-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -77,7 +77,7 @@ DEMO_MODE=true
 RECIPIENT_CONFIRM_DELAY_MS=5000
 
 SEED_ADMIN_EMAIL=admin@bankislam.demo
-SEED_ADMIN_PASSWORD=donorledger-demo-2026
+SEED_ADMIN_PASSWORD=Password123!
 SEED_ADMIN_NAME=Bank Islam Super Admin
 ```
 
@@ -161,7 +161,7 @@ npm run prisma:seed
 
 The seed creates a SUPER_ADMIN admin user. Credentials come from
 `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`
-(defaults: `admin@bankislam.demo` / `donorledger-demo-2026`).
+(defaults: `admin@bankislam.demo` / `Password123!`).
 
 ---
 
