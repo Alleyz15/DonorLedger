@@ -1,0 +1,33 @@
+.register-ngo-page {
+  min-height: 720px;
+}
+
+.register-ngo-hero {
+  align-items: center;
+}
+
+.register-ngo-card {
+  width: min(100%, 760px);
+}
+
+.register-ngo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 28px 0 24px;
+}
+
+.register-ngo-card .form-status {
+  margin-top: 12px;
+}
+
+@media (max-width: 720px) {
+  .register-ngo-page {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .register-ngo-grid {
+    grid-template-columns: 1fr;
+  }
+}

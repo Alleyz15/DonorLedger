@@ -1,24 +1,15 @@
 // prisma/seed.js
 //
-// Seeds the first AdminUser so the team can log into /api/admin/login on
-// a fresh deploy. Password hashing matches admin.routes.js: a per-row
-// random salt joined with the sha256 of (salt + plaintext), stored as
-// "salt:hash".
-//
-// Usage:
-//   node prisma/seed.js          # seeds default admin
-//   node prisma/seed.js --reset  # deletes existing admins first
-//
-// Production note: argon2id is the upgrade path (Section 21 — hackathon
-// scope tradeoff). sha256 with a per-row salt is good enough for the demo
-// because the demo VPS is single-tenant and the admin password rotates
-// after the hackathon.
+// Seeds demo login accounts. Password hashing matches backend auth routes:
+// a per-row random salt joined with the sha256 of (salt + plaintext), stored
+// as "salt:hash".
 
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { hashPassword } from '../backend/src/utils/password.utils.js'
+import { SAMPLE_USER_PASSWORD, sampleUsers } from './sample-users.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
@@ -28,29 +19,53 @@ const prisma = new PrismaClient()
 async function main() {
   const reset = process.argv.includes('--reset')
   if (reset) {
-    const deleted = await prisma.adminUser.deleteMany({})
-    console.log(`Reset — deleted ${deleted.count} admin rows`)
+    const deletedAdmins = await prisma.adminUser.deleteMany({})
+    console.log(`Reset - deleted ${deletedAdmins.count} admin rows`)
+    const deletedUsers = await prisma.user.deleteMany({})
+    console.log(`Reset - deleted ${deletedUsers.count} user rows`)
   }
 
-  const email = process.env.SEED_ADMIN_EMAIL || 'admin@bankislam.demo'
-  const password = process.env.SEED_ADMIN_PASSWORD || 'donorledger-demo-2026'
-  const name = process.env.SEED_ADMIN_NAME || 'Bank Islam Super Admin'
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@bankislam.demo'
+  const adminPassword =
+    process.env.SEED_ADMIN_PASSWORD || 'donorledger-demo-2026'
+  const adminName = process.env.SEED_ADMIN_NAME || 'Bank Islam Super Admin'
 
-  const existing = await prisma.adminUser.findUnique({ where: { email } })
-  if (existing) {
-    console.log(`Admin ${email} already exists — skipping (use --reset to recreate).`)
-  } else {
-    const admin = await prisma.adminUser.create({
-      data: {
-        email,
-        passwordHash: hashPassword(password),
-        name,
-        role: 'SUPER_ADMIN',
+  const admin = await prisma.adminUser.upsert({
+    where: { email: adminEmail },
+    update: {
+      name: adminName,
+      role: 'SUPER_ADMIN',
+      isActive: true,
+    },
+    create: {
+      email: adminEmail,
+      passwordHash: hashPassword(adminPassword),
+      name: adminName,
+      role: 'SUPER_ADMIN',
+    },
+  })
+  console.log('Seeded admin:', { id: admin.id, email: admin.email })
+  console.log('Admin password:', adminPassword)
+
+  for (const sample of sampleUsers) {
+    const user = await prisma.user.upsert({
+      where: { email: sample.email },
+      update: {
+        name: sample.name,
+        role: sample.role,
+        isActive: true,
+      },
+      create: {
+        name: sample.name,
+        email: sample.email,
+        role: sample.role,
+        passwordHash: hashPassword(SAMPLE_USER_PASSWORD),
       },
     })
-    console.log('Created admin:', { id: admin.id, email: admin.email })
-    console.log('Login password (rotate after the demo!):', password)
+    console.log('Seeded user:', { email: user.email, role: user.role })
   }
+
+  console.log('Sample user password:', SAMPLE_USER_PASSWORD)
 }
 
 main()

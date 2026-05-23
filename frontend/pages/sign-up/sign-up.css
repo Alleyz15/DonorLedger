@@ -1,0 +1,19 @@
+.signup-card {
+  width: min(100%, 464px);
+}
+
+.signup-card .login-form {
+  padding-bottom: 20px;
+}
+
+@media (max-height: 760px) and (min-width: 641px) {
+  .signup-card {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+
+  .signup-card .login-form {
+    gap: 14px;
+    padding-top: 18px;
+  }
+}

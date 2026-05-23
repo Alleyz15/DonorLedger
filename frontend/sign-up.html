@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | DonorLedger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./pages/sign-up/sign-up-page.js"></script>
+  </head>
+  <body class="login-screen">
+    <main class="login-page signup-page">
+      <nav class="login-nav" aria-label="Primary navigation">
+        <a class="login-brand" href="./introduction.html">
+          <span class="brand-mark">D</span>
+          <span>DonorLedger</span>
+        </a>
+      </nav>
+
+      <section class="login-hero" aria-labelledby="signup-title">
+        <div class="login-bg-grid" aria-hidden="true">
+          <div class="login-logo-card login-bg-1">
+            <img src="./assets/global-relief.png" alt="" />
+          </div>
+          <div class="login-logo-card login-bg-2">
+            <img src="./assets/medicaid-alliance.png" alt="" />
+          </div>
+          <div class="login-logo-card login-bg-3">
+            <img src="./assets/earthcare-sustainability-charity.png" alt="" />
+          </div>
+          <div class="login-logo-card login-bg-4">
+            <img src="./assets/children-education.png" alt="" />
+          </div>
+          <div class="login-logo-card login-bg-5">
+            <img src="./assets/ocean-guardians.png" alt="" />
+          </div>
+          <div class="login-logo-card login-bg-6">
+            <img src="./assets/wwf-logo.png" alt="" />
+          </div>
+        </div>
+
+        <form class="login-card signup-card" novalidate>
+          <h1 id="signup-title">Create Account</h1>
+          <p class="signup-intro">Create your DonorLedger account to continue.</p>
+
+          <div class="login-form">
+            <label class="field">
+              <span>Full name</span>
+              <input
+                type="text"
+                name="name"
+                autocomplete="name"
+                placeholder="Enter your full name"
+              />
+            </label>
+
+            <label class="field">
+              <span>Email</span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                placeholder="Enter your email"
+              />
+            </label>
+
+            <label class="field">
+              <span>Password</span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                placeholder="Create a password"
+              />
+            </label>
+
+            <label class="field">
+              <span>Confirm password</span>
+              <input
+                type="password"
+                name="confirmPassword"
+                autocomplete="new-password"
+                placeholder="Confirm your password"
+              />
+            </label>
+
+            <button class="login-button" type="submit">Sign Up</button>
+            <div class="form-status" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="signup-prompt">
+            <span>Already have an account?</span>
+            <a href="./login.html">Login</a>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

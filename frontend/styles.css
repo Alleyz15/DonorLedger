@@ -1,0 +1,5 @@
+@import './styles/base.css';
+@import './pages/introduction/introduction.css';
+@import './pages/login/login.css';
+@import './pages/sign-up/sign-up.css';
+@import './pages/register-ngo/register-ngo.css';

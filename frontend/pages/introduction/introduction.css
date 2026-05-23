@@ -1,0 +1,509 @@
+.hero-page {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 620px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 80% 50%, #dcfce7 0, rgba(249, 249, 255, 0) 24rem),
+    linear-gradient(90deg, var(--page), var(--page));
+}
+
+.top-nav {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--brand);
+}
+
+.hero {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 96px clamp(32px, 5vw, 64px) 32px;
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(6, 78, 59, 0.03);
+}
+
+.hero::before {
+  width: 46vw;
+  height: 600px;
+  left: 28%;
+  top: -80px;
+  border-radius: 300px;
+}
+
+.hero::after {
+  width: 800px;
+  height: 800px;
+  right: 0;
+  bottom: -160px;
+  border-radius: 400px;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 4;
+  width: min(100%, 576px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.launch-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: clamp(56px, 5.625vw, 72px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.hero-title span {
+  display: block;
+}
+
+.hero-title .accent {
+  color: var(--brand);
+}
+
+.hero-summary {
+  width: min(100%, 528px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(75, 85, 99, 0.5);
+  font-size: 20px;
+  line-height: 32.5px;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 16px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  border-radius: 12px;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.button-primary {
+  min-width: 148px;
+  padding: 18px 40px;
+  color: #ffffff;
+  background: var(--brand);
+  box-shadow:
+    0 20px 25px -5px rgba(6, 78, 59, 0.2),
+    0 8px 10px -6px rgba(6, 78, 59, 0.2);
+}
+
+.button-secondary {
+  min-width: 160px;
+  padding: 18px 42px;
+  color: var(--brand);
+  background: #ffffff;
+  border: 2px solid rgba(6, 78, 59, 0.1);
+}
+
+.ngo-proof {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-stack span {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ffffff;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.avatar-stack span:not(:first-child) {
+  margin-left: -12px;
+}
+
+.avatar-stack span:nth-child(1) {
+  background: var(--avatar-1);
+}
+
+.avatar-stack span:nth-child(2) {
+  background: var(--avatar-2);
+}
+
+.avatar-stack span:nth-child(3) {
+  background: var(--avatar-3);
+}
+
+.ngo-proof p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ngo-proof strong {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.logo-collage {
+  position: absolute;
+  z-index: 2;
+  inset: -2% -22% -8% 37%;
+  transform: rotate(-12deg);
+  transform-origin: center;
+}
+
+.logo-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  height: 400px;
+  padding: 24px;
+  border-radius: 40px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+}
+
+.logo-card img {
+  display: block;
+  width: 100%;
+  max-width: 258px;
+  height: auto;
+  max-height: 334px;
+  object-fit: contain;
+}
+
+.card-education {
+  top: -40px;
+  left: 370px;
+}
+
+.card-wwf {
+  top: 170px;
+  left: 110px;
+}
+
+.card-wwf img,
+.login-bg-6 img {
+  clip-path: inset(9% 8% 11% 8%);
+  max-width: none;
+  max-height: none;
+  transform: scale(1.22);
+}
+
+.card-medicaid {
+  top: 405px;
+  left: 505px;
+}
+
+.card-global {
+  top: 620px;
+  left: 230px;
+}
+
+.card-ocean {
+  top: -10px;
+  left: 735px;
+}
+
+.card-earthcare {
+  top: 430px;
+  left: 850px;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+
+  .logo-collage {
+    inset: -2% -36% -10% 34%;
+  }
+
+  .logo-card {
+    width: 256px;
+    height: 320px;
+    border-radius: 32px;
+  }
+
+  .card-education {
+    top: -20px;
+    left: 360px;
+  }
+
+  .card-wwf {
+    top: 190px;
+    left: 130px;
+  }
+
+  .card-medicaid {
+    top: 395px;
+    left: 455px;
+  }
+
+  .card-global {
+    top: 600px;
+    left: 240px;
+  }
+}
+
+@media (max-width: 860px) {
+  body.introduction-screen,
+  body.login-screen {
+    overflow: auto;
+  }
+
+  .hero-page {
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .hero {
+    min-height: auto;
+    display: block;
+    padding: 112px 24px 48px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .hero-title {
+    font-size: clamp(44px, 12vw, 64px);
+  }
+
+  .hero-summary {
+    font-size: 17px;
+    line-height: 28px;
+  }
+
+  .logo-collage {
+    position: relative;
+    inset: auto;
+    width: min(100%, 620px);
+    height: 440px;
+    margin-top: 42px;
+    transform: rotate(-8deg);
+  }
+
+  .logo-card {
+    width: 190px;
+    height: 238px;
+    border-radius: 28px;
+    padding: 18px;
+  }
+
+  .card-education {
+    top: 0;
+    left: 50%;
+  }
+
+  .card-wwf {
+    top: 54px;
+    left: 4%;
+  }
+
+  .card-medicaid {
+    top: 160px;
+    left: 58%;
+  }
+
+  .card-global {
+    top: 210px;
+    left: 24%;
+  }
+
+  .card-ocean,
+  .card-earthcare {
+    display: none;
+  }
+}
+
+@media (min-width: 861px) and (max-height: 820px) {
+  .hero {
+    padding-top: 86px;
+    padding-bottom: 20px;
+  }
+
+  .hero-copy {
+    gap: 16px;
+  }
+
+  .launch-pill {
+    min-height: 28px;
+    padding: 4px 14px;
+    font-size: 12px;
+  }
+
+  .hero-title {
+    font-size: 56px;
+  }
+
+  .hero-summary {
+    font-size: 17px;
+    line-height: 27px;
+  }
+
+  .hero-actions {
+    padding-top: 6px;
+  }
+
+  .button {
+    min-height: 54px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  .ngo-proof {
+    padding-top: 8px;
+  }
+
+  .logo-card {
+    width: 270px;
+    height: 338px;
+    border-radius: 34px;
+  }
+
+  .card-global {
+    top: 540px;
+  }
+}
+
+@media (max-width: 520px) {
+  .top-nav {
+    padding: 0 20px;
+  }
+
+  .brand {
+    font-size: 22px;
+  }
+
+  .hero {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .launch-pill {
+    font-size: 12px;
+  }
+
+  .hero-title {
+    font-size: clamp(40px, 13vw, 54px);
+  }
+
+  .hero-summary {
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
+  .button {
+    min-height: 56px;
+    flex: 1 1 100%;
+  }
+
+  .ngo-proof {
+    align-items: flex-start;
+  }
+
+  .ngo-proof p {
+    white-space: normal;
+  }
+
+  .logo-collage {
+    height: 360px;
+  }
+
+  .logo-card {
+    width: 150px;
+    height: 188px;
+    border-radius: 22px;
+  }
+
+  .card-wwf {
+    left: -4%;
+  }
+
+  .card-education {
+    left: 48%;
+  }
+
+  .card-medicaid {
+    left: 54%;
+  }
+}
