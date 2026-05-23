@@ -84,6 +84,16 @@
   gap: 16px;
 }
 
+.registration-details-row {
+  margin-top: 16px;
+}
+
+.directors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -211,6 +221,11 @@
   cursor: pointer;
 }
 
+.document-drop[data-has-file="true"] {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
 .document-drop input {
   position: absolute;
   inset: 0;
@@ -226,6 +241,15 @@
 .document-drop small {
   color: #6b7280;
   font-size: 11px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-drop[data-has-file="true"] small {
+  color: #047857;
+  font-weight: 700;
 }
 
 .register-ngo-button {

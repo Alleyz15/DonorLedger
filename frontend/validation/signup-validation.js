@@ -1,10 +1,6 @@
 import { validateLoginForm } from './login-validation.js'
 
-export function validateSignupForm({ name, email, password, confirmPassword }) {
-  if (!name || name.trim().length < 2) {
-    return 'Full name is required.'
-  }
-
+export function validateSignupForm({ email, password, confirmPassword }) {
   const loginError = validateLoginForm({ email, password })
   if (loginError) {
     return loginError

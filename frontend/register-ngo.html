@@ -35,7 +35,7 @@
             />
           </label>
 
-          <div class="form-row">
+          <div class="form-row registration-details-row">
             <fieldset class="radio-field">
               <legend>Registration Type</legend>
               <label><input type="radio" name="registrationType" value="ROS" /> ROS</label>
@@ -65,23 +65,27 @@
         <section class="form-section" aria-labelledby="directors-title">
           <div class="section-heading-row">
             <h2 id="directors-title">Board Of Directors</h2>
-            <button class="text-action" type="button">Add Director</button>
+            <button class="text-action add-director-button" type="button">
+              Add Director
+            </button>
           </div>
 
-          <div class="director-box">
-            <label class="field">
-              <span>Director 1 Full Name</span>
-              <input
-                name="directorName"
-                type="text"
-                placeholder="Name as per MyKad"
-              />
-            </label>
+          <div class="directors-list">
+            <div class="director-box">
+              <label class="field">
+                <span>Director 1 Full Name</span>
+                <input
+                  name="directorName"
+                  type="text"
+                  placeholder="Name as per MyKad"
+                />
+              </label>
 
-            <label class="field">
-              <span>MyKad Number</span>
-              <input name="directorMyKad" type="text" placeholder="XXXXXX-XX-XXXX" />
-            </label>
+              <label class="field">
+                <span>MyKad Number</span>
+                <input name="directorMyKad" type="text" placeholder="XXXXXX-XX-XXXX" />
+              </label>
+            </div>
           </div>
         </section>
 
@@ -159,12 +163,12 @@
             <label class="document-drop">
               <input name="registrationDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
               <span>SSM/ROS Certificate</span>
-              <small>PDF only, max 10MB</small>
+              <small data-empty-text="PDF only, max 10MB">PDF only, max 10MB</small>
             </label>
             <label class="document-drop">
               <input name="financialDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
               <span>Audited Financial Statement</span>
-              <small>PDF only, max 10MB</small>
+              <small data-empty-text="PDF only, max 10MB">PDF only, max 10MB</small>
             </label>
           </div>
         </section>

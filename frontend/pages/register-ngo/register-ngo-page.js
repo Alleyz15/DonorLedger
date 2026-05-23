@@ -5,12 +5,20 @@ import { setFormStatus } from '../../components/form-status.js'
 const form = document.querySelector('.register-ngo-card')
 const submitButton = document.querySelector('.register-ngo-button')
 const statusElement = document.querySelector('.form-status')
+const addDirectorButton = document.querySelector('.add-director-button')
+const directorsList = document.querySelector('.directors-list')
+const documentInputs = document.querySelectorAll('.document-drop input[type="file"]')
 const allocationInputs = [
   form?.querySelector('input[name="aidPercent"]'),
   form?.querySelector('input[name="logisticsPercent"]'),
   form?.querySelector('input[name="adminPercent"]'),
 ].filter(Boolean)
 const allocationTotal = document.querySelector('.allocation-total strong')
+
+addDirectorButton?.addEventListener('click', addDirectorBox)
+documentInputs.forEach((input) => {
+  input.addEventListener('change', updateDocumentLabel)
+})
 
 allocationInputs.forEach((input) => {
   input.addEventListener('input', updateAllocationTotal)
@@ -60,6 +68,48 @@ form?.addEventListener('submit', async (event) => {
 function setLoading(isLoading) {
   submitButton.disabled = isLoading
   submitButton.textContent = isLoading ? 'Submitting...' : 'Submit Application'
+}
+
+function addDirectorBox() {
+  if (!directorsList) return
+
+  const directorNumber = directorsList.querySelectorAll('.director-box').length + 1
+  const directorBox = document.createElement('div')
+  directorBox.className = 'director-box'
+  directorBox.innerHTML = `
+    <label class="field">
+      <span>Director ${directorNumber} Full Name (Optional)</span>
+      <input
+        name="directorName${directorNumber}"
+        type="text"
+        placeholder="Name as per MyKad"
+      />
+    </label>
+
+    <label class="field">
+      <span>MyKad Number</span>
+      <input
+        name="directorMyKad${directorNumber}"
+        type="text"
+        placeholder="XXXXXX-XX-XXXX"
+      />
+    </label>
+  `
+
+  directorsList.append(directorBox)
+  directorBox.querySelector('input')?.focus()
+}
+
+function updateDocumentLabel(event) {
+  const input = event.currentTarget
+  const documentDrop = input.closest('.document-drop')
+  const hint = documentDrop?.querySelector('small')
+  if (!documentDrop || !hint) return
+
+  const fileName = input.files?.[0]?.name
+  documentDrop.dataset.hasFile = fileName ? 'true' : 'false'
+  hint.textContent = fileName || hint.dataset.emptyText || 'PDF only, max 10MB'
+  hint.title = fileName || ''
 }
 
 function buildPlaceholderEmail(formData) {
