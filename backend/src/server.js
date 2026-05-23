@@ -31,6 +31,7 @@ import ngoRoutes from './routes/ngo.routes.js'
 import vendorRoutes from './routes/vendor.routes.js'
 import adminRoutes from './routes/admin.routes.js'
 import demoRoutes from './routes/demo.routes.js'
+import authRoutes from './routes/auth.routes.js'
 
 import {
   errorHandler,
@@ -44,12 +45,23 @@ import { startContractListeners } from './listeners/contract.listener.js'
 import { DONOR_MILESTONE_TEXT } from './utils/format.utils.js'
 
 const app = express()
+const allowedFrontendOrigins = new Set([
+  env.frontendOrigin,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+])
 
 // ---- Hardening --------------------------------------------------------
 app.use(helmet())
 app.use(
   cors({
-    origin: env.frontendOrigin,
+    origin(origin, callback) {
+      if (!origin || allowedFrontendOrigins.has(origin)) {
+        callback(null, true)
+        return
+      }
+      callback(new Error(`Origin not allowed by CORS: ${origin}`))
+    },
     credentials: true,
   })
 )
@@ -82,6 +94,7 @@ app.get('/health', (_req, res) => {
 })
 
 // ---- Routes -----------------------------------------------------------
+app.use('/api/auth', authRoutes)
 app.use('/api/donate', donateRoutes)
 app.use('/api/campaign', campaignRoutes)
 app.use('/api/evidence', evidenceRoutes)

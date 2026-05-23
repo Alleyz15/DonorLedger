@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register NGO | DonorLedger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./pages/register-ngo/register-ngo-page.js"></script>
+  </head>
+  <body class="login-screen">
+    <main class="login-page register-ngo-page">
+      <nav class="login-nav" aria-label="Primary navigation">
+        <a class="login-brand" href="./introduction.html">
+          <span class="brand-mark">D</span>
+          <span>DonorLedger</span>
+        </a>
+      </nav>
+
+      <section class="login-hero register-ngo-hero" aria-labelledby="register-ngo-title">
+        <form class="login-card register-ngo-card" novalidate>
+          <h1 id="register-ngo-title">Register For NGO</h1>
+          <p>Submit your organization details for Bank Islam KYC review.</p>
+
+          <div class="register-ngo-grid">
+            <label class="field">
+              <span>Organization name</span>
+              <input name="name" type="text" placeholder="Yayasan Example Malaysia" />
+            </label>
+
+            <label class="field">
+              <span>Registration number</span>
+              <input name="registrationNum" type="text" placeholder="SSM / ROS number" />
+            </label>
+
+            <label class="field">
+              <span>Contact email</span>
+              <input name="contactEmail" type="email" placeholder="admin@organization.org" />
+            </label>
+
+            <label class="field">
+              <span>Contact phone</span>
+              <input name="contactPhone" type="tel" placeholder="+60 12 345 6789" />
+            </label>
+          </div>
+
+          <button class="login-button register-ngo-button" type="submit">
+            Continue To Sign Up
+          </button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

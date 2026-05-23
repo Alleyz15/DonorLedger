@@ -1,0 +1,38 @@
+:root {
+  --ink: #111827;
+  --muted: #6b7280;
+  --brand: #064e3b;
+  --brand-soft: #d1fae5;
+  --avatar-1: #a7f3d0;
+  --avatar-2: #6ee7b7;
+  --avatar-3: #34d399;
+  --paper: #ffffff;
+  --page: #f9f9ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Manrope", Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+body.introduction-screen,
+body.login-screen {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+

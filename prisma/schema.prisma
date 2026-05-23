@@ -58,12 +58,41 @@ model NGO {
 
   campaigns       Campaign[]
   vendors         Vendor[]
+  users           User[]
 
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@index([status])
   @@index([walletAddress])
+}
+
+// ---------------------------------------------------------------------------
+// User accounts — donor-facing accounts and lightweight organizer/admin login
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  DONOR
+  ORGANIZER
+  BANK_ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(DONOR)
+
+  ngoId        String?
+  ngo          NGO?     @relation(fields: [ngoId], references: [id])
+
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([role])
+  @@index([ngoId])
 }
 
 // ---------------------------------------------------------------------------
