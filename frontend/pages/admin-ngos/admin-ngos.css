@@ -1,0 +1,321 @@
+.admin-ngo-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.admin-ngo-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px;
+}
+
+.admin-ngo-summary-card {
+  min-height: 220px;
+  border: 1px solid #bcc8c0;
+  border-radius: 18px;
+  padding: 34px;
+  background: #ffffff;
+}
+
+.admin-summary-icon {
+  display: inline-flex;
+  width: 66px;
+  height: 66px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #d8faef;
+}
+
+.admin-summary-icon::before {
+  color: #34d399;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.admin-summary-icon-grid::before {
+  content: "#";
+}
+
+.admin-summary-icon-calendar::before {
+  content: "!";
+}
+
+.admin-summary-icon-shield::before {
+  content: "✓";
+}
+
+.admin-summary-icon-warning::before {
+  content: "!";
+}
+
+.admin-ngo-summary-card h2 {
+  margin: 28px 0 12px;
+  color: #3b4541;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.admin-ngo-summary-card strong {
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.admin-ngo-panel {
+  overflow: hidden;
+  border: 1px solid #bcc8c0;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.admin-ngo-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+}
+
+.admin-ngo-panel-header > div {
+  display: flex;
+  gap: 16px;
+}
+
+.admin-tool-button {
+  min-height: 52px;
+  border: 1px solid #bcc8c0;
+  border-radius: 10px;
+  padding: 0 24px;
+  background: #ffffff;
+  color: #3b4541;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.admin-primary-action {
+  display: inline-flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 28px;
+  background: #3fd0a0;
+  color: #ffffff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.admin-primary-action:disabled {
+  opacity: 1;
+}
+
+.admin-ngo-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-ngo-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.admin-ngo-table thead {
+  background: #eef2ff;
+}
+
+.admin-ngo-table th,
+.admin-ngo-table td {
+  padding: 28px 32px;
+  border-bottom: 1px solid #bcc8c0;
+  text-align: left;
+}
+
+.admin-ngo-table th {
+  color: #3b4541;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-ngo-table td {
+  color: #3b4541;
+  font-size: 18px;
+}
+
+.admin-ngo-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-ngo-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #0f172a;
+}
+
+.admin-ngo-name-cell strong,
+.admin-ngo-name-cell span {
+  display: block;
+}
+
+.admin-ngo-name-cell strong {
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.admin-ngo-name-cell span {
+  margin-top: 4px;
+  color: #626f69;
+  font-size: 14px;
+}
+
+.admin-status-pill {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.admin-status-pill.is-pending {
+  background: #dbeafe;
+  color: #0369a1;
+}
+
+.admin-status-pill.is-verified {
+  background: #dcfce7;
+  color: #059669;
+}
+
+.admin-status-pill.is-flagged {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.admin-action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-verify-button,
+.admin-details-button,
+.admin-reject-button {
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-verify-button {
+  min-height: 58px;
+  padding: 0 24px;
+  background: #3fd0a0;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.admin-reject-button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #bcc8c0;
+  background: #ffffff;
+  color: #ef4444;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.admin-details-button {
+  min-height: 44px;
+  padding: 0 20px;
+  background: #ecfdf5;
+  color: #34d399;
+  font-size: 15px;
+}
+
+.admin-ngo-loading-cell,
+.admin-ngo-empty-cell,
+.admin-ngo-error-cell {
+  height: 120px;
+  color: #64748b;
+  text-align: center;
+}
+
+.admin-ngo-error-cell {
+  color: #b91c1c;
+}
+
+.admin-ngo-pagination {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: #eef2ff;
+  color: #3b4541;
+  font-size: 16px;
+}
+
+.admin-ngo-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-ngo-pagination button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  font-weight: 700;
+}
+
+.admin-ngo-pagination button.is-active {
+  border-color: #3fd0a0;
+  background: #3fd0a0;
+  color: #ffffff;
+}
+
+@media (max-width: 1100px) {
+  .admin-ngo-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-ngo-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-ngo-panel-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-ngo-panel-header > div {
+    flex-direction: column;
+  }
+}

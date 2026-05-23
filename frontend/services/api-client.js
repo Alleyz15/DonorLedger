@@ -21,6 +21,26 @@ export async function apiRequest(path, options = {}) {
   return payload
 }
 
+export async function apiFormRequest(path, formData, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: options.method || 'POST',
+    headers: {
+      Accept: 'application/json',
+      ...options.headers,
+    },
+    body: formData,
+  })
+
+  const payload = await readJson(response)
+
+  if (!response.ok) {
+    const message = payload?.error || 'Request failed. Please try again.'
+    throw new Error(message)
+  }
+
+  return payload
+}
+
 async function readJson(response) {
   const text = await response.text()
   return text ? JSON.parse(text) : null

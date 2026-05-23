@@ -59,8 +59,23 @@ router.get('/:id', async (req, res, next) => {
     const campaign = await prisma.campaign.findUnique({
       where: { id: req.params.id },
       include: {
-        ngo: true,
-        vendors: { where: { status: 'APPROVED' } },
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            riskTier: true,
+            status: true,
+          },
+        },
+        vendors: {
+          where: { status: 'APPROVED' },
+          select: {
+            id: true,
+            name: true,
+            serviceType: true,
+          },
+        },
       },
     })
     if (!campaign) {
@@ -84,6 +99,8 @@ router.get('/:id', async (req, res, next) => {
 
     res.json({
       ...campaign,
+      targetAmount: Number(campaign.targetAmount),
+      raisedAmount: Number(campaign.raisedAmount),
       onChainTotals,
       raisedFormatted: formatRinggit(campaign.raisedAmount),
       targetFormatted: formatRinggit(campaign.targetAmount),

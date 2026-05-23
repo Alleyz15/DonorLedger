@@ -19,6 +19,15 @@ export function signup(payload) {
   })
 }
 
+export function getSession() {
+  const value = localStorage.getItem(AUTH_STORAGE_KEY)
+  return value ? JSON.parse(value) : null
+}
+
+export function clearSession() {
+  localStorage.removeItem(AUTH_STORAGE_KEY)
+}
+
 function saveSession(session) {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session))
 }

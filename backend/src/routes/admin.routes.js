@@ -67,6 +67,27 @@ router.post(
 )
 
 router.post(
+  '/ngo/:id/reject',
+  requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
+  validate({ reason: { type: 'string', required: true, min: 3 } }),
+  async (req, res, next) => {
+    try {
+      const ngo = await prisma.nGO.update({
+        where: { id: req.params.id },
+        data: {
+          status: 'REJECTED',
+          revokedReason: req.body.reason,
+          kycApprovedBy: req.admin.sub,
+        },
+      })
+      res.json(ngo)
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
+router.post(
   '/ngo/:id/renew',
   requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
   async (req, res, next) => {
@@ -104,7 +125,7 @@ router.post(
 router.post(
   '/vendor/:id/approve',
   requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
-  validate({ campaignId: { type: 'string', required: true } }),
+  validate({ campaignId: { type: 'string', required: false } }),
   async (req, res, next) => {
     try {
       const vendor = await vendorService.approveVendor({
@@ -136,6 +157,39 @@ router.post(
     }
   }
 )
+
+router.get('/vendors', async (req, res, next) => {
+  try {
+    const vendors = await prisma.vendor.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        ssmNumber: true,
+        serviceType: true,
+        bankAccount: true,
+        walletAddress: true,
+        registrationDoc: true,
+        status: true,
+        approvedAt: true,
+        rejectedReason: true,
+        createdAt: true,
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            status: true,
+          },
+        },
+      },
+    })
+
+    res.json(vendors)
+  } catch (e) {
+    next(e)
+  }
+})
 
 router.get('/alerts', async (req, res, next) => {
   try {
@@ -170,10 +224,38 @@ router.get('/evidence/pending', async (req, res, next) => {
   }
 })
 
+router.get('/campaigns', async (req, res, next) => {
+  try {
+    const campaigns = await prisma.campaign.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            riskTier: true,
+            status: true,
+          },
+        },
+      },
+    })
+    res.json(
+      campaigns.map((c) => ({
+        ...c,
+        targetAmount: Number(c.targetAmount),
+        raisedAmount: Number(c.raisedAmount),
+      }))
+    )
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.get('/campaign/pending', async (req, res, next) => {
   try {
     const campaigns = await prisma.campaign.findMany({
-      where: { status: 'DRAFT' },
+      where: { status: { in: ['DRAFT', 'UNDER_REVIEW'] } },
       orderBy: { createdAt: 'desc' },
       include: {
         ngo: {
@@ -213,8 +295,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (campaign.status !== 'DRAFT') {
-        const err = new Error('Only draft campaign applications can be approved')
+      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
+        const err = new Error('Only pending or under-review campaign applications can be approved')
         err.status = 409
         throw err
       }
@@ -224,16 +306,23 @@ router.post(
         throw err
       }
 
-      const { contractAddress, deployTxHash } = await contractService.deployCampaign({
-        ngoWalletAddress: campaign.ngo.walletAddress,
-        name: campaign.name,
-        causeType: campaign.causeType,
-        aidPercent: campaign.aidPercent,
-        logisticsPercent: campaign.logisticsPercent,
-        adminPercent: campaign.adminPercent,
-        targetAmount: Number(campaign.targetAmount),
-        endDate: campaign.endDate,
-      })
+      let contractAddress = campaign.contractAddress
+      let deployTxHash = campaign.deployTxHash
+
+      if (!contractAddress) {
+        const deployed = await contractService.deployCampaign({
+          ngoWalletAddress: campaign.ngo.walletAddress,
+          name: campaign.name,
+          causeType: campaign.causeType,
+          aidPercent: campaign.aidPercent,
+          logisticsPercent: campaign.logisticsPercent,
+          adminPercent: campaign.adminPercent,
+          targetAmount: Number(campaign.targetAmount),
+          endDate: campaign.endDate,
+        })
+        contractAddress = deployed.contractAddress
+        deployTxHash = deployed.deployTxHash
+      }
 
       const updated = await prisma.campaign.update({
         where: { id: campaign.id },
@@ -245,7 +334,7 @@ router.post(
         },
       })
 
-      try {
+      if (contractAddress) try {
         attachCampaignListener(contractAddress, campaign.id)
       } catch (e) {
         console.warn('[admin] listener attach failed:', e.message)
@@ -277,8 +366,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (campaign.status !== 'DRAFT') {
-        const err = new Error('Only draft campaign applications can be rejected')
+      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
+        const err = new Error('Only pending or under-review campaign applications can be rejected')
         err.status = 409
         throw err
       }
@@ -302,11 +391,76 @@ router.post(
   }
 )
 
+router.post(
+  '/campaign/:id/unfreeze',
+  requireRole('SUPER_ADMIN'),
+  async (req, res, next) => {
+    try {
+      const campaign = await prisma.campaign.findUnique({
+        where: { id: req.params.id },
+      })
+      if (!campaign) {
+        const err = new Error('Campaign not found')
+        err.status = 404
+        throw err
+      }
+      if (campaign.status !== 'FROZEN') {
+        const err = new Error('Only frozen campaigns can be unfrozen')
+        err.status = 409
+        throw err
+      }
+
+      let txHash = null
+      if (campaign.contractAddress) {
+        const result = await contractService.unpauseCampaign(campaign.contractAddress)
+        txHash = result.txHash
+      }
+
+      const updated = await prisma.campaign.update({
+        where: { id: campaign.id },
+        data: {
+          status: 'ACTIVE',
+          pausedReason: null,
+        },
+      })
+
+      res.json({
+        campaignId: updated.id,
+        status: updated.status,
+        txHash,
+      })
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
 router.get('/ngo/pending', async (req, res, next) => {
   try {
     const ngos = await prisma.nGO.findMany({
       where: { status: 'PENDING_KYC' },
       orderBy: { createdAt: 'desc' },
+    })
+    res.json(ngos)
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/ngos', async (req, res, next) => {
+  try {
+    const ngos = await prisma.nGO.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        registrationNum: true,
+        contactEmail: true,
+        riskTier: true,
+        status: true,
+        kycApprovedAt: true,
+        createdAt: true,
+      },
     })
     res.json(ngos)
   } catch (e) {

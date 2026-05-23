@@ -29,6 +29,7 @@ const campaignSchema = {
   name: { type: 'string', required: true, min: 3, max: 200 },
   causeType: { type: 'string', required: true, min: 2, max: 100 },
   description: { type: 'string', required: false, max: 2000 },
+  vendorId: { type: 'string', required: true },
   aidPercent: { type: 'integer', required: true, min: 0, max: 100 },
   logisticsPercent: { type: 'integer', required: true, min: 0, max: 100 },
   adminPercent: { type: 'integer', required: true, min: 0, max: 100 },
@@ -123,10 +124,26 @@ router.post(
         adminPercent,
         targetAmount,
         endDate,
+        vendorId,
       } = req.body
 
       if (aidPercent + logisticsPercent + adminPercent !== 100) {
         const err = new Error('Allocation percentages must sum to 100')
+        err.status = 400
+        throw err
+      }
+
+      const vendor = await prisma.vendor.findFirst({
+        where: {
+          id: vendorId,
+          ngoId: ngo.id,
+          status: 'APPROVED',
+        },
+        select: { id: true },
+      })
+
+      if (!vendor) {
+        const err = new Error('Approved vendor is required before submitting a campaign')
         err.status = 400
         throw err
       }
@@ -143,6 +160,9 @@ router.post(
           targetAmount,
           endDate: new Date(endDate),
           status: 'DRAFT',
+          vendors: {
+            connect: { id: vendor.id },
+          },
         },
       })
 
@@ -183,6 +203,74 @@ router.get('/campaigns', requireNGO, async (req, res, next) => {
         raisedAmount: Number(c.raisedAmount),
       }))
     )
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/campaigns/:id', requireNGO, async (req, res, next) => {
+  try {
+    const campaign = await prisma.campaign.findFirst({
+      where: {
+        id: req.params.id,
+        ngoId: req.ngo.sub,
+      },
+      select: {
+        id: true,
+        name: true,
+        causeType: true,
+        description: true,
+        aidPercent: true,
+        logisticsPercent: true,
+        adminPercent: true,
+        targetAmount: true,
+        raisedAmount: true,
+        donorCount: true,
+        endDate: true,
+        status: true,
+        createdAt: true,
+      },
+    })
+
+    if (!campaign) {
+      const err = new Error('Campaign not found')
+      err.status = 404
+      throw err
+    }
+
+    res.json({
+      ...campaign,
+      targetAmount: Number(campaign.targetAmount),
+      raisedAmount: Number(campaign.raisedAmount),
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/vendors', requireNGO, async (req, res, next) => {
+  try {
+    const status = String(req.query.status || '').trim().toUpperCase()
+    const where = {
+      ngoId: req.ngo.sub,
+      ...(status ? { status } : {}),
+    }
+
+    const vendors = await prisma.vendor.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        ssmNumber: true,
+        serviceType: true,
+        walletAddress: true,
+        status: true,
+        createdAt: true,
+      },
+    })
+
+    res.json(vendors)
   } catch (e) {
     next(e)
   }
