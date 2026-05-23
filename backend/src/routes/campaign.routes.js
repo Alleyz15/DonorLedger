@@ -72,12 +72,14 @@ router.get('/:id', async (req, res, next) => {
     // Optionally cross-verify with the chain — never block if the chain
     // call fails. The frontend gets the DB number with a note.
     let onChainTotals = null
-    try {
-      onChainTotals = await contractService.readCampaignTotals(
-        campaign.contractAddress
-      )
-    } catch (e) {
-      console.warn('[campaign] on-chain read failed:', e.message)
+    if (campaign.contractAddress) {
+      try {
+        onChainTotals = await contractService.readCampaignTotals(
+          campaign.contractAddress
+        )
+      } catch (e) {
+        console.warn('[campaign] on-chain read failed:', e.message)
+      }
     }
 
     res.json({

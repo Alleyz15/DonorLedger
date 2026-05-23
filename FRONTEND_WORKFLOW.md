@@ -278,6 +278,7 @@ Response:
 - Registration type (SSM Company / ROS Society / Both)
 - Registration number
 - Registered address
+- Email + password for NGO portal login
 - Director 1: name + MyKad number
 - Director 2: name + MyKad number (optional)
 - Bank account number + bank name
@@ -295,6 +296,11 @@ Response:
 ```
 POST /api/ngo/register
 Content-Type: multipart/form-data
+Body includes: { name, registrationNum, contactEmail, password, contactPhone? }
+
+Note: the frontend does not need to ask the NGO for a wallet address. If no
+walletAddress is sent, the backend assigns an internal EVM audit identity for
+Registry.sol.
 
 Response:
 {
@@ -316,6 +322,24 @@ Response:
 
 Requires NGO JWT login.
 
+### Login
+```
+Route: /ngo/login
+POST /api/ngo/login
+Body: { email, password }
+Response:
+{
+  token: "jwt...",
+  role: "NGO",
+  ngo: {
+    id: "ngo_123",
+    name: "Yayasan Example",
+    status: "APPROVED",
+    riskTier: "MEDIUM"
+  }
+}
+```
+
 ### API Calls
 
 ```
@@ -334,6 +358,30 @@ Response:
     aiAlerts: 0
   }
 ]
+```
+
+Create campaign application:
+```
+POST /api/ngo/campaign/create
+Header: Authorization: Bearer <jwt>
+Body:
+{
+  name: "Banjir Kelantan Relief 2026",
+  causeType: "Disaster relief",
+  description: "Aid for affected families...",
+  aidPercent: 70,
+  logisticsPercent: 20,
+  adminPercent: 10,
+  targetAmount: 100000,
+  endDate: "2026-07-31T00:00:00.000Z"
+}
+
+Response:
+{
+  campaignId: "campaign_1",
+  status: "DRAFT",
+  message: "Campaign application submitted for Bank Islam review."
+}
 ```
 
 Submit disbursement evidence:
@@ -381,9 +429,10 @@ Requires Bank Islam admin JWT.
 
 ### Login
 ```
-POST /api/auth/login
+Route: /admin/login
+POST /api/admin/login
 Body: { email, password }
-Response: { token, expiresIn: "8h" }
+Response: { token, role, name }
 ```
 
 ### Key API Calls
@@ -429,11 +478,17 @@ Body: { evidenceId: "ev_123" }
 POST /api/disbursement/reject
 Body: { evidenceId: "ev_123", reason: "Invoice not itemised" }
 
-POST /api/admin/ngo/verify
-Body: { ngoId: "ngo_123", riskTier: "medium" }
+GET /api/admin/campaign/pending
 
-POST /api/admin/ngo/revoke
-Body: { ngoId: "ngo_123", reason: "Fraudulent activity confirmed" }
+POST /api/admin/campaign/:id/approve
+
+POST /api/admin/campaign/:id/reject
+Body: { reason: "Allocation plan needs clearer beneficiary detail" }
+
+POST /api/admin/ngo/:id/approve
+
+POST /api/admin/ngo/:id/revoke
+Body: { reason: "Fraudulent activity confirmed" }
 ```
 
 ### Design Rules

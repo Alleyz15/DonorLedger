@@ -91,8 +91,10 @@ All paths are relative to `D:\Hackerthon Project\DonorLedger\`.
   string, number, integer, boolean, email, address (0x...). Used inline
   in every route.
 - `auth.middleware.js` — JWT (HS256, secret from env). Exports
-  `requireAdmin`, `requireRole(...roles)`, `signAdminToken`.
-  Token payload: `{ sub, email, role }`.
+  `requireAdmin`, `requireNGO`, `requireRole(...roles)`,
+  `signAdminToken`, `signNGOToken`.
+  Admin token payload: `{ type: 'admin', sub, email, role }`; NGO token
+  payload: `{ type: 'ngo', sub, email, status }`.
 
 #### `services/`  (all business logic — Section 16 "thin routes, fat services")
 - `contract.service.js` — **single point of entry for every ethers call**.
@@ -133,7 +135,9 @@ All paths are relative to `D:\Hackerthon Project\DonorLedger\`.
 - `kyc.service.js` — Section 11 five-stage flow:
   `submitNGOApplication` (with simulated SSM/ROS/JPN/MACC checks),
   `approveNGO` (calls Registry.addNGO, 12-month expiry),
-  `renewNGOCredential`, `revokeNGOCredential`.
+  `renewNGOCredential`, `revokeNGOCredential`. NGO registration can omit
+  `walletAddress`; the backend assigns an internal EVM audit identity for
+  Registry.sol.
 - `vendor.service.js` — Section 12 shell-vendor guard:
   `submitVendor`, `approveVendor` (calls
   `Campaign.addApprovedVendor`), `rejectVendor`.
@@ -149,7 +153,8 @@ All paths are relative to `D:\Hackerthon Project\DonorLedger\`.
   trackers to `RELEASED`.
 - `tracker.routes.js` — `GET /api/tracker/:donorHash` — public donor
   view. Plain language only, never exposes AI score / patterns.
-- `ngo.routes.js` — `POST /api/ngo/register`, `GET /api/ngo/:id`.
+- `ngo.routes.js` — `POST /api/ngo/register`, `POST /api/ngo/login`,
+  `GET /api/ngo/:id`.
 - `vendor.routes.js` — `POST /api/vendor/submit` (multipart).
 - `admin.routes.js` — `POST /api/admin/login` (sha256 with salt, demo
   scope; argon2id is the production upgrade), plus NGO + vendor approval
@@ -324,10 +329,14 @@ OpenZeppelin v5 and run on any EVM chain.
 - `contract.service.js` — added `deployCampaign(...)` which loads the
   Campaign artifact, deploys signed by Bank Islam, returns
   `{contractAddress, deployTxHash}`.
-- `admin.routes.js` — added `POST /api/admin/campaign/create` (SUPER_ADMIN
-  only). Deploys Campaign.sol → persists row → attaches the live
-  contract listener so subsequent on-chain pause/approve events
-  reconcile to Postgres.
+- `ngo.routes.js` — added `POST /api/ngo/campaign/create` so approved
+  NGOs submit campaign applications as `DRAFT`.
+- `admin.routes.js` — replaced Bank-created campaigns with
+  `GET /api/admin/campaign/pending`,
+  `POST /api/admin/campaign/:id/approve`, and
+  `POST /api/admin/campaign/:id/reject`. Approval deploys Campaign.sol
+  signed by Bank Islam, stores the contract address, marks the campaign
+  `ACTIVE`, and attaches the listener.
 - `.env.example` — added `SEED_ADMIN_*` and `ETHERSCAN_API_KEY`.
 - `package.json` — added `prisma:seed` script.
 
@@ -388,9 +397,9 @@ npm run prisma:seed
 cd contracts
 npm run seed:monad
 ```
-This deploys one demo Campaign.sol; persist it via
-`POST /api/admin/campaign/create` (or insert a row manually) so the
-listener subscribes.
+Current app flow is NGO campaign application, then Bank Islam approval via
+`POST /api/admin/campaign/:id/approve`; approval deploys Campaign.sol and
+attaches the listener.
 
 ### 6. Boot the backend
 ```bash

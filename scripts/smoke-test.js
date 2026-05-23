@@ -12,7 +12,8 @@
 //   2. POST /api/admin/login                               — get admin JWT
 //   3. POST /api/ngo/register                              — submit demo NGO
 //   4. POST /api/admin/ngo/:id/approve                     — Bank Islam KYC ✓ (chain)
-//   5. POST /api/admin/campaign/create                     — deploy Campaign.sol
+//   5. POST /api/ngo/campaign/create                       — submit campaign
+//   6. POST /api/admin/campaign/:id/approve                — deploy Campaign.sol
 //   6. POST /api/vendor/submit                             — submit demo vendor
 //   7. POST /api/admin/vendor/:id/approve                  — addApprovedVendor (chain)
 //   8. POST /api/demo/simulate-duitnow                     — donate → tracker URL
@@ -43,6 +44,7 @@ const DEMO_VENDOR_WALLET = process.env.SMOKE_VENDOR_WALLET ||
   '0x000000000000000000000000000000000000bEEF'
 
 let token = null
+let ngoToken = null
 
 const c = {
   reset: '\x1b[0m',
@@ -55,7 +57,8 @@ const c = {
 
 async function http(method, path, body, opts = {}) {
   const headers = { 'content-type': 'application/json' }
-  if (token && !opts.skipAuth) headers.authorization = `Bearer ${token}`
+  const bearer = opts.token || (opts.skipAuth ? null : token)
+  if (bearer) headers.authorization = `Bearer ${bearer}`
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers,
@@ -119,17 +122,31 @@ async function main() {
   // 3
   step(3, 'POST /api/ngo/register')
   let ngoId
+  const ngoPassword = 'ngo-smoke-2026'
+  const ngoEmail = `ngo-${Date.now()}@smoke.test`
   {
     const r = await http('POST', '/api/ngo/register', {
       name: 'Yayasan Smoke Test',
       registrationNum: `SSM-SMOKE-${Date.now()}`,
       walletAddress: DEMO_NGO_WALLET,
-      contactEmail: 'ngo@smoke.test',
+      contactEmail: ngoEmail,
       contactPhone: '+60123456789',
+      password: ngoPassword,
     }, { skipAuth: true })
     if (!r.ok) fail('NGO register failed', r)
     ngoId = r.body.id
     ok(`NGO submitted: ${ngoId} (status=${r.body.status})`)
+  }
+
+  step('3b', 'POST /api/ngo/login')
+  {
+    const r = await http('POST', '/api/ngo/login', {
+      email: ngoEmail,
+      password: ngoPassword,
+    }, { skipAuth: true })
+    if (!r.ok) fail('NGO login failed', r)
+    ngoToken = r.body.token
+    ok(`NGO logged in as ${r.body.ngo.name}`)
   }
 
   // 4
@@ -145,12 +162,11 @@ async function main() {
   }
 
   // 5
-  step(5, 'POST /api/admin/campaign/create')
+  step(5, 'POST /api/ngo/campaign/create')
   let campaignId
   {
     const endDate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString()
-    const r = await http('POST', '/api/admin/campaign/create', {
-      ngoId,
+    const r = await http('POST', '/api/ngo/campaign/create', {
       name: 'Smoke Test Banjir Relief',
       causeType: 'Disaster relief',
       description: 'Created by smoke-test.js',
@@ -159,7 +175,7 @@ async function main() {
       adminPercent: 10,
       targetAmount: 100000,
       endDate,
-    })
+    }, { token: ngoToken })
     if (!r.ok) {
       warn('campaign deploy failed — most likely cause: contracts not compiled')
       console.log(`    ${c.dim}${JSON.stringify(r.body)}${c.reset}`)
@@ -167,6 +183,18 @@ async function main() {
       process.exit(1)
     }
     campaignId = r.body.campaignId
+    ok(`Campaign application submitted: ${campaignId} (status=${r.body.status})`)
+  }
+
+  step('5b', `POST /api/admin/campaign/${campaignId}/approve`)
+  {
+    const r = await http('POST', `/api/admin/campaign/${campaignId}/approve`)
+    if (!r.ok) {
+      warn('campaign approval failed - most likely cause: contracts not compiled')
+      console.log(`    ${c.dim}${JSON.stringify(r.body)}${c.reset}`)
+      console.log(`    ${c.dim}Run: cd contracts && npm run compile${c.reset}`)
+      process.exit(1)
+    }
     ok(`Campaign deployed: ${r.body.contractAddress}`)
     ok(`deploy tx: ${r.body.deployTxHash}`)
   }

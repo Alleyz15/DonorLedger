@@ -15,24 +15,15 @@
 // after the hackathon.
 
 import { PrismaClient } from '@prisma/client'
-import crypto from 'node:crypto'
 import * as dotenv from 'dotenv'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { hashPassword } from '../backend/src/utils/password.utils.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') })
 
 const prisma = new PrismaClient()
-
-function hashPassword(plaintext) {
-  const salt = crypto.randomBytes(16).toString('hex')
-  const hash = crypto
-    .createHash('sha256')
-    .update(salt + plaintext)
-    .digest('hex')
-  return `${salt}:${hash}`
-}
 
 async function main() {
   const reset = process.argv.includes('--reset')

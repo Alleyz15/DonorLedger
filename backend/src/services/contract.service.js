@@ -150,7 +150,8 @@ function getDonorTracker() {
 
 /**
  * Deploy a fresh Campaign.sol instance. Signed by the Bank Islam wallet
- * (which becomes the owner). Used by POST /api/admin/campaign/create.
+ * (which becomes the owner). Used when Bank Islam approves an NGO-created
+ * campaign application.
  *
  * Bytecode + ABI must come from the Hardhat artifact — fallback ABIs are
  * read-only, they have no bytecode. So this requires `hardhat compile`

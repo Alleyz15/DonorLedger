@@ -1,0 +1,1 @@
+ALTER TABLE "NGO" ADD COLUMN "passwordHash" TEXT;

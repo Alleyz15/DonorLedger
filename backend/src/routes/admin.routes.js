@@ -1,20 +1,10 @@
 // routes/admin.routes.js
 //
-// All Bank Islam admin endpoints. JWT-protected via requireAdmin.
-// These are the only endpoints where the higher-privilege bank-islam
-// wallet is loaded into the call path (Section 9).
-//
-// POST  /api/admin/login                    — exchange password for JWT
-// POST  /api/admin/ngo/:id/approve          — Stage 4 KYC approval
-// POST  /api/admin/ngo/:id/renew            — Stage 5 annual renewal
-// POST  /api/admin/ngo/:id/revoke           — permanent revocation
-// POST  /api/admin/vendor/:id/approve       — addApprovedVendor()
-// POST  /api/admin/vendor/:id/reject        — soft reject (off-chain only)
-// GET   /api/admin/alerts                   — Bank Islam dashboard feed
-// GET   /api/admin/evidence/pending         — disbursements awaiting review
+// Bank Islam admin endpoints. Admins review NGO KYC, campaign applications,
+// evidence, and alerts. NGOs create campaign applications; Bank Islam only
+// approves or rejects them.
 
 import { Router } from 'express'
-import crypto from 'node:crypto'
 import prisma from '../config/database.js'
 import kycService from '../services/kyc.service.js'
 import vendorService from '../services/vendor.service.js'
@@ -26,21 +16,9 @@ import {
   signAdminToken,
 } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
+import { checkPassword } from '../utils/password.utils.js'
 
 const router = Router()
-
-// --- Login (open) -------------------------------------------------------
-// Demo: passwords are stored as sha256(salt + plaintext). For production
-// switch to argon2id. Hackathon scope tradeoff (Section 21).
-function checkPassword(plaintext, storedHash) {
-  const [salt, expected] = (storedHash || '').split(':')
-  if (!salt || !expected) return false
-  const actual = crypto
-    .createHash('sha256')
-    .update(salt + plaintext)
-    .digest('hex')
-  return actual === expected
-}
 
 router.post(
   '/login',
@@ -70,10 +48,8 @@ router.post(
   }
 )
 
-// --- All routes below require an admin JWT -----------------------------
 router.use(requireAdmin)
 
-// NGO KYC
 router.post(
   '/ngo/:id/approve',
   requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
@@ -124,7 +100,7 @@ router.post(
   }
 )
 
-// Vendor KYC
+// Kept for backend compatibility, but not part of the frontend demo flow.
 router.post(
   '/vendor/:id/approve',
   requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
@@ -161,7 +137,6 @@ router.post(
   }
 )
 
-// Dashboard reads
 router.get('/alerts', async (req, res, next) => {
   try {
     const alerts = await prisma.alert.findMany({
@@ -195,95 +170,131 @@ router.get('/evidence/pending', async (req, res, next) => {
   }
 })
 
-// ---------------------------------------------------------------------------
-// Campaign deployment — POST /api/admin/campaign/create
-//
-// Deploys a fresh Campaign.sol signed by the Bank Islam wallet, persists the
-// row in Postgres, and attaches the on-chain event listener so reconciliation
-// runs from this point forward (Section 17 listeners/contract.listener.js).
-// ---------------------------------------------------------------------------
+router.get('/campaign/pending', async (req, res, next) => {
+  try {
+    const campaigns = await prisma.campaign.findMany({
+      where: { status: 'DRAFT' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            riskTier: true,
+            status: true,
+          },
+        },
+      },
+    })
+    res.json(
+      campaigns.map((c) => ({
+        ...c,
+        targetAmount: Number(c.targetAmount),
+        raisedAmount: Number(c.raisedAmount),
+      }))
+    )
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.post(
-  '/campaign/create',
+  '/campaign/:id/approve',
   requireRole('SUPER_ADMIN'),
-  validate({
-    ngoId: { type: 'string', required: true },
-    name: { type: 'string', required: true, min: 3, max: 200 },
-    causeType: { type: 'string', required: true, min: 2, max: 100 },
-    description: { type: 'string', required: false, max: 2000 },
-    aidPercent: { type: 'integer', required: true, min: 0, max: 100 },
-    logisticsPercent: { type: 'integer', required: true, min: 0, max: 100 },
-    adminPercent: { type: 'integer', required: true, min: 0, max: 100 },
-    targetAmount: { type: 'number', required: true, min: 1 },
-    endDate: { type: 'string', required: true },
-  }),
   async (req, res, next) => {
     try {
-      const {
-        ngoId,
-        name,
-        causeType,
-        description,
-        aidPercent,
-        logisticsPercent,
-        adminPercent,
-        targetAmount,
-        endDate,
-      } = req.body
-
-      if (aidPercent + logisticsPercent + adminPercent !== 100) {
-        const err = new Error('Allocation percentages must sum to 100')
+      const campaign = await prisma.campaign.findUnique({
+        where: { id: req.params.id },
+        include: { ngo: true },
+      })
+      if (!campaign) {
+        const err = new Error('Campaign not found')
+        err.status = 404
+        throw err
+      }
+      if (campaign.status !== 'DRAFT') {
+        const err = new Error('Only draft campaign applications can be approved')
+        err.status = 409
+        throw err
+      }
+      if (campaign.ngo.status !== 'APPROVED') {
+        const err = new Error('NGO must be approved before campaign approval')
         err.status = 400
         throw err
       }
 
-      const ngo = await prisma.nGO.findUnique({ where: { id: ngoId } })
-      if (!ngo || ngo.status !== 'APPROVED') {
-        const err = new Error('NGO must be Bank Islam-approved before deploying a campaign')
-        err.status = 400
-        throw err
-      }
-
-      // Section 8 — Bank Islam wallet signs the deploy and becomes the owner
       const { contractAddress, deployTxHash } = await contractService.deployCampaign({
-        ngoWalletAddress: ngo.walletAddress,
-        name,
-        causeType,
-        aidPercent,
-        logisticsPercent,
-        adminPercent,
-        targetAmount,
-        endDate,
+        ngoWalletAddress: campaign.ngo.walletAddress,
+        name: campaign.name,
+        causeType: campaign.causeType,
+        aidPercent: campaign.aidPercent,
+        logisticsPercent: campaign.logisticsPercent,
+        adminPercent: campaign.adminPercent,
+        targetAmount: Number(campaign.targetAmount),
+        endDate: campaign.endDate,
       })
 
-      const campaign = await prisma.campaign.create({
+      const updated = await prisma.campaign.update({
+        where: { id: campaign.id },
         data: {
-          ngoId,
-          name,
-          causeType,
-          description: description || '',
-          aidPercent,
-          logisticsPercent,
-          adminPercent,
-          targetAmount,
-          endDate: new Date(endDate),
           contractAddress,
           deployTxHash,
           status: 'ACTIVE',
+          pausedReason: null,
         },
       })
 
-      // Hook the listener so on-chain pause/approve events reconcile to Postgres
       try {
         attachCampaignListener(contractAddress, campaign.id)
       } catch (e) {
         console.warn('[admin] listener attach failed:', e.message)
       }
 
-      res.status(201).json({
-        campaignId: campaign.id,
+      res.json({
+        campaignId: updated.id,
         contractAddress,
         deployTxHash,
-        status: campaign.status,
+        status: updated.status,
+      })
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
+router.post(
+  '/campaign/:id/reject',
+  requireRole('SUPER_ADMIN'),
+  validate({ reason: { type: 'string', required: true, min: 3, max: 1000 } }),
+  async (req, res, next) => {
+    try {
+      const campaign = await prisma.campaign.findUnique({
+        where: { id: req.params.id },
+      })
+      if (!campaign) {
+        const err = new Error('Campaign not found')
+        err.status = 404
+        throw err
+      }
+      if (campaign.status !== 'DRAFT') {
+        const err = new Error('Only draft campaign applications can be rejected')
+        err.status = 409
+        throw err
+      }
+
+      const updated = await prisma.campaign.update({
+        where: { id: campaign.id },
+        data: {
+          status: 'REJECTED',
+          pausedReason: req.body.reason,
+        },
+      })
+
+      res.json({
+        campaignId: updated.id,
+        status: updated.status,
+        reason: updated.pausedReason,
       })
     } catch (e) {
       next(e)

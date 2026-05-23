@@ -1,0 +1,3 @@
+ALTER TYPE "CampaignStatus" ADD VALUE IF NOT EXISTS 'REJECTED';
+
+ALTER TABLE "Campaign" ALTER COLUMN "contractAddress" DROP NOT NULL;

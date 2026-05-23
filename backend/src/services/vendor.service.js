@@ -64,6 +64,12 @@ export async function approveVendor({
   }
 
   // Section 12 — on-chain whitelist. Funds can now release to this address.
+  if (campaign.status !== 'ACTIVE' || !campaign.contractAddress) {
+    const err = new Error('Campaign must be approved before vendor approval')
+    err.status = 400
+    throw err
+  }
+
   await contractService.addApprovedVendor(
     campaign.contractAddress,
     vendor.walletAddress

@@ -772,34 +772,48 @@ POST /api/donate
      returns: { txHash, donorHash, trackerUrl }
 ```
 
-### NGO Endpoints — NGO JWT Required
+### NGO Endpoints
 ```
 POST /api/ngo/register
-     body: { legalName, regNumber, regType, directorIds[],
-             bankAccount, cause, allocationPlan }
+     body: { name, registrationNum, contactEmail,
+             contactPhone?, password? }
+     returns: { id, status, riskTier, message }
+     note: walletAddress is optional; backend assigns an internal audit
+           address when omitted.
+
+POST /api/ngo/login
+     body: { email, password }
+     returns: { token, role: "NGO", ngo }
 
 POST /api/evidence/submit
+     header: Authorization: Bearer <ngo-jwt>
      body: { campaignId, category, amount, vendorId }
      files: { serviceAgreement, invoice, deliveryProof }
      returns: { evidenceId, documentHash, aiScore, status }
 
 GET  /api/ngo/campaigns                   NGO's own campaigns + status
 GET  /api/ngo/evidence/:campaignId        All submitted evidence for campaign
+POST /api/ngo/campaign/create             Submit campaign application
 ```
 
 ### Bank Islam Admin — Admin JWT Required
 ```
-POST /api/auth/login                      Get admin JWT token
+POST /api/admin/login                     Get admin JWT token
      body: { email, password }
+     returns: { token, role, name }
 
 GET  /api/admin/dashboard                 Live overview — all campaigns,
                                           alerts, frozen funds
 
 GET  /api/admin/ngo/pending               NGOs awaiting KYC approval
-POST /api/admin/ngo/verify                Approve NGO + issue on-chain credential
-     body: { ngoAddress, riskTier }
-POST /api/admin/ngo/revoke                Revoke NGO credential
-     body: { ngoAddress, reason }
+POST /api/admin/ngo/:id/approve           Approve NGO + issue on-chain credential
+POST /api/admin/ngo/:id/revoke            Revoke NGO credential
+     body: { reason }
+
+GET  /api/admin/campaign/pending          Campaign applications awaiting review
+POST /api/admin/campaign/:id/approve      Approve + deploy Campaign.sol
+POST /api/admin/campaign/:id/reject       Reject campaign application
+     body: { reason }
 
 GET  /api/admin/alerts                    All AI-flagged anomalies with scores
 POST /api/disbursement/approve            Approve evidence + release funds
@@ -832,7 +846,7 @@ model NGO {
 
 model Campaign {
   id              String   @id @default(cuid())
-  contractAddress String   @unique
+  contractAddress String?  @unique
   ngoId           String
   ngo             NGO      @relation(fields: [ngoId], references: [id])
   name            String

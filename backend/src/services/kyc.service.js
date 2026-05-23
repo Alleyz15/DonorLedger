@@ -7,6 +7,11 @@
 
 import prisma from '../config/database.js'
 import contractService from './contract.service.js'
+import crypto from 'node:crypto'
+
+function createInternalAuditAddress() {
+  return `0x${crypto.randomBytes(20).toString('hex')}`
+}
 
 // --- Stage 1 — automated pre-screening (simulated) -----------------------
 async function preScreen(applicant) {
@@ -57,9 +62,10 @@ export async function submitNGOApplication(applicant) {
     data: {
       name: applicant.name,
       registrationNum: applicant.registrationNum,
-      walletAddress: applicant.walletAddress,
+      walletAddress: applicant.walletAddress || createInternalAuditAddress(),
       contactEmail: applicant.contactEmail,
       contactPhone: applicant.contactPhone,
+      passwordHash: applicant.passwordHash,
       riskTier,
       status: 'PENDING_KYC',
       kycNotes: JSON.stringify({ stage1: screen }),

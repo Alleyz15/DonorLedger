@@ -45,6 +45,7 @@ model NGO {
   walletAddress   String     @unique // address registered on Registry.sol
   contactEmail    String
   contactPhone    String?
+  passwordHash    String?    // NGO portal login; optional for legacy/demo rows
   riskTier        RiskTier   @default(MEDIUM)
   status          NGOStatus  @default(PENDING_KYC)
 
@@ -70,10 +71,11 @@ model NGO {
 // ---------------------------------------------------------------------------
 
 enum CampaignStatus {
-  DRAFT
+  DRAFT          // NGO-submitted campaign application pending Bank Islam review
   ACTIVE
   UNDER_REVIEW   // AI review window (60-85 confidence) — Bank Islam reviewing
   FROZEN         // AI auto-freeze fired (>85) — pauseCampaign() was called
+  REJECTED       // Bank Islam rejected the campaign application
   COMPLETED
 }
 
@@ -98,7 +100,7 @@ model Campaign {
   donorCount       Int            @default(0)
   endDate          DateTime
 
-  contractAddress  String         @unique // Campaign.sol deployed instance
+  contractAddress  String?        @unique // Campaign.sol deployed instance after approval
   deployTxHash     String?
   status           CampaignStatus @default(DRAFT)
   pausedReason     String?
