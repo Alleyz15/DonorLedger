@@ -26,14 +26,14 @@ async function main() {
   }
 
   const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@bankislam.demo'
-  const adminPassword =
-    process.env.SEED_ADMIN_PASSWORD || 'donorledger-demo-2026'
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || SAMPLE_USER_PASSWORD
   const adminName = process.env.SEED_ADMIN_NAME || 'Bank Islam Super Admin'
 
   const admin = await prisma.adminUser.upsert({
     where: { email: adminEmail },
     update: {
       name: adminName,
+      passwordHash: hashPassword(adminPassword),
       role: 'SUPER_ADMIN',
       isActive: true,
     },
@@ -52,6 +52,7 @@ async function main() {
       where: { email: sample.email },
       update: {
         name: sample.name,
+        passwordHash: hashPassword(SAMPLE_USER_PASSWORD),
         role: sample.role,
         isActive: true,
       },

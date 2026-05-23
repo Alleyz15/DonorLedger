@@ -5,6 +5,17 @@ import { setFormStatus } from '../../components/form-status.js'
 const form = document.querySelector('.register-ngo-card')
 const submitButton = document.querySelector('.register-ngo-button')
 const statusElement = document.querySelector('.form-status')
+const allocationInputs = [
+  form?.querySelector('input[name="aidPercent"]'),
+  form?.querySelector('input[name="logisticsPercent"]'),
+  form?.querySelector('input[name="adminPercent"]'),
+].filter(Boolean)
+const allocationTotal = document.querySelector('.allocation-total strong')
+
+allocationInputs.forEach((input) => {
+  input.addEventListener('input', updateAllocationTotal)
+})
+updateAllocationTotal()
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -13,13 +24,17 @@ form?.addEventListener('submit', async (event) => {
   const payload = {
     name: String(formData.get('name') || '').trim(),
     registrationNum: String(formData.get('registrationNum') || '').trim(),
-    contactEmail: String(formData.get('contactEmail') || '').trim(),
-    contactPhone: String(formData.get('contactPhone') || '').trim(),
+    contactEmail: buildPlaceholderEmail(formData),
+    contactPhone: '',
   }
 
   const validationMessage = validateNGORegistrationForm(payload)
   if (validationMessage) {
     setFormStatus(statusElement, validationMessage, 'error')
+    return
+  }
+  if (getAllocationTotal() !== 100) {
+    setFormStatus(statusElement, 'Fund allocation must total exactly 100%.', 'error')
     return
   }
 
@@ -31,7 +46,6 @@ form?.addEventListener('submit', async (event) => {
     setFormStatus(statusElement, 'Application submitted. Continue to signup.', 'success')
     const params = new URLSearchParams({
       ngoId: result.id,
-      email: payload.contactEmail,
     })
     window.setTimeout(() => {
       window.location.href = `./sign-up.html?${params.toString()}`
@@ -45,5 +59,25 @@ form?.addEventListener('submit', async (event) => {
 
 function setLoading(isLoading) {
   submitButton.disabled = isLoading
-  submitButton.textContent = isLoading ? 'Submitting...' : 'Continue To Sign Up'
+  submitButton.textContent = isLoading ? 'Submitting...' : 'Submit Application'
+}
+
+function buildPlaceholderEmail(formData) {
+  const registrationNum = String(formData.get('registrationNum') || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+  return `ngo-${registrationNum || Date.now()}@pending.donorledger.local`
+}
+
+function getAllocationTotal() {
+  return allocationInputs.reduce((sum, input) => sum + Number(input.value || 0), 0)
+}
+
+function updateAllocationTotal() {
+  if (!allocationTotal) return
+  const total = getAllocationTotal()
+  allocationTotal.textContent = `${total}% / 100%`
+  allocationTotal.classList.toggle('is-invalid', total !== 100)
 }

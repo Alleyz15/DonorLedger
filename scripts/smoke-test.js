@@ -32,7 +32,7 @@ dotenv.config()
 
 const BASE = process.env.API_BASE_URL || 'http://localhost:3001'
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@bankislam.demo'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'donorledger-demo-2026'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'Password123!'
 const prisma = new PrismaClient()
 
 // Demo wallet addresses — these don't need to be funded for the smoke test
