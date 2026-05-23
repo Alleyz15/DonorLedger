@@ -1,0 +1,244 @@
+.admin-campaign-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #ffffff;
+}
+
+.admin-campaign-shell .app-content {
+  padding: 12px 34px 44px;
+}
+
+.admin-campaign-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 748px;
+}
+
+.admin-campaign-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-campaign-summary-card {
+  min-height: 88px;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  padding: 20px 20px;
+  background: #fafaff;
+}
+
+.admin-campaign-summary-card h2 {
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.admin-campaign-summary-card strong {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-campaign-summary-card:nth-child(3) strong,
+.admin-campaign-summary-card:nth-child(4) strong {
+  color: #ef4444;
+}
+
+.admin-campaign-panel {
+  overflow: hidden;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.admin-campaign-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-campaign-table th,
+.admin-campaign-table td {
+  padding: 20px 20px;
+  border-bottom: 1px solid #f6f7fb;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-campaign-table thead {
+  background: #fbfbff;
+}
+
+.admin-campaign-table th {
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-campaign-table td {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.admin-campaign-name strong,
+.admin-campaign-name span,
+.admin-campaign-name small {
+  display: block;
+}
+
+.admin-campaign-name strong {
+  color: #020617;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.admin-campaign-name span {
+  margin-top: 3px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.admin-campaign-name small {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8px;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: #f4f4f5;
+  color: #374151;
+  font-size: 10px;
+}
+
+.admin-campaign-status {
+  display: inline-flex;
+  min-height: 18px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.admin-campaign-status.is-pending,
+.admin-campaign-status.is-review {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.admin-campaign-status.is-frozen {
+  background: #fff1f2;
+  color: #ef4444;
+}
+
+.admin-campaign-status.is-active {
+  background: #dcfce7;
+  color: #22c55e;
+}
+
+.admin-campaign-status.is-default {
+  background: #eef2ff;
+  color: #475569;
+}
+
+.admin-campaign-raised strong,
+.admin-campaign-raised span {
+  display: block;
+}
+
+.admin-campaign-raised strong {
+  color: #020617;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.admin-campaign-raised span {
+  margin-top: 3px;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.admin-campaign-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-campaign-action {
+  min-height: 30px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 15px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-campaign-action.is-approve {
+  background: #ecfdf5;
+  color: #22c55e;
+}
+
+.admin-campaign-action.is-reject {
+  background: #fff1f2;
+  color: #ef4444;
+}
+
+.admin-campaign-action.is-unfreeze {
+  min-width: 88px;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.admin-campaign-action:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.admin-campaign-more {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: #92400e;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-campaign-loading-cell,
+.admin-campaign-empty-cell,
+.admin-campaign-error-cell {
+  height: 120px;
+  color: #64748b;
+  text-align: center;
+}
+
+.admin-campaign-error-cell {
+  color: #b91c1c;
+}
+
+@media (max-width: 980px) {
+  .admin-campaign-dashboard {
+    max-width: none;
+  }
+
+  .admin-campaign-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-campaign-panel {
+    overflow-x: auto;
+  }
+
+  .admin-campaign-table {
+    min-width: 760px;
+  }
+}

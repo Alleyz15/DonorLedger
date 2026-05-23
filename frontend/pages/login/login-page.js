@@ -29,6 +29,19 @@ form?.addEventListener('submit', async (event) => {
     const displayName =
       session.name || session.user?.name || session.ngo?.name || 'Account'
     setFormStatus(statusElement, `Signed in as ${displayName}.`, 'success')
+    if (['ORGANIZER', 'NGO'].includes(session.role)) {
+      window.setTimeout(() => {
+        window.location.href = './my-campaigns.html'
+      }, 500)
+    } else if (session.role === 'BANK_ADMIN') {
+      window.setTimeout(() => {
+        window.location.href = './admin-ngos.html'
+      }, 500)
+    } else if (session.role === 'DONOR') {
+      window.setTimeout(() => {
+        window.location.href = './donor-campaigns.html'
+      }, 500)
+    }
   } catch (error) {
     setFormStatus(statusElement, error.message, 'error')
   } finally {

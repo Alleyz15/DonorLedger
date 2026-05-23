@@ -1,13 +1,13 @@
 // services/vendor.service.js
 //
-// Section 12 — vendor KYC. Without this, an NGO could create a shell
+// Section 12 - vendor KYC. Without this, an NGO could create a shell
 // company and route every donated ringgit back to themselves through it.
-// Vendor KYC plus the on-chain `approvedVendors` list closes that hole.
+// Vendor KYC plus the on-chain approved vendor list closes that hole.
 
 import prisma from '../config/database.js'
 import contractService from './contract.service.js'
 
-/** NGO submits a new vendor — status PENDING_KYC until Bank Islam acts. */
+/** NGO submits a new vendor. Status stays PENDING_KYC until Bank Islam acts. */
 export async function submitVendor({
   ngoId,
   name,
@@ -37,12 +37,6 @@ export async function submitVendor({
   })
 }
 
-/**
- * Bank Islam approves a vendor → addApprovedVendor() is called on every
- * Campaign contract owned by the same NGO that should be able to release
- * to this vendor. For the hackathon we attach to a single campaign
- * passed in by the admin.
- */
 export async function approveVendor({
   vendorId,
   campaignId,
@@ -54,26 +48,29 @@ export async function approveVendor({
     err.status = 404
     throw err
   }
-  const campaign = await prisma.campaign.findUnique({
-    where: { id: campaignId },
-  })
-  if (!campaign) {
-    const err = new Error('Campaign not found')
-    err.status = 404
-    throw err
-  }
 
-  // Section 12 — on-chain whitelist. Funds can now release to this address.
-  if (campaign.status !== 'ACTIVE' || !campaign.contractAddress) {
-    const err = new Error('Campaign must be approved before vendor approval')
-    err.status = 400
-    throw err
-  }
+  let campaign = null
+  if (campaignId) {
+    campaign = await prisma.campaign.findUnique({
+      where: { id: campaignId },
+    })
+    if (!campaign) {
+      const err = new Error('Campaign not found')
+      err.status = 404
+      throw err
+    }
 
-  await contractService.addApprovedVendor(
-    campaign.contractAddress,
-    vendor.walletAddress
-  )
+    if (campaign.status !== 'ACTIVE' || !campaign.contractAddress) {
+      const err = new Error('Campaign must be approved before vendor approval')
+      err.status = 400
+      throw err
+    }
+
+    await contractService.addApprovedVendor(
+      campaign.contractAddress,
+      vendor.walletAddress
+    )
+  }
 
   return prisma.vendor.update({
     where: { id: vendorId },
@@ -81,7 +78,7 @@ export async function approveVendor({
       status: 'APPROVED',
       approvedBy: adminUserId,
       approvedAt: new Date(),
-      campaigns: { connect: { id: campaignId } },
+      ...(campaignId ? { campaigns: { connect: { id: campaignId } } } : {}),
     },
   })
 }
