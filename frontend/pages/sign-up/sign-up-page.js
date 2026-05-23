@@ -24,7 +24,6 @@ form?.addEventListener('submit', async (event) => {
 
   const formData = new FormData(form)
   const payload = {
-    name: String(formData.get('name') || '').trim(),
     email: String(formData.get('email') || '').trim(),
     password: String(formData.get('password') || ''),
     confirmPassword: String(formData.get('confirmPassword') || ''),
