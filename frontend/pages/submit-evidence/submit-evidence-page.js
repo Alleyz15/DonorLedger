@@ -53,11 +53,11 @@ async function renderSubmitEvidencePage() {
       </div>
 
       <div class="evidence-upload-grid">
-        ${renderFileInput('ssmDoc', 'SSM / ROS Document')}
-        ${renderFileInput('serviceAgreement', 'Service Agreement')}
-        ${renderFileInput('invoice', 'Invoice')}
-        ${renderFileInput('deliveryProof', 'Delivery Proof')}
-        ${renderFileInput('recipientConfirm', 'Recipient Confirmation')}
+        ${renderFileInput('ssmDoc', 'SSM / ROS Document', true)}
+        ${renderFileInput('serviceAgreement', 'Service Agreement', true)}
+        ${renderFileInput('invoice', 'Invoice', true)}
+        ${renderFileInput('deliveryProof', 'Delivery Proof', true)}
+        ${renderFileInput('recipientConfirm', 'Recipient Confirmation', true)}
       </div>
 
       <p class="evidence-note">
@@ -127,6 +127,10 @@ async function submitEvidence(event) {
     setFormStatus(status, 'Campaign, vendor, category and amount are required.', 'error')
     return
   }
+  if (!evidenceFields.every((field) => payload[field] instanceof File && payload[field].size > 0)) {
+    setFormStatus(status, 'Please upload all five evidence documents before submitting.', 'error')
+    return
+  }
 
   button.disabled = true
   button.textContent = 'Submitting...'
@@ -146,13 +150,21 @@ async function submitEvidence(event) {
   }
 }
 
-function renderFileInput(name, label) {
+const evidenceFields = [
+  'ssmDoc',
+  'serviceAgreement',
+  'invoice',
+  'deliveryProof',
+  'recipientConfirm',
+]
+
+function renderFileInput(name, label, required = false) {
   return `
     <label class="evidence-upload">
       <span>${label}</span>
       <strong>Click to upload</strong>
       <small>PDF, JPG or PNG</small>
-      <input name="${name}" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+      <input name="${name}" type="file" accept=".pdf,.jpg,.jpeg,.png" ${required ? 'required' : ''} />
     </label>
   `
 }

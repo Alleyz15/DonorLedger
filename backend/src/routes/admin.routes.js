@@ -288,7 +288,7 @@ router.post(
     try {
       const campaign = await prisma.campaign.findUnique({
         where: { id: req.params.id },
-        include: { ngo: true },
+        include: { ngo: true, vendors: true },
       })
       if (!campaign) {
         const err = new Error('Campaign not found')
@@ -322,6 +322,20 @@ router.post(
         })
         contractAddress = deployed.contractAddress
         deployTxHash = deployed.deployTxHash
+      }
+
+      for (const vendor of campaign.vendors) {
+        if (vendor.status !== 'APPROVED' || !vendor.walletAddress) continue
+        const alreadyApproved = await contractService.isVendorApproved(
+          contractAddress,
+          vendor.walletAddress
+        )
+        if (!alreadyApproved) {
+          await contractService.addApprovedVendor(
+            contractAddress,
+            vendor.walletAddress
+          )
+        }
       }
 
       const updated = await prisma.campaign.update({
