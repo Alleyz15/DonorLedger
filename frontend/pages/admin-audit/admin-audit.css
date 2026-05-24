@@ -1,0 +1,167 @@
+.admin-audit-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.admin-audit-shell .app-content {
+  padding: 48px 50px;
+}
+
+.admin-audit-page {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1468px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.admin-audit-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.admin-audit-hero p {
+  margin: 12px 0 0;
+  color: #667085;
+  font-size: 20px;
+}
+
+/* ── Panel ── */
+.admin-audit-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-audit-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 0 28px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-audit-panel-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.admin-audit-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ── Timeline ── */
+.admin-audit-timeline {
+  position: relative;
+  padding: 24px 28px 8px 64px;
+}
+
+.admin-audit-timeline::before {
+  content: "";
+  position: absolute;
+  left: 46px;
+  top: 36px;
+  bottom: 16px;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.admin-audit-entry {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.admin-audit-dot {
+  position: absolute;
+  left: -26px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #e2e8f0;
+}
+
+.admin-audit-dot.is-critical { background: #ef4444; box-shadow: 0 0 0 2px #fecaca; }
+.admin-audit-dot.is-warning  { background: #f59e0b; box-shadow: 0 0 0 2px #fde68a; }
+.admin-audit-dot.is-info     { background: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
+
+.admin-audit-entry-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.admin-audit-entry-time {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-audit-entry-actor {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-audit-entry-actor.is-ai     { background: #ede9fe; color: #5b21b6; }
+.admin-audit-entry-actor.is-bank   { background: #d1fae5; color: #065f46; }
+.admin-audit-entry-actor.is-system { background: #dbeafe; color: #1e40af; }
+
+.admin-audit-entry-msg {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.admin-audit-entry-campaign {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* empty */
+.admin-audit-empty {
+  padding: 60px 28px;
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .admin-audit-shell .app-content { padding: 24px 16px; }
+  .admin-audit-hero h1 { font-size: 28px; }
+  .admin-audit-timeline { padding-left: 40px; }
+  .admin-audit-timeline::before { left: 22px; }
+  .admin-audit-dot { left: -20px; }
+}

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DonorLedger — AI Fraud Detection Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    .demo-header {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%);
+      padding: 40px 48px 36px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .demo-header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(52,211,153,0.5);
+      border-radius: 999px;
+      padding: 4px 14px;
+      background: rgba(52,211,153,0.12);
+      color: #6ee7b7;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .demo-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .demo-header h1 {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .demo-header h1 span { color: #6ee7b7; }
+
+    .demo-header p {
+      color: #a7f3d0;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 700px;
+    }
+
+    /* ── Campaign ID bar ── */
+    .demo-config {
+      max-width: 1280px;
+      margin: 32px auto 0;
+      padding: 0 48px;
+    }
+
+    .demo-config-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px 24px;
+      background: #1e293b;
+    }
+
+    .demo-config-card label {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .demo-config-card input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 0 14px;
+      height: 40px;
+      background: #0f172a;
+      color: #f1f5f9;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .demo-config-card input::placeholder { color: #475569; }
+    .demo-config-card input:focus { outline: 2px solid #34d399; outline-offset: 2px; border-color: transparent; }
+
+    .demo-config-note {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Main grid ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1280px;
+      margin: 28px auto 0;
+      padding: 0 48px;
+    }
+
+    /* ── Panel ── */
+    .demo-panel {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #1e293b;
+    }
+
+    .demo-panel-header {
+      padding: 24px 28px 20px;
+    }
+
+    .demo-panel.is-clean  .demo-panel-header { background: linear-gradient(135deg, #064e3b, #065f46); }
+    .demo-panel.is-fraud  .demo-panel-header { background: linear-gradient(135deg, #7f1d1d, #991b1b); }
+
+    .demo-panel-header .scenario-label {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .demo-panel.is-clean  .scenario-label { color: #6ee7b7; }
+    .demo-panel.is-fraud  .scenario-label { color: #fca5a5; }
+
+    .demo-panel-header h2 {
+      font-size: 22px;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .demo-panel-header p {
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .demo-panel.is-clean  .demo-panel-header p { color: #a7f3d0; }
+    .demo-panel.is-fraud  .demo-panel-header p { color: #fecaca; }
+
+    /* invoice preview strip */
+    .demo-invoice-strip {
+      margin-top: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .demo-invoice-strip p {
+      margin: 0 0 4px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+
+    .demo-invoice-strip code {
+      display: block;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+    }
+
+    /* run button */
+    .demo-run-btn {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      padding: 14px 24px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+
+    .demo-run-btn:hover  { filter: brightness(1.1); }
+    .demo-run-btn:active { filter: brightness(0.95); }
+    .demo-run-btn:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
+
+    .demo-panel.is-clean .demo-run-btn  { background: #10b981; color: #ffffff; }
+    .demo-panel.is-fraud .demo-run-btn  { background: #ef4444; color: #ffffff; }
+
+    .demo-run-btn .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .demo-run-btn.is-loading .spinner { display: block; }
+    .demo-run-btn.is-loading .btn-text { opacity: 0.7; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* result body */
+    .demo-result {
+      padding: 24px 28px;
+      background: #1e293b;
+      min-height: 260px;
+    }
+
+    .demo-result-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 220px;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* Score badge */
+    .result-score-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .result-score-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .result-score-badge .score-num {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .result-score-badge .score-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .score-allow  { background: #064e3b; color: #34d399; }
+    .score-review { background: #422006; color: #fb923c; }
+    .score-freeze { background: #450a0a; color: #f87171; }
+
+    .result-verdict {
+      flex: 1;
+    }
+
+    .result-verdict-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 14px 4px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .verdict-pass   { background: #064e3b; color: #34d399; }
+    .verdict-review { background: #431407; color: #fb923c; }
+    .verdict-freeze { background: #450a0a; color: #f87171; }
+
+    .result-verdict-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .verdict-pass::before   { background: #34d399; }
+    .verdict-review::before { background: #fb923c; }
+    .verdict-freeze::before { background: #f87171; }
+
+    .result-verdict h3 {
+      color: #f1f5f9;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    /* divider */
+    .result-divider {
+      height: 1px;
+      background: #334155;
+      margin: 18px 0;
+    }
+
+    /* details rows */
+    .result-detail {
+      margin-bottom: 14px;
+    }
+
+    .result-detail-label {
+      display: block;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .result-detail-value {
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    .result-detail-value.is-mono {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #94a3b8;
+    }
+
+    /* patterns */
+    .result-patterns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .result-pattern-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      border-radius: 5px;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .tag-none   { background: #064e3b; color: #34d399; }
+    .tag-flag   { background: #431407; color: #fb923c; }
+    .tag-freeze { background: #450a0a; color: #f87171; }
+
+    /* price analysis highlight box */
+    .result-price-box {
+      border-left: 3px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      margin-top: 4px;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    .price-box-pass   { border-color: #34d399; background: #022c22; color: #6ee7b7; }
+    .price-box-fraud  { border-color: #ef4444; background: #2d0a0a; color: #fca5a5; }
+
+    /* extra info strip */
+    .result-meta-strip {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .result-meta-item {
+      flex: 1;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      background: #0f172a;
+    }
+
+    .result-meta-item span {
+      display: block;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .result-meta-item strong {
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    /* ── Footer note ── */
+    .demo-footer-note {
+      max-width: 1280px;
+      margin: 24px auto 0;
+      padding: 0 48px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .demo-grid { grid-template-columns: 1fr; padding: 0 20px; }
+      .demo-header { padding: 28px 20px 24px; }
+      .demo-header h1 { font-size: 26px; }
+      .demo-config { padding: 0 20px; }
+      .demo-config-card { flex-wrap: wrap; }
+      .demo-footer-note { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
+  <header class="demo-header">
+    <div class="demo-header-inner">
+      <div class="demo-badge">Live AI Demo</div>
+      <h1>Gemini AI <span>Fraud Detection</span></h1>
+      <p>
+        Watch Google Gemini analyse two disbursement scenarios in real time —
+        a legitimate food aid purchase versus a price-inflated invoice designed
+        to drain funds. The AI scores each disbursement 0–100 based on
+        Malaysian market benchmarks and MACC fraud patterns.
+      </p>
+    </div>
+  </header>
+
+  <!-- ══ CONFIG ══════════════════════════════════════════════════════════════ -->
+  <div class="demo-config">
+    <div class="demo-config-card">
+      <label for="campaign-id-input">Campaign ID</label>
+      <input
+        id="campaign-id-input"
+        type="text"
+        placeholder="Paste a campaign ID from the admin panel…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <span class="demo-config-note">Required — must have ≥ 1 approved vendor</span>
+    </div>
+  </div>
+
+  <!-- ══ MAIN PANELS ══════════════════════════════════════════════════════════ -->
+  <div class="demo-grid">
+
+    <!-- ── CLEAN panel ── -->
+    <article class="demo-panel is-clean">
+      <div class="demo-panel-header">
+        <p class="scenario-label">Scenario A — Legitimate Disbursement</p>
+        <h2>Rice Aid at Market Price</h2>
+        <p>
+          200 kg beras putih purchased at RM 2.50 /kg — within the Malaysian
+          wholesale benchmark of RM 2.00–2.80 /kg. Amount is 1% of raised funds.
+        </p>
+        <div class="demo-invoice-strip">
+          <p>Invoice preview</p>
+          <code>200 kg beras putih × RM 2.50/kg = RM 500.00
+Category : Aid / Food Supply
+Vendor SSM : registered &gt; 2 years, service matches
+Admin %  : 8% (declared in campaign)
+─────────────────────────────────────────
+Expected Gemini verdict: ✅ PASS (score 10–30)</code>
+        </div>
+      </div>
+      <button class="demo-run-btn" id="run-clean-btn" type="button">
+        <span class="spinner" aria-hidden="true"></span>
+        <span class="btn-text">▶  Run Clean Disbursement Analysis</span>
+      </button>
+      <div class="demo-result" id="clean-result">
+        <p class="demo-result-placeholder">
+          Press the button above to run<br>Gemini AI analysis on this scenario.
+        </p>
+      </div>
+    </article>
+
+    <!-- ── FRAUD panel ── -->
+    <article class="demo-panel is-fraud">
+      <div class="demo-panel-header">
+        <p class="scenario-label">Scenario B — Price Inflation Fraud</p>
+        <h2>Rice Invoiced at 3× Market Rate</h2>
+        <p>
+          Same 200 kg rice but invoiced at RM 8.50 /kg — 204% above the
+          RM 2.80 /kg wholesale ceiling. Total equals 34% of raised funds.
+        </p>
+        <div class="demo-invoice-strip">
+          <p>Invoice preview</p>
+          <code>200 kg beras putih × RM 8.50/kg = RM 1,700+
+Category : Aid / Food Supply
+Vendor SSM : registered &lt; 14 months ago
+Admin %  : implied 34% of raised funds
+─────────────────────────────────────────
+Expected Gemini verdict: 🚨 AUTO-FREEZE (score 78+)</code>
+        </div>
+      </div>
+      <button class="demo-run-btn" id="run-fraud-btn" type="button">
+        <span class="spinner" aria-hidden="true"></span>
+        <span class="btn-text">▶  Run Fraudulent Disbursement Analysis</span>
+      </button>
+      <div class="demo-result" id="fraud-result">
+        <p class="demo-result-placeholder">
+          Press the button above to run<br>Gemini AI analysis on this scenario.
+        </p>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- ══ FOOTER NOTE ════════════════════════════════════════════════════════ -->
+  <p class="demo-footer-note">
+    Demo endpoints do not write to the blockchain or database — pure AI analysis only.
+    The real <code>simulate-fraud</code> endpoint does write on-chain and fires the MACC webhook.
+    Powered by Google Gemini 1.5 Flash · Market benchmarks from KPDNHEP Q1 2026.
+  </p>
+
+  <script type="module">
+    // Read API base from window global (set by VPS deployment) or default to localhost
+    const API_BASE = window.DONORLEDGER_API_BASE_URL || 'http://127.0.0.1:3001/api'
+
+    const campaignInput = document.getElementById('campaign-id-input')
+    const cleanBtn      = document.getElementById('run-clean-btn')
+    const fraudBtn      = document.getElementById('run-fraud-btn')
+    const cleanResult   = document.getElementById('clean-result')
+    const fraudResult   = document.getElementById('fraud-result')
+
+    cleanBtn.addEventListener('click', () => runScenario('clean'))
+    fraudBtn.addEventListener('click', () => runScenario('fraud'))
+
+    async function runScenario(scenario) {
+      const campaignId = campaignInput.value.trim()
+      if (!campaignId) {
+        campaignInput.focus()
+        campaignInput.style.outline = '2px solid #ef4444'
+        setTimeout(() => { campaignInput.style.outline = '' }, 1800)
+        return
+      }
+
+      const btn    = scenario === 'clean' ? cleanBtn : fraudBtn
+      const panel  = scenario === 'clean' ? cleanResult : fraudResult
+      const url    = `${API_BASE}/demo/simulate-${scenario === 'clean' ? 'clean' : 'price-fraud'}`
+
+      btn.disabled = true
+      btn.classList.add('is-loading')
+      btn.querySelector('.btn-text').textContent = 'Analysing with Gemini AI…'
+
+      panel.innerHTML = `
+        <p class="demo-result-placeholder">
+          Sending to Google Gemini 1.5 Flash…<br>
+          <span style="font-size:12px;margin-top:6px;display:block;opacity:0.6">
+            Checking Malaysian market price benchmarks
+          </span>
+        </p>
+      `
+
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ campaignId }),
+        })
+        const data = await resp.json()
+        if (!resp.ok) throw new Error(data?.error || `HTTP ${resp.status}`)
+        renderResult(panel, data, scenario)
+      } catch (err) {
+        panel.innerHTML = `
+          <p class="demo-result-placeholder" style="color:#f87171">
+            ${escHtml(err.message)}
+          </p>
+        `
+      } finally {
+        btn.disabled = false
+        btn.classList.remove('is-loading')
+        btn.querySelector('.btn-text').textContent =
+          scenario === 'clean' ? '▶  Run Clean Disbursement Analysis' : '▶  Run Fraudulent Disbursement Analysis'
+      }
+    }
+
+    function renderResult(panel, data, scenario) {
+      const score = Number(data.confidenceScore || 0)
+      const rec   = String(data.recommendation || '').toLowerCase()
+
+      // Score badge class
+      const badgeClass = score >= 85 ? 'score-freeze' : score >= 60 ? 'score-review' : 'score-allow'
+
+      // Verdict pill + label
+      let verdictClass, verdictLabel
+      if (score >= 85) {
+        verdictClass = 'verdict-freeze'
+        verdictLabel = '🚨 AUTO-FREEZE — MACC Alerted'
+      } else if (score >= 60) {
+        verdictClass = 'verdict-review'
+        verdictLabel = '⚠ Manual Review Required'
+      } else {
+        verdictClass = 'verdict-pass'
+        verdictLabel = '✅ PASS — Funds Cleared'
+      }
+
+      // Patterns
+      const patterns = Array.isArray(data.flaggedPatterns) ? data.flaggedPatterns : []
+      const patternHtml = patterns.length
+        ? patterns.map(p => `<span class="result-pattern-tag tag-${score >= 85 ? 'freeze' : 'flag'}">${escHtml(p)}</span>`).join('')
+        : `<span class="result-pattern-tag tag-none">NONE DETECTED</span>`
+
+      // Price analysis box
+      const priceBox = data.priceAnalysis
+        ? `<div class="result-price-box ${score >= 60 ? 'price-box-fraud' : 'price-box-pass'}">${escHtml(data.priceAnalysis)}</div>`
+        : ''
+
+      panel.innerHTML = `
+        <div class="result-score-row">
+          <div class="result-score-badge ${badgeClass}">
+            <span class="score-num">${score}</span>
+            <span class="score-lbl">/ 100</span>
+          </div>
+          <div class="result-verdict">
+            <div class="result-verdict-pill ${verdictClass}">${verdictLabel}</div>
+            <h3>${escHtml(data.verdict || (score >= 85 ? 'Campaign Frozen' : score >= 60 ? 'Flagged for Review' : 'Disbursement Approved'))}</h3>
+          </div>
+        </div>
+
+        <div class="result-meta-strip">
+          <div class="result-meta-item">
+            <span>Amount</span>
+            <strong>RM ${Number(data.amount || 0).toLocaleString('en-MY', {minimumFractionDigits:2})}</strong>
+          </div>
+          <div class="result-meta-item">
+            <span>Category</span>
+            <strong>${escHtml(data.disbursementCategory || '—')}</strong>
+          </div>
+          <div class="result-meta-item">
+            <span>Recommendation</span>
+            <strong>${escHtml(rec.toUpperCase() || '—')}</strong>
+          </div>
+        </div>
+
+        <div class="result-divider"></div>
+
+        <div class="result-detail">
+          <span class="result-detail-label">Invoice Description</span>
+          <div class="result-detail-value is-mono">${escHtml(data.invoiceDescription || '—')}</div>
+        </div>
+
+        <div class="result-detail">
+          <span class="result-detail-label">Market Benchmark Check</span>
+          <div class="result-detail-value is-mono">${escHtml(data.marketBenchmark || '—')}</div>
+        </div>
+
+        ${data.priceAnalysis ? `
+        <div class="result-detail">
+          <span class="result-detail-label">Gemini Price Analysis</span>
+          ${priceBox}
+        </div>
+        ` : ''}
+
+        <div class="result-detail">
+          <span class="result-detail-label">Gemini Reasoning</span>
+          <p class="result-detail-value">${escHtml(data.reason || '—')}</p>
+        </div>
+
+        <div class="result-detail">
+          <span class="result-detail-label">Flagged Patterns</span>
+          <div class="result-patterns">${patternHtml}</div>
+        </div>
+      `
+    }
+
+    function escHtml(v) {
+      return String(v ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+    }
+  </script>
+
+</body>
+</html>

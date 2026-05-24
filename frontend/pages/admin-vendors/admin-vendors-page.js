@@ -5,6 +5,9 @@ import {
   getAdminVendors,
   rejectVendor,
 } from '../../services/admin-service.js'
+import { API_BASE_URL } from '../../config/api-config.js'
+
+const FILES_BASE = API_BASE_URL.replace(/\/api$/, '')
 import {
   createAdminVendorSummary,
   updateAdminVendorSummary,
@@ -61,7 +64,12 @@ function renderAdminVendorPage() {
     table.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })
   table.addEventListener('click', (event) => handleTableAction(event, table, summary))
-  content.addEventListener('click', (event) => handleDrawerAction(event, table, summary))
+
+  // The drawer is appended to document.body (outside #app-shell), so we must
+  // listen on document.body — not on content — otherwise the X and Close
+  // buttons are outside the listener's subtree and clicks are never captured.
+  document.body.addEventListener('click', (event) => handleDrawerAction(event, table, summary))
+
   loadVendors(table, summary)
 }
 
@@ -135,7 +143,11 @@ function openVendorDrawer(vendor) {
         <div><dt>NGO Registration</dt><dd>${escapeHtml(vendor.ngo?.registrationNum || '-')}</dd></div>
         <div><dt>Bank Account</dt><dd>${escapeHtml(vendor.bankAccount || '-')}</dd></div>
         <div><dt>Wallet Address</dt><dd>${escapeHtml(vendor.walletAddress || '-')}</dd></div>
-        <div><dt>Registration Document</dt><dd>${escapeHtml(vendor.registrationDoc || 'Not uploaded')}</dd></div>
+        <div><dt>Registration Document</dt><dd>${
+          vendor.registrationDoc
+            ? `<a href="${FILES_BASE}${escapeHtml(vendor.registrationDoc)}" target="_blank" rel="noreferrer" style="color:#065f46;font-weight:800;text-decoration:underline">📄 View Document</a>`
+            : 'Not uploaded'
+        }</dd></div>
         <div><dt>Status</dt><dd>${escapeHtml(vendor.status)}</dd></div>
         ${vendor.rejectedReason ? `<div><dt>Rejected Reason</dt><dd>${escapeHtml(vendor.rejectedReason)}</dd></div>` : ''}
       </dl>

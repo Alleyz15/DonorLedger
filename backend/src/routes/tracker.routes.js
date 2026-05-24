@@ -68,6 +68,22 @@ router.get('/:donorHash', async (req, res, next) => {
       ]
     }
 
+    // ALLOCATED is an implicit milestone — Bank Islam's escrow lock is
+    // automatic the instant Campaign.donate() is recorded on-chain. There
+    // is no separate transaction needed. If RECEIVED is present but
+    // ALLOCATED is missing (e.g. older donations, nonce race on Sepolia),
+    // we synthesise it here so the donor always sees step 2 as done.
+    const hasAllocated = journey.some((m) => m.milestone === 'ALLOCATED')
+    const received     = journey.find((m) => m.milestone === 'RECEIVED')
+    if (!hasAllocated && received) {
+      const insertAt = journey.findIndex((m) => m.milestone === 'RECEIVED') + 1
+      journey.splice(insertAt, 0, {
+        milestone:   'ALLOCATED',
+        description: DONOR_MILESTONE_TEXT.ALLOCATED,
+        timestamp:   received.timestamp + 1000, // 1 second after RECEIVED
+      })
+    }
+
     // Section 14 — what the donor sees: plain language only.
     res.json({
       donorHash,

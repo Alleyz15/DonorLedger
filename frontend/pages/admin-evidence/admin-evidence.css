@@ -1,0 +1,382 @@
+.admin-evidence-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.admin-evidence-shell .app-content {
+  padding: 48px 50px;
+}
+
+.admin-evidence-page {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1468px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.admin-evidence-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.admin-evidence-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.admin-evidence-hero p {
+  margin: 12px 0 0;
+  color: #667085;
+  font-size: 20px;
+}
+
+/* ── Summary badges ── */
+.admin-evidence-summary {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 20px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-evidence-badge strong {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.admin-evidence-badge span {
+  color: #64748b;
+}
+
+/* ── Evidence cards ── */
+.admin-evidence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-evidence-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-evidence-card.is-frozen {
+  border-left: 4px solid #ef4444;
+}
+
+.admin-evidence-card.is-review {
+  border-left: 4px solid #f59e0b;
+}
+
+.admin-evidence-card.is-approved {
+  border-left: 4px solid #065f46;
+}
+
+/* card header */
+.admin-evidence-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-evidence-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-evidence-card-title strong {
+  display: block;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.admin-evidence-card-title span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-evidence-status {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-evidence-status.is-frozen   { background: #fee2e2; color: #991b1b; }
+.admin-evidence-status.is-review   { background: #fef3c7; color: #92400e; }
+.admin-evidence-status.is-approved { background: #d1fae5; color: #065f46; }
+.admin-evidence-status.is-default  { background: #f1f5f9; color: #475569; }
+
+/* card body */
+.admin-evidence-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  padding: 18px 24px;
+}
+
+.admin-evidence-detail {
+  padding: 0 16px 0 0;
+}
+
+.admin-evidence-detail:not(:first-child) {
+  padding-left: 16px;
+  border-left: 1px solid #f1f5f9;
+}
+
+.admin-evidence-detail dt {
+  margin: 0 0 5px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-evidence-detail dd {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* AI section */
+.admin-evidence-ai {
+  margin: 0 24px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  background: #fafafa;
+}
+
+.admin-evidence-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.admin-evidence-ai-label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-evidence-score {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-evidence-score.is-freeze { background: #fee2e2; color: #991b1b; }
+.admin-evidence-score.is-review { background: #fef3c7; color: #92400e; }
+.admin-evidence-score.is-ok     { background: #d1fae5; color: #065f46; }
+
+.admin-evidence-ai-reason {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.admin-evidence-price-note {
+  margin: 0 0 8px;
+  color: #475569;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.admin-evidence-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-evidence-pattern {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ── Documents section (Gate 4 — Bank Islam human review) ── */
+.admin-evidence-docs {
+  margin: 0 24px 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #f8fafc;
+}
+
+.admin-evidence-docs-label {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-evidence-docs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-evidence-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  border: 1px solid #d1fae5;
+  border-radius: 6px;
+  padding: 0 12px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.admin-evidence-doc:hover {
+  background: #d1fae5;
+}
+
+.admin-evidence-doc-missing {
+  border-color: #fee2e2;
+  background: #fff1f2;
+  color: #9f1239;
+}
+
+.admin-evidence-doc-missing em {
+  font-style: normal;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+/* actions */
+.admin-evidence-actions {
+  display: flex;
+  gap: 12px;
+  padding: 0 24px 20px;
+}
+
+.admin-evidence-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.admin-evidence-btn:disabled { opacity: 0.5; cursor: default; }
+
+.admin-evidence-btn.is-approve {
+  border: 0;
+  background: #065f46;
+  color: #ffffff;
+}
+
+.admin-evidence-btn.is-reject {
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.admin-evidence-btn.is-reject:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Section 13 — Bank Islam SMS confirmation button */
+.admin-evidence-btn.is-confirm {
+  border: 0;
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.admin-evidence-btn.is-confirm:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+.admin-evidence-confirm-note {
+  margin: 0;
+  padding: 0 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-style: italic;
+  align-self: center;
+}
+
+/* empty */
+.admin-evidence-empty {
+  padding: 60px 24px;
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px dashed #e2e8f0;
+  border-radius: 14px;
+}
+
+@media (max-width: 900px) {
+  .admin-evidence-card-body { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .admin-evidence-shell .app-content { padding: 24px 16px; }
+  .admin-evidence-hero h1 { font-size: 28px; }
+  .admin-evidence-card-body { grid-template-columns: 1fr; }
+}

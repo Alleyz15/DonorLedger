@@ -40,10 +40,12 @@ export function renderSuccessCard(payment) {
 }
 
 function formatCurrency(value) {
-  return `$${new Intl.NumberFormat('en-MY', {
+  return new Intl.NumberFormat('en-MY', {
+    style: 'currency',
+    currency: 'MYR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(Number(value || 0))}`
+  }).format(Number(value || 0))
 }
 
 function formatTransaction(value) {

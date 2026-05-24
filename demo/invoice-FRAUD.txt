@@ -1,0 +1,78 @@
+================================================================================
+                         TAX INVOICE / INVOIS CUKAI
+================================================================================
+
+  Vendor  : Syarikat Bekalan Premium Malaysia Sdn Bhd
+  SSM No  : 202301098321 (1498321-W)
+  Address : Unit 33-A, Menara Platinum, Jalan Ampang, 50450 Kuala Lumpur
+  Tel     : 03-2161 8888
+  Email   : billing@bekalan-premium.com.my
+
+  Bill To : Yayasan Peduli Insan Malaysia (YPIM)
+  ROS No  : PPM-018-14-22062022
+  Campaign: Bantuan Banjir Kelantan 2026 — Food Supply Package B
+
+  Invoice No : INV-2026-1188
+  Invoice Date: 15 April 2026
+  Payment Due : 16 April 2026  ← [⚠ NEXT-DAY PAYMENT — UNUSUAL]
+
+  Reference  : Campaign ID DL-2026-0091 | Internal Ref YPIM-EXP-0044
+
+--------------------------------------------------------------------------------
+  ITEM DESCRIPTION                          QTY     UNIT     UNIT PRICE  AMOUNT
+--------------------------------------------------------------------------------
+
+  Beras Putih — Gred Premium Antarabangsa   200 kg   —          RM8.50    RM 1,700.00
+    [⚠ PRICE ALERT: RM8.50/kg is 204%
+     above Malaysian wholesale ceiling
+     of RM2.80/kg for white rice.
+     Benchmark: RM2.00–2.80/kg]
+
+  Pakej Penghantaran & Pengurusan Khas      1 lot    —          RM15,300.00  RM 15,300.00
+    [⚠ VAGUE LINE ITEM: No unit breakdown.
+     No quantity. No hourly/daily rate.
+     "Pengurusan Khas" = admin overhead
+     not eligible under aid category.
+     Amount = 30.6% of raised funds.]
+
+                                                        ─────────────────────────
+                                               SUBTOTAL              RM 17,000.00
+                                               SST (6%)              RM  1,020.00
+                                               ─────────────────────────────────
+                                               TOTAL DUE             RM 18,020.00
+                                               ─────────────────────────────────
+                                               [⚠ = 36% of campaign raised amount]
+
+--------------------------------------------------------------------------------
+  PAYMENT METHOD: Instant Transfer — Personal Account
+  Recipient: Maybank 1621 0044 5678 — AHMAD ZULKIFLI BIN ROSLI ← [⚠ PERSONAL ACCT]
+  (not a company account — does not match vendor SSM registration)
+  Memo: "Khidmat April"
+--------------------------------------------------------------------------------
+
+  Delivery Details:
+    Delivery Date  : TBD   ← [⚠ EVIDENCE SUBMITTED BEFORE DELIVERY]
+    Delivery To    : "Kawasan banjir" (no specific location named)
+    Received By    : (blank)
+    Signature      : (blank)
+    Delivery Order : NONE ATTACHED
+
+  Note: Premium import grade sourced from private supplier. Price reflects
+  current global commodity market rates and cold-chain storage surcharge.
+
+  [⚠ SSM incorporation date: 3 February 2023 — company is 14 months old.
+   AI flag: New vendor receiving large disbursement from NGO campaign.]
+
+--------------------------------------------------------------------------------
+  Company Registration : 202301098321 (1498321-W)
+  Authorised by        : (signature illegible)
+================================================================================
+
+  *** FOR BANK ISLAM DONORLEDGER AUDIT TRAIL — INVOICE HASH ANCHORED ON-CHAIN ***
+  *** Document SHA-256 hash recorded to Ethereum Sepolia via DonorLedger       ***
+
+  *** AI FRAUD ANALYSIS RESULT — CONFIDENCE SCORE: 88/100 — AUTO-FROZEN ***
+  *** Patterns: PRICE_INFLATION, DISPROPORTIONATE, SHELL_VENDOR_RISK    ***
+  *** Action: Campaign paused. MACC Webhook alert transmitted.           ***
+
+================================================================================

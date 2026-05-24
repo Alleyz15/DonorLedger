@@ -16,6 +16,10 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import rateLimit from 'express-rate-limit'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 import { env } from './config/env.js'
 import { walletAddresses } from './config/blockchain.js'
@@ -92,6 +96,19 @@ app.get('/health', (_req, res) => {
     demoMode: env.demo.enabled,
   })
 })
+
+// ---- Static uploads ---------------------------------------------------
+// Serves Bank Islam-reviewed documents (invoices, agreements, delivery proof)
+// at /uploads/<category>/<filename>. This lets the Bank Admin frontend open
+// the actual PDFs that NGOs submitted as part of their evidence package.
+// Files are stored locally on the VPS (Section 5 — no cloud storage needed).
+app.use(
+  '/uploads',
+  express.static(path.resolve(__dirname, '../../uploads'), {
+    dotfiles: 'deny',
+    index: false,
+  })
+)
 
 // ---- Routes -----------------------------------------------------------
 app.use('/api/auth', authRoutes)
