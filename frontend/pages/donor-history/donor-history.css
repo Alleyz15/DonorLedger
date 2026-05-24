@@ -435,6 +435,144 @@
   color: #cbd5e1;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Blockchain Journey Flow — Donor → Bank Islam → NGO → Vendor → Beneficiary
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.donor-receipt-flow {
+  margin-top: 20px;
+  border: 1px solid #d8e0e8;
+  border-radius: 14px;
+  padding: 20px;
+  background: #f8fafc;
+}
+
+.donor-receipt-flow h3 {
+  margin: 0 0 4px;
+  color: #052e23;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.donor-receipt-flow-sub {
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Steps container — vertical list */
+.donor-receipt-flow-steps {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Individual step ── */
+.donor-flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.donor-flow-step-icon {
+  flex-shrink: 0;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.donor-flow-step.is-done .donor-flow-step-icon {
+  background: #064e3b;
+  color: #ffffff;
+}
+
+.donor-flow-step.is-pending .donor-flow-step-icon {
+  background: #e2e8f0;
+  color: #94a3b8;
+}
+
+.donor-flow-step.is-frozen .donor-flow-step-icon {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* connector line between steps */
+.donor-flow-connector {
+  width: 2px;
+  height: 20px;
+  margin: 3px 0 3px 17px;
+  border-radius: 999px;
+}
+
+.donor-flow-connector.is-done    { background: #064e3b; }
+.donor-flow-connector.is-pending { background: #e2e8f0; }
+
+/* step content */
+.donor-flow-step-body {
+  flex: 1;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.donor-flow-step-actor {
+  display: block;
+  margin-bottom: 2px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.donor-flow-step-title {
+  display: block;
+  color: #052e23;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.donor-flow-step.is-pending .donor-flow-step-title,
+.donor-flow-step.is-pending .donor-flow-step-actor {
+  color: #94a3b8;
+}
+
+.donor-flow-step-desc {
+  margin: 2px 0 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.donor-flow-step.is-pending .donor-flow-step-desc {
+  color: #cbd5e1;
+}
+
+.donor-flow-step-time {
+  display: block;
+  margin-top: 4px;
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.donor-flow-step-frozen {
+  display: block;
+  margin-top: 4px;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* widen the receipt card to accommodate the flow */
+.donor-receipt-card {
+  width: min(100%, 680px);
+}
+
 @media (max-width: 900px) {
   .donor-history-summary {
     grid-template-columns: 1fr;

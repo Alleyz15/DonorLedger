@@ -199,16 +199,32 @@ function closeReceiptModal() {
   modal.innerHTML = ''
 }
 
+// ---------------------------------------------------------------------------
+// Receipt — complete blockchain journey visual
+//
+// Shows the full money flow that is architecturally impossible to fake:
+//   Donor → Bank Islam Escrow → NGO Evidence → Vendor Release → Beneficiary
+//
+// Each stage maps to a real on-chain event in DonorTracker.sol.
+// Milestones not yet reached are shown as "pending" so the donor can see
+// exactly where in the pipeline their money sits right now.
+// ---------------------------------------------------------------------------
+
 function renderReceipt(receipt, donation) {
+  const statusMeta = getCampaignStatusMeta(receipt.campaign.status)
+
   return `
     <section class="donor-receipt-card" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
       <button class="donor-receipt-close" type="button" data-close-receipt aria-label="Close receipt">×</button>
+
       <p class="donor-receipt-kicker">Verified Donation Receipt</p>
       <h2 id="receipt-title">${escapeHtml(receipt.campaign.name)}</h2>
       <p class="donor-receipt-muted">
-        This receipt confirms your donation was recorded in DonorLedger's audit trail.
+        Your donation is anchored on the Ethereum Sepolia blockchain.
+        Every step below was written by Bank Islam's cryptographic signature — nobody can alter it.
       </p>
 
+      <!-- Core donation details -->
       <dl class="donor-receipt-grid">
         <div>
           <dt>NGO</dt>
@@ -223,36 +239,67 @@ function renderReceipt(receipt, donation) {
           <dd>${escapeHtml(receipt.yourDonation.amountFormatted)}</dd>
         </div>
         <div>
-          <dt>Date Received</dt>
+          <dt>Paid On</dt>
           <dd>${escapeHtml(receipt.yourDonation.date)}</dd>
         </div>
         <div>
           <dt>Campaign Status</dt>
-          <dd>${escapeHtml(receipt.campaign.status)}</dd>
+          <dd>
+            <span style="display:inline-flex;align-items:center;gap:6px">
+              <span style="width:8px;height:8px;border-radius:50%;background:${statusMeta.color};flex-shrink:0"></span>
+              ${escapeHtml(statusMeta.label)}
+            </span>
+          </dd>
         </div>
         <div>
-          <dt>Vendor Choice</dt>
-          <dd>${escapeHtml(receipt.yourDonation.vendor || 'Not earmarked')}</dd>
+          <dt>Earmarked For</dt>
+          <dd>${escapeHtml(receipt.yourDonation.vendor || 'General Aid Fund')}</dd>
         </div>
       </dl>
 
+      <!-- ── Blockchain Flow Diagram ── -->
+      <section class="donor-receipt-flow">
+        <h3>Complete Blockchain Journey</h3>
+        <p class="donor-receipt-flow-sub">
+          Follow your ${escapeHtml(receipt.yourDonation.amountFormatted)} from your phone to the final beneficiary.
+        </p>
+        <div class="donor-receipt-flow-steps">
+          ${renderFlowStep(receipt, 'RECEIVED',    '1', 'You', 'Paid via DuitNow', 'Your payment was received by Bank Islam.')}
+          ${renderFlowConnector(receipt, 'RECEIVED')}
+          ${renderFlowStep(receipt, 'ALLOCATED',   '2', 'Bank Islam', 'Escrow Locked', 'Bank Islam locked your funds in the smart contract. Allocation rules are now immutable.')}
+          ${renderFlowConnector(receipt, 'ALLOCATED')}
+          ${renderFlowStep(receipt, 'RELEASED',    '3', 'NGO → Vendor', 'Funds Released', 'NGO submitted verified evidence. Bank Islam approved and released funds directly to the vendor.')}
+          ${renderFlowConnector(receipt, 'RELEASED')}
+          ${renderFlowStep(receipt, 'CONFIRMED',   '4', 'Beneficiary', 'Delivery Confirmed', 'Bank Islam received independent confirmation from the beneficiary that aid was delivered.')}
+          ${renderFlowConnector(receipt, 'CONFIRMED')}
+          ${renderFlowStep(receipt, 'COMPLETED',   '5', 'Complete', 'Full Cycle Done', 'Your donation completed the full accountability loop. Impact verified on-chain.')}
+        </div>
+      </section>
+
+      <!-- ── Blockchain Proof ── -->
       <section class="donor-receipt-proof">
         <h3>Blockchain Proof</h3>
         <p>
-          DonorLedger does not expose your email on-chain. Your donation is linked to this anonymous donor hash.
+          Your identity is never stored on-chain. Your donation is anonymously
+          linked to this unique hash generated from your email + campaign + timestamp.
         </p>
         <code>${escapeHtml(receipt.donorHash)}</code>
-        <p class="donor-receipt-tx">Transaction: ${escapeHtml(formatHash(donation?.txHash))}</p>
-      </section>
-
-      <section class="donor-receipt-journey">
-        <h3>Donation Journey</h3>
-        ${receipt.journey.map(renderJourneyItem).join('')}
+        <p class="donor-receipt-tx">
+          On-chain transaction:
+          <strong>${escapeHtml(formatHash(donation?.txHash))}</strong>
+          ${donation?.txHash
+            ? `<a href="https://sepolia.etherscan.io/tx/${encodeURIComponent(donation.txHash)}"
+                 target="_blank" rel="noreferrer"
+                 style="margin-left:8px;color:#10b981;font-size:11px;font-weight:800">
+                 View on Etherscan ↗
+               </a>`
+            : ''}
+        </p>
       </section>
 
       <footer class="donor-receipt-actions">
         <a href="${API_BASE_URL}/tracker/${encodeURIComponent(receipt.donorHash)}" target="_blank" rel="noreferrer">
-          Open Raw Audit JSON
+          Open Audit JSON
         </a>
         <button type="button" data-close-receipt>Close</button>
       </footer>
@@ -260,14 +307,58 @@ function renderReceipt(receipt, donation) {
   `
 }
 
-function renderJourneyItem(item) {
+/**
+ * Renders one step in the Donor → Bank → NGO → Vendor → Beneficiary flow.
+ * Checks if this milestone exists in the journey array to mark it done/pending.
+ */
+function renderFlowStep(receipt, milestone, stepNum, actor, title, description) {
+  const reached = receipt.journey.find((j) => j.milestone === milestone)
+  const isFrozen = receipt.campaign.status === 'FROZEN' || receipt.campaign.status === 'UNDER_REVIEW'
+  const isUnderReview = receipt.journey.find((j) => j.milestone === 'UNDER_REVIEW')
+
+  let state = 'pending'
+  if (reached) state = 'done'
+  // Only show frozen/amber if the campaign is CURRENTLY frozen AND
+  // UNDER_REVIEW is in the journey. Once Bank Islam unfreezes the campaign
+  // (status back to ACTIVE), steps revert to pending so the donor knows
+  // things are moving again — even though the on-chain UNDER_REVIEW entry
+  // is permanent (blockchain immutability is the point).
+  if (!reached && isFrozen && isUnderReview && ['RELEASED', 'CONFIRMED', 'COMPLETED'].includes(milestone)) {
+    state = 'frozen'
+  }
+
+  const stateClass = state === 'done' ? 'is-done'
+    : state === 'frozen' ? 'is-frozen' : 'is-pending'
+
+  const icon = state === 'done' ? '✓'
+    : state === 'frozen' ? '⏸' : stepNum
+
   return `
-    <article>
-      <strong>${escapeHtml(item.milestone)}</strong>
-      <p>${escapeHtml(item.description)}</p>
-      <span>${escapeHtml(item.at)}</span>
-    </article>
+    <div class="donor-flow-step ${stateClass}">
+      <div class="donor-flow-step-icon">${escapeHtml(icon)}</div>
+      <div class="donor-flow-step-body">
+        <span class="donor-flow-step-actor">${escapeHtml(actor)}</span>
+        <strong class="donor-flow-step-title">${escapeHtml(title)}</strong>
+        <p class="donor-flow-step-desc">${escapeHtml(reached ? reached.description : description)}</p>
+        ${reached ? `<span class="donor-flow-step-time">${escapeHtml(reached.at)}</span>` : ''}
+        ${state === 'frozen' ? '<span class="donor-flow-step-frozen">⚠ Paused — under Bank Islam review</span>' : ''}
+      </div>
+    </div>
   `
+}
+
+function renderFlowConnector(receipt, afterMilestone) {
+  const reached = receipt.journey.find((j) => j.milestone === afterMilestone)
+  return `<div class="donor-flow-connector ${reached ? 'is-done' : 'is-pending'}"></div>`
+}
+
+function getCampaignStatusMeta(status) {
+  if (status === 'ACTIVE')       return { label: 'Active',       color: '#10b981' }
+  if (status === 'COMPLETED')    return { label: 'Completed',    color: '#3b82f6' }
+  if (status === 'FROZEN')       return { label: 'Under Review', color: '#f59e0b' }
+  if (status === 'UNDER_REVIEW') return { label: 'Under Review', color: '#f59e0b' }
+  if (status === 'DRAFT')        return { label: 'Pending',      color: '#94a3b8' }
+  return { label: status || '—', color: '#94a3b8' }
 }
 
 function formatHash(value) {

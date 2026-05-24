@@ -58,16 +58,13 @@ router.post(
       })
 
       // Donor-facing milestone update (Section 6 Layer 2 — plain language)
+      // We scope to campaignId only — NOT vendorId — because donors who
+      // chose "General Aid Fund" have vendorId = null and would be excluded
+      // by a vendorId filter. When Bank Islam approves any disbursement for
+      // this campaign, every donor in that campaign should see RELEASED.
       try {
-        // Note: the donor milestone is keyed by donor hash, but a single
-        // disbursement affects many donors. We emit one "RELEASED" event
-        // per donation tied to this campaign category. In a production
-        // build this would be a batched on-chain call.
         const donations = await prisma.donation.findMany({
-          where: {
-            campaignId: evidence.campaignId,
-            vendorId: evidence.vendorId,
-          },
+          where: { campaignId: evidence.campaignId },
           select: { donorHash: true },
         })
         for (const d of donations) {

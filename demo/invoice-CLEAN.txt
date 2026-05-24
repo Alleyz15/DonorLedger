@@ -1,0 +1,73 @@
+================================================================================
+                         TAX INVOICE / INVOIS CUKAI
+================================================================================
+
+  Vendor  : Syarikat Makanan Barakah Sdn Bhd
+  SSM No  : 202201034567 (1391234-K)
+  Address : No. 12, Jalan Industri 3/4, Kawasan Perindustrian Ringan,
+            43000 Kajang, Selangor
+  Tel     : 03-8733 1234
+  Email   : accounts@barakah-food.com.my
+
+  Bill To : Pertubuhan Kebajikan Amanah Malaysia (PKAM)
+  ROS No  : PPM-003-12-07052015
+  Campaign: Bantuan Banjir Kelantan 2026 — Food Supply Package A
+
+  Invoice No : INV-2026-0412
+  Invoice Date: 15 April 2026
+  Payment Due : 22 April 2026
+
+  Reference  : Campaign ID DL-2026-0087 | PO No. PKAM-PO-2026-004
+
+--------------------------------------------------------------------------------
+  ITEM DESCRIPTION                          QTY     UNIT     UNIT PRICE  AMOUNT
+--------------------------------------------------------------------------------
+
+  Beras Putih Cap Jasmine 5kg               40 bag    —          RM12.50   RM  500.00
+    (equiv. 200 kg @ RM2.50/kg — within
+     Malaysian wholesale benchmark
+     RM2.00–2.80/kg)
+
+  Minyak Masak Sawit 5L                     10 btl    —          RM18.50   RM  185.00
+    (equiv. 50L @ RM3.70/L — within
+     Malaysian wholesale benchmark
+     RM3.00–4.20/L)
+
+  Sardin dalam Sos Tomato 425g              50 tin    —          RM4.20    RM  210.00
+    (@ RM4.20/tin — within benchmark
+     RM3.50–5.00/tin)
+
+                                                        ─────────────────────────
+                                               SUBTOTAL              RM  895.00
+                                               SST (6%)              RM   53.70
+                                               DELIVERY              RM   25.00
+                                               ─────────────────────────────────
+                                               TOTAL DUE             RM  973.70
+                                               ─────────────────────────────────
+
+--------------------------------------------------------------------------------
+  PAYMENT METHOD: DuitNow Business Transfer
+  Recipient Account: Maybank 5621 4300 1234 — Syarikat Makanan Barakah Sdn Bhd
+  Memo: INV-2026-0412 / PKAM-Banjir-Kelantan-2026
+--------------------------------------------------------------------------------
+
+  Delivery Details:
+    Delivery Date  : 16 April 2026, 9:00 AM – 12:00 PM
+    Delivery To    : Sekolah Kebangsaan Tok Uban, Pasir Puteh, Kelantan
+    Received By    : Encik Mohd Faizal bin Hamid (Guru Besar)
+    Signature      : [SIGNED]
+    Delivery Order : DO-2026-0089 (attached)
+
+  Note: All items supplied at published wholesale price list dated 1 Jan 2026.
+  Prices verified against KPDNHEP bulletin for essential goods Q1 2026.
+
+--------------------------------------------------------------------------------
+  Company Registration : 202201034567 (1391234-K)
+  GST/SST Registration  : W12-1801-23400201
+  Authorised by         : Puan Siti Aisyah binti Osman (Finance Manager)
+================================================================================
+
+  *** FOR BANK ISLAM DONORLEDGER AUDIT TRAIL — INVOICE HASH ANCHORED ON-CHAIN ***
+  *** Document SHA-256 hash recorded to Ethereum Sepolia via DonorLedger       ***
+
+================================================================================

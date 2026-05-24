@@ -1,125 +1,11 @@
+/* Normalized to match admin-campaigns, admin-ngos, admin-dashboard shell sizing */
 .admin-vendor-shell.app-shell {
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   background: #f8fafc;
 }
 
-.admin-vendor-shell .app-sidebar {
-  padding: 24px 18px;
-  border-right-color: #e5e7eb;
-}
-
-.admin-vendor-shell .app-brand {
-  color: #0f172a;
-  font-size: 22px;
-  letter-spacing: 0;
-}
-
-.admin-vendor-shell .app-brand-mark {
-  display: inline-flex;
-}
-
-.admin-vendor-shell .app-menu {
-  gap: 10px;
-  margin-top: 46px;
-}
-
-.admin-vendor-shell .app-menu-link {
-  min-height: 50px;
-  gap: 14px;
-  border-radius: 6px;
-  padding: 0 14px;
-  color: #667085;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.admin-vendor-shell .app-menu-link::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  border: 2px solid currentColor;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.admin-vendor-shell .app-menu-link:nth-child(2)::before,
-.admin-vendor-shell .app-menu-link:nth-child(6)::before,
-.admin-vendor-shell .app-menu-link:nth-child(7)::before {
-  border-radius: 50%;
-}
-
-.admin-vendor-shell .app-menu-link.is-active {
-  background: #e4f8f1;
-  color: #35c99a;
-}
-
-.admin-vendor-shell .app-menu-link.is-disabled {
-  opacity: 1;
-}
-
-.admin-vendor-shell .app-header {
-  min-height: 70px;
-  padding: 12px 32px;
-  border-bottom-color: #e5e7eb;
-}
-
-.admin-vendor-shell .app-search {
-  max-width: 500px;
-}
-
-.admin-vendor-shell .app-search input {
-  height: 44px;
-  border-radius: 999px;
-  background: #f4f6f8;
-  color: #101828;
-  font-size: 16px;
-}
-
-.admin-vendor-shell .app-search span {
-  border-color: #98a2b3;
-}
-
-.admin-vendor-shell .app-search span::after {
-  background: #98a2b3;
-}
-
-.admin-vendor-shell .app-user {
-  border-left: 0;
-}
-
-.admin-vendor-shell .app-help-button {
-  width: 28px;
-  height: 28px;
-  margin-left: auto;
-  border: 2px solid #98a2b3;
-  border-radius: 50%;
-  background: #ffffff;
-  color: #98a2b3;
-  font: inherit;
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.admin-vendor-shell .app-user strong {
-  font-size: 15px;
-}
-
-.admin-vendor-shell .app-user span {
-  color: #98a2b3;
-  font-size: 11px;
-}
-
-.admin-vendor-shell .app-avatar {
-  width: 42px;
-  height: 42px;
-  background: #065f46;
-  color: #ffffff;
-  font-size: 15px;
-}
-
 .admin-vendor-shell .app-content {
-  padding: 34px 40px;
+  padding: 48px 50px;
 }
 
 .admin-vendor-dashboard {
@@ -140,15 +26,15 @@
 .admin-vendor-hero h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 34px;
+  font-size: 42px;
   line-height: 1.1;
   font-weight: 800;
 }
 
 .admin-vendor-hero p {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   color: #667085;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .admin-vendor-queue-button {
@@ -318,7 +204,7 @@
 .admin-vendor-panel-header h2 {
   margin: 0;
   color: #111827;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
 }
 
@@ -366,7 +252,7 @@
 
 .admin-vendor-table td {
   color: #667085;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .admin-vendor-table td strong,

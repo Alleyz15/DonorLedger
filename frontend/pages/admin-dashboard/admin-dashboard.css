@@ -1,0 +1,314 @@
+/* Admin Dashboard — consistent shell sizing */
+.admin-dashboard-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.admin-dashboard-shell .app-content {
+  padding: 48px 50px;
+}
+
+.admin-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1468px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.admin-dashboard-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.admin-dashboard-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.admin-dashboard-hero p {
+  margin: 12px 0 0;
+  color: #667085;
+  font-size: 20px;
+}
+
+.admin-dashboard-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1.5px solid #d1fae5;
+  border-radius: 10px;
+  padding: 0 20px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.admin-dashboard-badge span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: dashboard-pulse 2s infinite;
+}
+
+@keyframes dashboard-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Stat cards ── */
+.admin-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.admin-dashboard-stat {
+  min-height: 190px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.admin-dashboard-stat-icon {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  font-size: 22px;
+}
+
+.admin-dashboard-stat-icon.is-ngo    { background: #dbeafe; }
+.admin-dashboard-stat-icon.is-campaign { background: #d1fae5; }
+.admin-dashboard-stat-icon.is-alert  { background: #fef3c7; }
+.admin-dashboard-stat-icon.is-frozen { background: #fee2e2; }
+
+.admin-dashboard-stat p {
+  margin: 0 0 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-dashboard-stat strong {
+  display: block;
+  color: #0f172a;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin-dashboard-stat em {
+  display: inline-block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ── Section layout ── */
+.admin-dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+/* ── Panel card ── */
+.admin-dashboard-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-dashboard-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 0 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-dashboard-panel-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.admin-dashboard-panel-link {
+  color: #065f46;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-dashboard-panel-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Alert list ── */
+.admin-dashboard-alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-dashboard-alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.admin-dashboard-alert-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-dashboard-alert-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.admin-dashboard-alert-dot.is-critical { background: #ef4444; }
+.admin-dashboard-alert-dot.is-warning  { background: #f59e0b; }
+.admin-dashboard-alert-dot.is-info     { background: #3b82f6; }
+
+.admin-dashboard-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-dashboard-alert-msg {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-dashboard-alert-meta {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ── Campaign list ── */
+.admin-dashboard-campaign-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-dashboard-campaign-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.admin-dashboard-campaign-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-dashboard-campaign-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-dashboard-campaign-name strong {
+  display: block;
+  color: #0f172a;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-dashboard-campaign-name span {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-dashboard-campaign-status {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  border-radius: 999px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.admin-dashboard-campaign-status.is-active   { background: #d1fae5; color: #065f46; }
+.admin-dashboard-campaign-status.is-frozen   { background: #fee2e2; color: #991b1b; }
+.admin-dashboard-campaign-status.is-draft    { background: #fef3c7; color: #92400e; }
+.admin-dashboard-campaign-status.is-review   { background: #dbeafe; color: #1e40af; }
+.admin-dashboard-campaign-status.is-default  { background: #f1f5f9; color: #475569; }
+
+/* ── Empty / loading states ── */
+.admin-dashboard-empty {
+  padding: 32px 24px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .admin-dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-dashboard-shell .app-content {
+    padding: 24px 16px;
+  }
+
+  .admin-dashboard-hero h1 {
+    font-size: 28px;
+  }
+
+  .admin-dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+}

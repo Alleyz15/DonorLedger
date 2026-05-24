@@ -56,6 +56,10 @@ export async function processDuitNowPayment({
     vendorAddress: vendor ? vendor.walletAddress : null,
   })
 
+  // Section 6 Layer 2 — Step 1: donor's payment received by Bank Islam.
+  // ALLOCATED (step 2) is derived automatically from RECEIVED in the
+  // tracker API — Bank Islam's escrow lock is an inherent property of
+  // Campaign.donate() landing on-chain, not a separate transaction.
   try {
     await contractService.updateDonorMilestone({
       donorHash,

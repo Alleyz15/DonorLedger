@@ -1,0 +1,197 @@
+.admin-alerts-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.admin-alerts-shell .app-content {
+  padding: 48px 50px;
+}
+
+.admin-alerts-page {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1468px;
+  margin: 0 auto;
+}
+
+/* ── Hero ── */
+.admin-alerts-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.admin-alerts-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.admin-alerts-hero p {
+  margin: 12px 0 0;
+  color: #667085;
+  font-size: 20px;
+}
+
+/* ── Filter tabs ── */
+.admin-alerts-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-alerts-filter-btn {
+  min-height: 40px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 0 18px;
+  background: #ffffff;
+  color: #475569;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-alerts-filter-btn.is-active,
+.admin-alerts-filter-btn:hover {
+  border-color: #065f46;
+  background: #065f46;
+  color: #ffffff;
+}
+
+/* ── Alert card list ── */
+.admin-alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-alerts-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 22px 26px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: box-shadow 0.15s;
+}
+
+.admin-alerts-card:hover {
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.admin-alerts-card.is-critical { border-left: 4px solid #ef4444; }
+.admin-alerts-card.is-warning  { border-left: 4px solid #f59e0b; }
+.admin-alerts-card.is-info     { border-left: 4px solid #3b82f6; }
+
+.admin-alerts-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.admin-alerts-card-severity {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-alerts-card-severity.is-critical { background: #fee2e2; color: #991b1b; }
+.admin-alerts-card-severity.is-warning  { background: #fef3c7; color: #92400e; }
+.admin-alerts-card-severity.is-info     { background: #dbeafe; color: #1e40af; }
+
+.admin-alerts-card-time {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-alerts-card-msg {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.admin-alerts-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-alerts-card-meta span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-alerts-card-meta strong {
+  color: #0f172a;
+}
+
+/* AI score badge */
+.admin-alerts-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-alerts-score.is-freeze  { background: #fee2e2; color: #991b1b; }
+.admin-alerts-score.is-review  { background: #fef3c7; color: #92400e; }
+.admin-alerts-score.is-ok      { background: #d1fae5; color: #065f46; }
+
+/* Payload details (expandable) */
+.admin-alerts-card-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-alerts-pattern-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Empty / error */
+.admin-alerts-empty {
+  padding: 60px 24px;
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px dashed #e2e8f0;
+  border-radius: 14px;
+}
+
+@media (max-width: 640px) {
+  .admin-alerts-shell .app-content { padding: 24px 16px; }
+  .admin-alerts-hero h1 { font-size: 28px; }
+}
