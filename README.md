@@ -1,1051 +1,514 @@
-# DonorLedger 🔗
+# DonorLedger
 
-> **Blockchain-powered donation transparency for Malaysia.**
-> Every ringgit traceable. No crypto knowledge needed.
+Blockchain-backed donation transparency for Malaysia.
 
-Built for **Hackathon X Fintech Forward 2026** — Be U by Bank Islam × UMPSA
-**Track 1: Reimagine Money** — Islamic Digital Finance + Fraud Detection
+DonorLedger lets donors donate in MYR while Bank Islam, NGOs, and donors can verify the donation journey through an immutable audit layer on Monad testnet. The blockchain does not replace Ringgit. It records campaign approval, donations, vendor allowlists, evidence submission, disbursement decisions, and donor milestones.
 
----
+Built for Hackathon X Fintech Forward 2026, Be U by Bank Islam x UMPSA.
 
-## 👥 Team
+## Current Demo Flow
 
-| Role | Responsibility |
-|---|---|
-| Backend Engineer | Node.js server, Smart contracts (Solidity), Gemini AI integration, blockchain bridge, deployment |
-| Frontend Engineer | UI/UX design (Figma), frontend implementation, donor tracker, campaign browser |
-| Pitcher | Presentation, research, judge Q&A, documentation support |
+### Donor
 
----
+- Logs in with a pre-seeded demo donor account.
+- Views active campaigns.
+- Opens campaign details.
+- Donates a MYR amount through a simulated DuitNow flow.
+- Backend records the donation in PostgreSQL and writes an audit record to the campaign smart contract.
+- Donor identity is protected with a salted donor hash.
+- Donor can view donation history and receipt.
+- Receipt shows the campaign, amount, date, and public audit journey.
 
-## 🚨 The Problem
+### NGO Organizer
 
-In 2024–2026, Malaysians lost over **RM300 million** in donated funds to NGO fraud:
+- Registers through the NGO application form.
+- Logs in after the account exists.
+- Creates campaign applications.
+- Adds or selects approved vendors.
+- Tracks campaign status.
+- Submits evidence before money can be released.
+- Evidence upload requires five documents:
+  - SSM / ROS document
+  - Service agreement
+  - Invoice
+  - Delivery proof
+  - Recipient confirmation
 
-- **RM230 million** misappropriated by a single welfare NGO
-- **RM70 million** in Gaza fundraising fraud — 41 bank accounts frozen by MACC
-- **96,722 registered NGOs** in Malaysia — zero real-time accountability infrastructure
-- **No specific law** exists to regulate online donation drives in Malaysia
-- Law enforcement admits they cannot act in real time — investigations take months
+### Bank Islam Admin
 
-> *"Every year, Malaysians donate billions in good faith — but once the money leaves their hands, it disappears into a black box that nobody, not donors, not regulators, not even MACC, can see inside in real time."*
+- Logs in with the seeded admin account.
+- Reviews NGO applications.
+- Approves or rejects campaign applications.
+- Reviews vendor KYC.
+- Approves or rejects vendors.
+- Reviews evidence and AI fraud results.
+- Approves or rejects disbursement.
+- Can view alerts, audit logs, campaigns, NGOs, vendors, and evidence reviews.
 
----
+## Demo Accounts
 
-## 💡 The Solution
+### Donor
 
-DonorLedger is a blockchain-powered donation transparency platform:
+Use any seeded donor:
 
-- **NGOs are verified** by Bank Islam KYC before receiving a single donation
-- **Fund allocation rules** are locked in smart contracts — impossible to change after campaign launch
-- **Money never touches NGO hands** — Bank Islam holds all funds in escrow, releases directly to verified vendors only
-- **NGOs must submit evidence** (invoice, service agreement, delivery proof) before any ringgit is released
-- **AI monitors** every disbursement in real time using Google Gemini, flags fraud patterns automatically
-- **Funds auto-freeze** when anomaly is detected — MACC alerted immediately
-- **Donors use DuitNow** — no crypto wallet, no seed phrase, no technical knowledge needed
-- **Donor tracker** shows personal fund journey in plain language — no blockchain visible
-
----
-
-## 🏗️ System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                          USER LAYER                             │
-│                                                                 │
-│   Donor App          NGO Portal          Bank Islam Admin       │
-│   (Frontend)         (Frontend)          Dashboard (Frontend)   │
-└──────────┬───────────────┬──────────────────────┬──────────────┘
-           │               │                      │
-           ▼               ▼                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   BACKEND LAYER                                 │
-│               Node.js + Express.js                              │
-│              IPserverone NovaCloud VPS                          │
-│                                                                 │
-│  ┌──────────────┐  ┌───────────────┐  ┌──────────────────────┐ │
-│  │  REST API    │  │ Bridge Service│  │   AI Monitor Service │ │
-│  │  (Express)   │  │ DuitNow→Chain │  │   (Gemini API)       │ │
-│  └──────────────┘  └───────────────┘  └──────────────────────┘ │
-│                                                                 │
-│  ┌──────────────┐  ┌───────────────┐  ┌──────────────────────┐ │
-│  │  Webhook     │  │ Contract      │  │   Alert Service      │ │
-│  │  Handler     │  │ Event         │  │   (MACC + BankIslam) │ │
-│  │              │  │ Listener      │  │                      │ │
-│  └──────────────┘  └───────────────┘  └──────────────────────┘ │
-│                                                                 │
-│  ┌──────────────┐  ┌───────────────┐                           │
-│  │  PostgreSQL  │  │  Redis        │                           │
-│  │  (IPserver1) │  │  (IPserver1)  │                           │
-│  └──────────────┘  └───────────────┘                           │
-└──────────┬───────────────┬──────────────────────────────────────┘
-           │               │
-           ▼               ▼
-┌──────────────────┐   ┌──────────────────────────────────────────┐
-│  BLOCKCHAIN      │   │         EXTERNAL SERVICES                │
-│  LAYER           │   │                                          │
-│                  │   │  Google Gemini API — AI fraud detection  │
-│  Registry.sol    │   │  Infura — Sepolia RPC endpoint           │
-│  Campaign.sol    │   │  Local Storage — NGO document files      │
-│  DonorTracker    │   │  Webhook.site — MACC alert simulation    │
-│  .sol            │   │                                          │
-│                  │   │                                          │
-│  Ethereum        │   │                                          │
-│  Sepolia Testnet │   │                                          │
-│  (FREE)          │   │                                          │
-└──────────────────┘   └──────────────────────────────────────────┘
+```text
+Email: donor01@example.com
+Password: Password123!
 ```
 
----
+More demo donors exist from `donor01@example.com` to `donor10@example.com`.
 
-## 🛠️ Tech Stack
+### Bank Islam Admin
+
+```text
+Email: admin@bankislam.demo
+Password: Password123!
+```
+
+### NGO
+
+NGO accounts are created through the NGO registration / organizer signup flow. The NGO login uses email and password.
+
+## Tech Stack
+
+### Frontend
+
+- Static HTML, CSS, and JavaScript
+- Modular page scripts under `frontend/pages`
+- Shared services under `frontend/services`
+- API base configured in `frontend/config/api-config.js`
 
 ### Backend
-| Technology | Version | Purpose |
-|---|---|---|
-| Node.js | v20 LTS | Server runtime |
-| Express.js | ^4.18 | REST API framework + webhook handling |
-| ethers.js | ^6.9 | Smart contract interaction from backend |
-| @google/generative-ai | ^0.2 | Google Gemini AI SDK for fraud detection |
-| prisma | ^5.0 | PostgreSQL ORM — database queries |
-| @prisma/client | ^5.0 | Generated database client |
-| bull | ^4.12 | Redis-backed job queue for async AI analysis |
-| multer | ^1.4 | Local file upload handling for NGO documents |
-| jsonwebtoken | ^9.0 | JWT auth for Bank Islam admin endpoints |
-| bcryptjs | ^2.4 | Password hashing |
-| dotenv | ^16.0 | Environment variable management |
-| cors | ^2.8 | Cross-origin requests from frontend |
-| helmet | ^7.0 | Basic security headers |
-| jest | ^29.0 | Unit testing |
+
+- Node.js
+- Express
+- Prisma
+- PostgreSQL
+- Redis + Bull queue
+- Multer file upload
+- JWT authentication
+- Google Gemini AI fraud detection
+- ethers.js blockchain bridge
 
 ### Smart Contracts
-| Technology | Version | Purpose |
-|---|---|---|
-| Solidity | ^0.8.20 | Smart contract language |
-| Hardhat | ^2.19 | Compile, test, deploy framework |
-| OpenZeppelin Contracts | ^5.0 | Audited base contracts — Ownable, Pausable, ReentrancyGuard |
-| ethers.js | ^6.9 | Hardhat + backend contract interaction |
-| @nomicfoundation/hardhat-toolbox | ^4.0 | Testing utilities |
-| Ethereum Sepolia Testnet | — | Free test network for demo deployment |
 
-### Infrastructure
-| Service | Purpose |
-|---|---|
-| IPserverone NovaCloud | VPS — runs Node.js backend + PostgreSQL + Redis |
-| Ethereum Sepolia | Free testnet for smart contract deployment |
-| Infura (free tier) | Sepolia RPC URL — connects backend to blockchain |
-| Local VPS Storage | NGO document files (invoices, photos, PDFs) |
+- Solidity
+- Hardhat
+- OpenZeppelin
+- Monad testnet
 
----
+Contracts:
 
-## 📁 Project Structure
+- `Registry.sol`: Bank Islam verified NGO registry.
+- `Campaign.sol`: Per-campaign donation, vendor allowlist, evidence, pause, and disbursement logic.
+- `DonorTracker.sol`: Donor-facing milestone and campaign progress audit trail.
 
-```
-donorledger/
-│
-├── backend/
-│   ├── src/
-│   │   ├── server.js                      # Express entry point
-│   │   │
-│   │   ├── config/
-│   │   │   ├── env.js                     # Validate + export env vars
-│   │   │   ├── gemini.js                  # Gemini API client init
-│   │   │   ├── blockchain.js              # ethers provider + wallets
-│   │   │   ├── database.js                # Prisma client init
-│   │   │   └── queue.js                   # Bull queue init (Redis)
-│   │   │
-│   │   ├── routes/
-│   │   │   ├── donate.routes.js           # POST /api/donate
-│   │   │   ├── campaign.routes.js         # GET /api/campaign
-│   │   │   │                              # GET /api/campaign/:id
-│   │   │   ├── evidence.routes.js         # POST /api/evidence/submit
-│   │   │   ├── disbursement.routes.js     # POST /api/disbursement/approve
-│   │   │   │                              # POST /api/disbursement/reject
-│   │   │   ├── tracker.routes.js          # GET /api/tracker/:donorHash
-│   │   │   ├── ngo.routes.js              # POST /api/ngo/register
-│   │   │   └── admin.routes.js            # All Bank Islam admin routes
-│   │   │
-│   │   ├── services/
-│   │   │   ├── bridge.service.js          # DuitNow simulation → blockchain
-│   │   │   ├── contract.service.js        # All ethers.js contract calls
-│   │   │   ├── ai.service.js              # Gemini fraud detection logic
-│   │   │   ├── alert.service.js           # MACC + Bank Islam alerts
-│   │   │   ├── storage.service.js         # Local file storage (multer)
-│   │   │   └── kyc.service.js             # Bank Islam KYC simulation
-│   │   │
-│   │   ├── middleware/
-│   │   │   ├── auth.middleware.js         # JWT verify for admin routes
-│   │   │   ├── validate.middleware.js     # Request body validation
-│   │   │   └── error.middleware.js        # Global error handler
-│   │   │
-│   │   ├── listeners/
-│   │   │   └── contract.listener.js       # Listen for on-chain events
-│   │   │                                  # (DonationReceived, CampaignPaused)
-│   │   │
-│   │   └── utils/
-│   │       ├── hash.utils.js              # Donor ID hashing (SHA-256)
-│   │       └── format.utils.js            # Amount + date formatting
-│   │
-│   ├── prisma/
-│   │   ├── schema.prisma                  # Database schema
-│   │   └── migrations/                    # Auto-generated migrations
-│   │
-│   ├── uploads/                           # Local NGO document storage
-│   │   ├── invoices/
-│   │   ├── agreements/
-│   │   └── delivery-proof/
-│   │
-│   ├── .env                               # Your actual secrets (never commit)
-│   ├── .env.example                       # Template (safe to commit)
-│   ├── .gitignore
-│   ├── package.json
-│   └── jest.config.js
-│
-├── contracts/
-│   ├── contracts/
-│   │   ├── Registry.sol                   # NGO credential registry
-│   │   ├── Campaign.sol                   # Per-campaign fund control
-│   │   └── DonorTracker.sol               # Public transparency layer
-│   │
-│   ├── scripts/
-│   │   ├── deploy.js                      # Deploy all 3 contracts to Sepolia
-│   │   └── seed.js                        # Register test NGO + campaign
-│   │
-│   ├── test/
-│   │   ├── Registry.test.js
-│   │   └── Campaign.test.js
-│   │
-│   ├── hardhat.config.js
-│   ├── .env                               # Separate .env for contracts
-│   └── package.json
-│
-├── frontend/                              # Frontend teammate's folder
-│   └── ...
-│
-└── README.md
+## Blockchain Design
+
+Production MYR flow:
+
+```text
+Donor -> DuitNow / Bank Islam -> Bank escrow -> verified vendor / NGO-linked payout flow
 ```
 
----
+Blockchain audit flow:
 
-## 🔄 Core Workflows
-
-### Workflow 1 — Donation
-
-```
-1.  Donor picks a verified campaign on the frontend
-2.  Frontend calls  POST /api/donate
-                    body: { campaignId, amount, donorEmail }
-3.  bridge.service.js simulates receiving DuitNow payment
-4.  contract.service.js calls Campaign.donate(donorHash, amount)
-5.  Smart contract writes immutable record on Sepolia
-6.  Backend generates unique donorHash for this donor
-7.  Backend saves donor email + donorHash to PostgreSQL
-    (email is off-chain — never goes on blockchain)
-8.  API returns { txHash, trackerUrl } to frontend
-9.  Frontend shows donor their tracker link
+```text
+Backend -> Monad smart contracts -> public audit trail
 ```
 
-### Workflow 2 — Evidence Submission + AI Check
+Important distinction:
 
-```
-1.  NGO submits disbursement request via NGO portal
-2.  Frontend calls  POST /api/evidence/submit
-                    body: { campaignId, category, amount,
-                            vendorId, documents[] }
-3.  storage.service.js saves files to /uploads/ on VPS
-4.  contract.service.js writes SHA-256 hash of documents on-chain
-    (proves documents existed at this timestamp — not alterable)
-5.  Bull queue adds AI analysis job
-6.  ai.service.js sends structured prompt to Gemini API:
-    — campaign type, declared allocation %
-    — spending history to date
-    — this disbursement: amount, category, vendor
-    — known fraud patterns from MACC cases
-7.  Gemini returns { confidenceScore, reason, recommendation }
-8a. Score BELOW 60  → flag in Bank Islam dashboard for human review
-                      funds continue to flow normally
-8b. Score 60-85     → flag with warning, Bank Islam must approve
-                      before release
-8c. Score ABOVE 85  → contract.service.js calls pauseCampaign()
-                      alert.service.js fires MACC webhook alert
-                      donor tracker updates to "Under Review"
-```
+- MYR is still real money handled by Bank Islam / DuitNow.
+- MON is only used as testnet gas for the hackathon demo.
+- Blockchain is used for transparency, not as the donation currency.
 
-### Workflow 3 — Disbursement Approval
-
-```
-1.  Bank Islam reviews evidence in admin dashboard
-2.  Bank Islam clicks approve
-3.  Frontend calls  POST /api/disbursement/approve
-                    header: Authorization: Bearer <jwt>
-4.  auth.middleware.js verifies Bank Islam JWT
-5.  contract.service.js calls Campaign.approveDisbursement(evidenceId)
-6.  Smart contract checks: does this amount keep all
-    categories within declared allocation %?
-    — If NO  → transaction reverted, approval rejected
-    — If YES → DisbursementApproved event emitted on-chain
-7.  contract.listener.js catches the event
-8.  Bank Islam escrow releases ringgit directly to vendor
-    bank account (simulated in demo)
-9.  Donor tracker updates to "Funds Released to Vendor"
-```
-
----
-
-## 🤖 AI Tools Used
-
-| Tool | How Used |
-|---|---|
-| **Google Gemini API** | Core fraud anomaly detection — analyses every disbursement request against declared allocation rules and known fraud patterns, returns confidence score and recommendation |
-| **Claude by Anthropic** | System architecture design, problem statement development, pitch strategy, limitation analysis |
-| **GitHub Copilot** | Code completion during hackathon build |
-
-### Gemini Prompt Structure (ai.service.js)
-
-Every disbursement request sends this structured prompt to Gemini:
-
-```
-You are a financial fraud detection system for Malaysian NGO donations.
-
-CAMPAIGN CONTEXT:
-- Cause type: [disaster_relief / medical_aid / education / etc]
-- Declared allocation: [X]% direct aid, [Y]% logistics, [Z]% admin
-- Campaign target: RM [amount]
-- Total raised so far: RM [amount]
-
-SPENDING HISTORY TO DATE:
-- Direct aid spent: RM [amount] ([X]% of raised)
-- Logistics spent: RM [amount] ([Y]% of raised)
-- Admin spent: RM [amount] ([Z]% of raised)
-
-THIS DISBURSEMENT REQUEST:
-- Category claimed: [category]
-- Amount: RM [amount]
-- Vendor: [vendor name] — registered [X] months ago
-- If approved, admin total becomes: [new %]
-
-KNOWN FRAUD PATTERNS (from MACC Malaysia cases):
-- Admin costs exceed declared % by more than 10%
-- Large payment to vendor registered less than 6 months ago
-- Funds idle more than 30 days then sudden large withdrawal
-- Same vendor receiving payments from multiple unrelated NGOs
-- Invoice amount inconsistent with market rates for claimed service
-
-Analyse this disbursement request.
-Return ONLY valid JSON, no markdown:
-{
-  "confidenceScore": 0-100,
-  "reason": "one sentence explanation",
-  "recommendation": "approve" | "review" | "freeze",
-  "flaggedPatterns": ["pattern1", "pattern2"]
-}
-```
-
----
-
-## 📋 Smart Contracts (Solidity + OpenZeppelin)
-
-All three contracts use **OpenZeppelin v5** as the base.
-OpenZeppelin is an industry-standard audited contract library — we build on top of it rather than writing security-critical code from scratch.
+## Smart Contract Responsibilities
 
 ### Registry.sol
 
-```
-Base: Ownable (OpenZeppelin)
-Owner: Bank Islam admin wallet
-Network: Ethereum Sepolia Testnet
-Purpose: Single source of truth for verified NGOs
+Stores verified NGO credentials.
 
-Key functions:
-addNGO(address, name, regNumber, riskTier, expiryDate)
-  — Only callable by Bank Islam wallet (onlyOwner)
-  — Writes NGO credential on-chain
+Bank Islam can:
 
-revokeNGO(address, reason)
-  — Only callable by Bank Islam wallet
-  — Marks credential as revoked permanently
+- Add approved NGO
+- Renew NGO credential
+- Revoke NGO credential
 
-isVerified(address) → bool
-  — Public read — anyone can check if NGO is verified
-  — Returns false if expired or revoked
-
-getNGODetails(address) → NGOCredential struct
-
-Key events emitted:
-NGOVerified(address indexed ngo, string name, uint256 timestamp)
-NGORevoked(address indexed ngo, string reason, uint256 timestamp)
-```
+Campaign contracts call this registry to check whether an NGO is still valid.
 
 ### Campaign.sol
 
-```
-Base: Ownable + Pausable + ReentrancyGuard (OpenZeppelin)
-Deployed: Once per campaign by backend server wallet
-Network: Ethereum Sepolia Testnet
-Purpose: Locks allocation rules, records all donations,
-         controls every disbursement
+Each approved campaign gets its own campaign contract.
 
-Constructor sets (PERMANENT — cannot change after deploy):
-- ngoAddress
-- campaignName
-- causeType
-- aidPercent + logisticsPercent + adminPercent
-- targetAmount
-- endDate
-- registryContract address (checks NGO is verified)
+It records:
 
-Key functions:
-donate(donorHash, amount)
-  — Called by backend bridge when DuitNow payment received
-  — Records immutable donation entry
+- Donation totals
+- Donor hashes
+- Approved vendors
+- Evidence submissions
+- Disbursement approval or rejection
+- Campaign pause / unpause state
 
-submitEvidence(documentHash, category, amount, vendorAddress)
-  — Called by backend when NGO submits disbursement request
-  — Stores document hash on-chain (proves doc not tampered)
+It enforces:
 
-approveDisbursement(evidenceId)
-  — Only callable by Bank Islam wallet
-  — Checks allocation % before approving
-  — Emits event for contract.listener.js to catch
-
-pauseCampaign(reason)
-  — Callable by Bank Islam wallet OR backend AI trigger wallet
-  — Uses OpenZeppelin Pausable — blocks all disbursements
-
-unpauseCampaign()
-  — Only callable by Bank Islam wallet
-
-Key events emitted:
-DonationReceived(bytes32 donorHash, uint256 amount, uint256 timestamp)
-EvidenceSubmitted(uint256 evidenceId, string category, uint256 amount)
-DisbursementApproved(uint256 evidenceId, address vendor, uint256 amount)
-CampaignPaused(string reason, uint256 timestamp)
-CampaignUnpaused(uint256 timestamp)
-```
+- NGO must be verified
+- Vendor must be approved for that campaign
+- Evidence amount cannot exceed raised minus released funds
+- Bank Islam approval is required for disbursement
 
 ### DonorTracker.sol
 
-```
-Base: Ownable (OpenZeppelin)
-Owner: Backend server wallet
-Network: Ethereum Sepolia Testnet
-Purpose: Public anonymised transparency layer
-         (what donor tracker page reads from)
+Stores donor journey milestones using donor hashes, not donor emails.
 
-Key functions:
-updateMilestone(campaignId, donorHash, milestone, description)
-  — Called by backend when fund status changes
-  — Milestone types: RECEIVED, ALLOCATED, RELEASED, CONFIRMED,
-                     UNDER_REVIEW, FROZEN, COMPLETED
+Example milestones:
 
-getDonorJourney(donorHash) → Milestone[]
-  — Public read
-  — Returns array of milestones for one donor's donation
+- `RECEIVED`
+- `ALLOCATED`
+- `UNDER_REVIEW`
+- `RELEASED`
+- `CONFIRMED`
+- `COMPLETED`
 
-getCampaignProgress(campaignId) → Progress
-  — Public read
-  — Returns aggregate % per category for display
+## Evidence And Fraud Detection
 
-Key events emitted:
-MilestoneUpdated(bytes32 donorHash, string milestone, uint256 timestamp)
-```
+Evidence submission works like this:
 
----
-
-## 🔐 Environment Variables — Complete Setup Guide
-
-### Step 1 — Get your Sepolia RPC URL (Free)
-
-Infura gives you a free connection URL to the Ethereum Sepolia testnet.
-Your backend needs this to talk to the blockchain.
-
-```
-1. Go to https://app.infura.io
-2. Sign up for a free account
-3. Click "Create New API Key"
-4. Name it "donorledger"
-5. Click on the key → copy the Sepolia HTTPS URL
-   It looks like: https://sepolia.infura.io/v3/abc123def456...
+```text
+NGO submits five documents
+Backend hashes the evidence package
+Backend writes the evidence hash to Campaign.sol
+Gemini AI reviews the disbursement
+Bank Islam sees the fraud risk score
+Bank Islam approves or rejects the evidence
+Smart contract records the final decision
 ```
 
-### Step 2 — Get free Sepolia testnet ETH
+Fraud score routing:
 
-You need test ETH to pay gas fees when deploying contracts.
-This is completely fake money — not real ETH, zero real cost.
-
-```
-1. Open MetaMask
-2. Switch network to "Sepolia Test Network"
-   (Settings → Advanced → Show test networks → ON)
-3. Copy your wallet address
-4. Go to https://sepoliafaucet.com
-5. Paste your address → click Send
-6. You receive 0.5 Sepolia ETH — enough for many deployments
-7. Do this for all three wallets:
-   - Bank Islam admin wallet
-   - Test NGO wallet
-   - Test donor wallet
+```text
+Below 60: low risk, still visible to Bank Islam
+60 to 85: manual Bank Islam review
+Above 85: auto-freeze campaign and send MACC webhook alert
 ```
 
-### Step 3 — Export your MetaMask private keys
+## Local Setup
 
-Your backend needs the Bank Islam admin wallet private key to sign
-contract transactions from the server side.
+### 1. Start infrastructure
 
-```
-WARNING: Private keys give full control of the wallet.
-Never commit them to GitHub. Never share them.
-Only put them in your .env file.
-
-To export from MetaMask:
-1. Click the three dots next to your account name
-2. Click "Account Details"
-3. Click "Export Private Key"
-4. Enter your MetaMask password
-5. Copy the 64-character hex string
+```powershell
+docker compose up -d
 ```
 
-You need to export:
-- Bank Islam admin wallet private key → BANK_ISLAM_PRIVATE_KEY
-- Backend server wallet private key → SERVER_WALLET_PRIVATE_KEY
-  (this is the wallet that calls donate() and updateMilestone())
+This starts:
 
-### Step 4 — Deploy contracts and get addresses
+- PostgreSQL
+- Redis
 
-Contract addresses do not exist until you deploy them.
-Run deployment first, then copy the printed addresses into .env
+### 2. Install dependencies
 
-```bash
+```powershell
+npm install
 cd contracts
 npm install
-npx hardhat run scripts/deploy.js --network sepolia
-
-# Terminal will print:
-# Registry deployed to: 0xABC...
-# Campaign deployed to: 0xDEF...
-# DonorTracker deployed to: 0x789...
-# Copy these three addresses into your backend .env
+cd ..
 ```
 
-### Step 5 — Get Gemini API key
+### 3. Configure environment
 
-```
-1. Go to https://aistudio.google.com
-2. Sign in with your Google account
-3. Click "Get API Key" → Create API Key
-4. Copy the key — starts with "AIza..."
-```
+Copy the example env file:
 
-### Step 6 — Set up PostgreSQL on IPserverone VPS
-
-```bash
-# After launching your NovaCloud instance and SSH into it:
-sudo apt update
-sudo apt install postgresql postgresql-contrib -y
-sudo systemctl start postgresql
-sudo -u postgres psql
-
-# Inside PostgreSQL shell:
-CREATE DATABASE donorledger;
-CREATE USER donoruser WITH PASSWORD 'your_strong_password';
-GRANT ALL PRIVILEGES ON DATABASE donorledger TO donoruser;
-\q
-
-# Your DATABASE_URL will be:
-# postgresql://donoruser:your_strong_password@localhost:5432/donorledger
+```powershell
+copy .env.example .env
 ```
 
-### Step 7 — Set up Redis on IPserverone
+Fill in:
 
-IPserverone NovaCloud has Redis available as a service in their dashboard sidebar. Use that. No separate installation needed.
+- `DATABASE_URL`
+- `BLOCKCHAIN_RPC_URL`
+- `CHAIN_ID`
+- `BLOCKCHAIN_NETWORK_NAME`
+- `BANK_ISLAM_PRIVATE_KEY`
+- `SERVER_WALLET_PRIVATE_KEY`
+- `REGISTRY_CONTRACT_ADDRESS`
+- `DONOR_TRACKER_CONTRACT_ADDRESS`
+- `DONOR_HASH_SALT`
+- `GEMINI_API_KEY`
+- `JWT_SECRET`
+- `MACC_WEBHOOK_URL`
 
-```
-1. In IPserverone dashboard → click Redis (sidebar)
-2. Create a Redis instance
-3. Copy the connection URL — looks like:
-   redis://default:password@host:port
-```
+Do not commit `.env`.
 
-If Redis service is not available on your instance tier, install it manually:
-```bash
-sudo apt install redis-server -y
-sudo systemctl start redis
-# URL: redis://localhost:6379
-```
+### 4. Compile and test contracts
 
----
-
-### Complete .env.example
-
-Copy this to `.env` and fill in every value:
-
-```env
-# ─────────────────────────────────────
-# SERVER
-# ─────────────────────────────────────
-PORT=3001
-NODE_ENV=development
-# Change to 'production' when deploying to IPserverone
-
-# ─────────────────────────────────────
-# DATABASE
-# PostgreSQL on IPserverone VPS
-# ─────────────────────────────────────
-DATABASE_URL=postgresql://donoruser:YOUR_DB_PASSWORD@localhost:5432/donorledger
-
-# ─────────────────────────────────────
-# REDIS
-# IPserverone Redis service or local
-# ─────────────────────────────────────
-REDIS_URL=redis://localhost:6379
-# Replace with IPserverone Redis URL if using their service
-
-# ─────────────────────────────────────
-# BLOCKCHAIN — ETHEREUM SEPOLIA TESTNET
-# 100% free — no real money involved
-# ─────────────────────────────────────
-
-# From Infura (https://app.infura.io) — free account
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
-
-# Bank Islam admin wallet private key
-# Exported from MetaMask → Account Details → Export Private Key
-# This wallet signs: addNGO, revokeNGO, approveDisbursement, pauseCampaign
-BANK_ISLAM_PRIVATE_KEY=YOUR_64_CHAR_HEX_PRIVATE_KEY
-
-# Backend server wallet private key
-# Separate wallet from Bank Islam — signs: donate(), updateMilestone()
-SERVER_WALLET_PRIVATE_KEY=YOUR_64_CHAR_HEX_PRIVATE_KEY
-
-# Contract addresses — only available AFTER running deploy.js
-# Run: cd contracts && npx hardhat run scripts/deploy.js --network sepolia
-# Then copy the three addresses printed in terminal
-REGISTRY_CONTRACT_ADDRESS=0x_FILL_AFTER_DEPLOY
-CAMPAIGN_CONTRACT_ADDRESS=0x_FILL_AFTER_DEPLOY
-DONOR_TRACKER_CONTRACT_ADDRESS=0x_FILL_AFTER_DEPLOY
-
-# ─────────────────────────────────────
-# GOOGLE GEMINI AI
-# From https://aistudio.google.com
-# ─────────────────────────────────────
-GEMINI_API_KEY=AIza_YOUR_GEMINI_KEY
-GEMINI_MODEL=gemini-1.5-flash
-# gemini-1.5-flash is free tier — sufficient for hackathon
-
-# Fraud detection thresholds (tunable)
-AI_REVIEW_THRESHOLD=60
-# Scores above this → flag for Bank Islam human review
-AI_FREEZE_THRESHOLD=85
-# Scores above this → auto freeze + MACC alert
-
-# ─────────────────────────────────────
-# FILE STORAGE
-# Local storage on VPS — no cloud needed
-# ─────────────────────────────────────
-UPLOAD_DIR=./uploads
-MAX_FILE_SIZE_MB=10
-ALLOWED_FILE_TYPES=pdf,jpg,jpeg,png
-
-# ─────────────────────────────────────
-# AUTH
-# JWT for Bank Islam admin routes
-# ─────────────────────────────────────
-JWT_SECRET=MINIMUM_32_CHARACTER_RANDOM_STRING_HERE
-JWT_EXPIRES_IN=8h
-
-# Demo admin credentials (change in production)
-BANK_ISLAM_ADMIN_EMAIL=admin@bankislam.com.my
-BANK_ISLAM_ADMIN_PASSWORD=DemoPassword2026!
-
-# ─────────────────────────────────────
-# ALERT SIMULATION
-# Use webhook.site for demo — shows MACC alert payload
-# ─────────────────────────────────────
-MACC_ALERT_WEBHOOK_URL=https://webhook.site/YOUR_UNIQUE_URL
-# Get your free URL at https://webhook.site
-# When AI freezes a campaign, this URL receives the alert payload
-# Show this to judges as "MACC receiving the alert"
-
-# ─────────────────────────────────────
-# CORS
-# Your frontend URL
-# ─────────────────────────────────────
-FRONTEND_URL=http://localhost:5173
-# Change to IPserverone IP when deployed:
-# FRONTEND_URL=http://YOUR_VPS_IP:5173
+```powershell
+npm run contracts:compile
+npm run contracts:test
 ```
 
----
+### 5. Deploy infrastructure contracts to Monad
 
-## 🚀 Setup Instructions
-
-### Prerequisites
-
-```bash
-Node.js v20 LTS
-npm v10+
-Git
-MetaMask browser extension (Chrome/Firefox)
-PostgreSQL (on VPS)
-Redis (on VPS or IPserverone service)
+```powershell
+npm run contracts:deploy
 ```
 
-### 1. Clone the repository
+Copy the printed addresses into `.env`:
 
-```bash
-git clone https://github.com/yourteam/donorledger.git
-cd donorledger
+```text
+REGISTRY_CONTRACT_ADDRESS=0x...
+DONOR_TRACKER_CONTRACT_ADDRESS=0x...
 ```
 
-### 2. Deploy smart contracts to Sepolia
+Campaign contracts are deployed later when Bank Islam approves a campaign.
 
-```bash
-cd contracts
-npm install
+### 6. Migrate and seed database
 
-# Create contracts .env
-cp .env.example .env
-# Fill in: SEPOLIA_RPC_URL and BANK_ISLAM_PRIVATE_KEY
-
-# Compile contracts
-npx hardhat compile
-
-# Run contract tests (always before deploy)
-npx hardhat test
-
-# Deploy to Sepolia testnet
-npx hardhat run scripts/deploy.js --network sepolia
-# COPY the three contract addresses printed in terminal
-
-# Seed test data (registers test NGO + creates test campaign)
-npx hardhat run scripts/seed.js --network sepolia
+```powershell
+npm run prisma:migrate -- --name init
+npm run prisma:seed
 ```
 
-### 3. Set up backend
+### 7. Run backend
 
-```bash
-cd ../backend
-npm install
-
-# Set up environment
-cp .env.example .env
-# Fill in ALL values following the setup guide above
-
-# Run database migrations
-npx prisma migrate dev --name init
-npx prisma generate
-
-# Create upload directories
-mkdir -p uploads/invoices uploads/agreements uploads/delivery-proof
-
-# Start development server
+```powershell
 npm run dev
-# Backend running at http://localhost:3001
 ```
 
-### 4. Verify setup is working
+Backend health check:
 
-```bash
-# Should return { status: "ok", blockchain: "connected" }
-curl http://localhost:3001/api/health
-
-# Should return list of campaigns (empty at first)
-curl http://localhost:3001/api/campaign
+```powershell
+curl http://localhost:3001/health
 ```
 
----
+### 8. Run frontend
 
-## 🔌 API Endpoints
+From the `frontend` folder:
 
-### Public — No Auth Required
-```
-GET  /api/health                          Server + blockchain health check
-GET  /api/campaign                        All verified active campaigns
-GET  /api/campaign/:id                    Single campaign details + progress
-GET  /api/tracker/:donorHash              Donor fund journey (from blockchain)
+```powershell
+python -m http.server 5173
 ```
 
-### Donor Endpoints — No Auth Required
+Open:
+
+```text
+http://127.0.0.1:5173/introduction.html
 ```
+
+## Useful Local URLs
+
+```text
+Frontend: http://127.0.0.1:5173
+Backend:  http://127.0.0.1:3001
+Health:   http://127.0.0.1:3001/health
+```
+
+## Key Pages
+
+### Public / Auth
+
+```text
+frontend/introduction.html
+frontend/login.html
+frontend/register-ngo.html
+```
+
+### Donor
+
+```text
+frontend/donor-campaigns.html
+frontend/campaign-details.html
+frontend/confirm-payment.html
+frontend/payment-success.html
+frontend/donor-history.html
+```
+
+### NGO
+
+```text
+frontend/my-campaigns.html
+frontend/start-campaign.html
+frontend/submit-vendor.html
+frontend/submit-evidence.html
+```
+
+### Bank Admin
+
+```text
+frontend/admin-dashboard.html
+frontend/admin-ngos.html
+frontend/admin-vendors.html
+frontend/admin-campaigns.html
+frontend/admin-evidence.html
+frontend/admin-alerts.html
+frontend/admin-audit.html
+```
+
+## Main API Endpoints
+
+### Auth
+
+```text
+POST /api/auth/login
+POST /api/auth/signup
+```
+
+### Donor
+
+```text
+GET  /api/campaign
+GET  /api/campaign/:id
+GET  /api/campaign/:id/vendors
 POST /api/donate
-     body: { campaignId, amount, donorEmail }
-     returns: { txHash, donorHash, trackerUrl }
+GET  /api/donate/history
+GET  /api/tracker/:donorHash
 ```
 
-### NGO Endpoints
-```
+### NGO
+
+```text
 POST /api/ngo/register
-     body: { name, registrationNum, contactEmail,
-             contactPhone?, password? }
-     returns: { id, status, riskTier, message }
-     note: walletAddress is optional; backend assigns an internal audit
-           address when omitted.
-
-POST /api/ngo/login
-     body: { email, password }
-     returns: { token, role: "NGO", ngo }
-
+POST /api/ngo/campaign/create
+GET  /api/ngo/campaigns
+GET  /api/ngo/campaigns/:id
+GET  /api/ngo/vendors
+POST /api/vendor/submit
 POST /api/evidence/submit
-     header: Authorization: Bearer <ngo-jwt>
-     body: { campaignId, category, amount, vendorId }
-     files: { serviceAgreement, invoice, deliveryProof }
-     returns: { evidenceId, documentHash, aiScore, status }
-
-GET  /api/ngo/campaigns                   NGO's own campaigns + status
-GET  /api/ngo/evidence/:campaignId        All submitted evidence for campaign
-POST /api/ngo/campaign/create             Submit campaign application
 ```
 
-### Bank Islam Admin — Admin JWT Required
-```
-POST /api/admin/login                     Get admin JWT token
-     body: { email, password }
-     returns: { token, role, name }
+### Bank Admin
 
-GET  /api/admin/dashboard                 Live overview — all campaigns,
-                                          alerts, frozen funds
-
-GET  /api/admin/ngo/pending               NGOs awaiting KYC approval
-POST /api/admin/ngo/:id/approve           Approve NGO + issue on-chain credential
-POST /api/admin/ngo/:id/revoke            Revoke NGO credential
-     body: { reason }
-
-GET  /api/admin/campaign/pending          Campaign applications awaiting review
-POST /api/admin/campaign/:id/approve      Approve + deploy Campaign.sol
-POST /api/admin/campaign/:id/reject       Reject campaign application
-     body: { reason }
-
-GET  /api/admin/alerts                    All AI-flagged anomalies with scores
-POST /api/disbursement/approve            Approve evidence + release funds
-     body: { evidenceId }
-POST /api/disbursement/reject             Reject evidence
-     body: { evidenceId, reason }
-
-POST /api/campaign/pause                  Manually pause campaign
-     body: { campaignId, reason }
-POST /api/campaign/unpause                Unpause campaign
-     body: { campaignId }
+```text
+GET  /api/admin/ngos
+POST /api/admin/ngo/:id/approve
+POST /api/admin/ngo/:id/reject
+GET  /api/admin/vendors
+POST /api/admin/vendor/:id/approve
+POST /api/admin/vendor/:id/reject
+GET  /api/admin/campaigns
+POST /api/admin/campaign/:id/approve
+POST /api/admin/campaign/:id/reject
+GET  /api/admin/evidence/pending
+GET  /api/admin/alerts
+POST /api/disbursement/approve
+POST /api/disbursement/reject
+POST /api/disbursement/unpause
 ```
 
----
+### Demo
 
-## 🗄️ Database Schema (Prisma)
-
-```prisma
-model NGO {
-  id             String   @id @default(cuid())
-  walletAddress  String   @unique
-  legalName      String
-  regNumber      String   @unique
-  status         String   @default("pending")
-  riskTier       String?
-  verifiedAt     DateTime?
-  createdAt      DateTime @default(now())
-  campaigns      Campaign[]
-}
-
-model Campaign {
-  id              String   @id @default(cuid())
-  contractAddress String?  @unique
-  ngoId           String
-  ngo             NGO      @relation(fields: [ngoId], references: [id])
-  name            String
-  causeType       String
-  aidPercent      Int
-  logisticsPercent Int
-  adminPercent    Int
-  targetAmount    Float
-  status          String   @default("active")
-  createdAt       DateTime @default(now())
-  donations       Donation[]
-  evidences       Evidence[]
-}
-
-model Donation {
-  id          String   @id @default(cuid())
-  donorHash   String   @unique
-  donorEmail  String
-  amount      Float
-  campaignId  String
-  campaign    Campaign @relation(fields: [campaignId], references: [id])
-  txHash      String   @unique
-  createdAt   DateTime @default(now())
-}
-
-model Evidence {
-  id              String   @id @default(cuid())
-  campaignId      String
-  campaign        Campaign @relation(fields: [campaignId], references: [id])
-  category        String
-  amount          Float
-  vendorId        String
-  documentHash    String
-  aiScore         Float?
-  aiReason        String?
-  status          String   @default("pending")
-  submittedAt     DateTime @default(now())
-  reviewedAt      DateTime?
-}
-
-model Alert {
-  id          String   @id @default(cuid())
-  campaignId  String
-  evidenceId  String?
-  aiScore     Float
-  reason      String
-  patterns    String[]
-  status      String   @default("open")
-  createdAt   DateTime @default(now())
-}
+```text
+POST /api/demo/simulate-duitnow
+POST /api/demo/simulate-fraud
+POST /api/demo/recipient-confirm
 ```
 
----
+## Demo Scripts For Presentation
 
-## 🧪 Running Tests
+### Normal Donation
 
-```bash
-# Smart contract tests
-cd contracts
-npx hardhat test
+```text
+Donor views active campaigns, opens a campaign detail page, checks the NGO, cause, target amount, and Bank Islam verification status.
 
-# Backend unit tests
-cd backend
-npm test
+Then the donor donates RM10.
 
-# Test only AI service
-npm test -- --testPathPattern=ai.service
+In real life, the money moves through DuitNow or Bank Islam. In our demo, we simulate the payment.
 
-# Test only contract service
-npm test -- --testPathPattern=contract.service
+After payment, our backend records the donation and writes an audit record to the smart contract on Monad testnet.
+
+The donor identity is protected using a donor hash, so personal details are not public on-chain.
+
+The donor can then view the receipt and donation history.
+
+So blockchain is used for transparency and verification, not to replace MYR.
 ```
 
----
+### Evidence And Fraud Detection
 
-## 🌐 Deployment to IPserverone NovaCloud
+```text
+After receiving donations, the NGO cannot directly take the money.
 
-### Launch VPS Instance
+The NGO must submit evidence first, such as invoice, delivery proof, service agreement, and recipient confirmation.
 
-```
-1. Log in to IPserverone dashboard
-2. NovaCloud → Cloud Instances → Launch Instance
-3. Select: Ubuntu 22.04 LTS
-4. Select smallest available tier (sufficient for demo)
-5. Add your SSH public key under Public Keys first
-6. Launch → wait for instance to show "Active" status
-7. Copy the Primary IP address
-```
+Then Bank Islam reviews the evidence with AI fraud detection.
 
-### SSH into your VPS and install dependencies
+The AI gives a fraud risk percentage. If the score is low, it can proceed to bank review. If it is medium, Bank Islam manually reviews it. If it is high, the campaign can be frozen automatically.
 
-```bash
-ssh ubuntu@YOUR_VPS_IP
+Only after Bank Islam approves the evidence, the fund release is recorded in the smart contract.
 
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install Node.js v20
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Install PostgreSQL
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl enable postgresql
-sudo systemctl start postgresql
-
-# Install Redis (if not using IPserverone Redis service)
-sudo apt install -y redis-server
-sudo systemctl enable redis-server
-sudo systemctl start redis-server
-
-# Install PM2 — keeps Node.js running after you close terminal
-sudo npm install -g pm2
-
-# Verify installations
-node --version    # should show v20.x.x
-npm --version
-psql --version
-redis-cli ping    # should return PONG
+So this prevents NGOs from taking money without proof.
 ```
 
-### Deploy backend to VPS
+## Troubleshooting
 
-```bash
-# On your VPS
-git clone https://github.com/yourteam/donorledger.git
-cd donorledger/backend
+### `Campaign: vendor not approved`
 
-npm install
-cp .env.example .env
-nano .env    # Fill in all production values
+The vendor is approved in the database but may not be approved on-chain for that specific campaign.
 
-npx prisma migrate deploy
-npx prisma generate
+Fix:
 
-mkdir -p uploads/invoices uploads/agreements uploads/delivery-proof
+- Approve the vendor from Bank Admin.
+- Make sure the campaign is active.
+- Retry evidence submission.
 
-# Start with PM2 (keeps running after terminal closes)
-pm2 start src/server.js --name donorledger-backend
-pm2 save
-pm2 startup    # Follow the command it prints to auto-start on reboot
+The backend now also repairs older demo data by syncing the vendor allowlist before evidence submission when the DB relation is already valid.
 
-# Check it is running
-pm2 status
-pm2 logs donorledger-backend
+### Evidence page says only NGO accounts can access
+
+Hard refresh the browser:
+
+```text
+Ctrl + Shift + R
 ```
 
-### Verify deployment
+Then log in again as an NGO organizer.
 
-```bash
-# From your local machine
-curl http://YOUR_VPS_IP:3001/api/health
-# Should return { status: "ok", blockchain: "connected" }
+### Backend not responding
+
+Restart backend:
+
+```powershell
+npm run dev
 ```
 
----
+Or check health:
 
-## ⚠️ Known Limitations
-
-| # | Limitation | Severity | Mitigation for Hackathon |
-|---|---|---|---|
-| 1 | KYC verifies identity, not future behaviour | Medium | AI monitoring is second gate after KYC |
-| 2 | Oracle problem — NGO can submit fake delivery proof | High | Bank Islam admin spot-check + recipient SMS confirmation simulation |
-| 3 | NGOs can bypass platform entirely | High | Bank Islam payment rail incentive — unverified = no DuitNow badge |
-| 4 | Shell vendor fraud via connected company | Medium | Vendor KYC required + AI benchmarks invoice price against market rates |
-| 5 | AI false positives may freeze legitimate disaster aid | Medium | Confidence threshold tunable — auto-freeze only above 85% |
-| 6 | Smart contract bugs are permanent once deployed | High | OpenZeppelin audited base + proxy upgrade pattern in production |
-| 7 | Donor privacy — on-chain data analysis risk | Low | Hashed + salted donor IDs — real identity only in PostgreSQL |
-| 8 | Bank Islam as single point of trust | Medium | Deliberate v1 tradeoff — multi-institution co-signing in v2 |
-
----
-
-## 🔮 Production Roadmap
-
-```
-v1 — Hackathon Demo (current)
-     Sepolia testnet · Simulated DuitNow · Mock KYC
-     Gemini AI anomaly detection · IPserverone VPS
-
-v2 — Pilot Program
-     Private permissioned blockchain (Hyperledger Fabric)
-     Real DuitNow integration via Bank Islam API
-     Live Bank Islam KYC pipeline
-     Recipient SMS confirmation via Twilio
-     Mobile app for donors
-
-v3 — National Production
-     Multi-institution credential co-signing (BNM + ROS + Bank Islam)
-     MACC live API integration
-     National NGO registry API integration
-     Zero-knowledge proofs for donor privacy
-     Regional expansion — Indonesia, Bangladesh
+```powershell
+curl http://localhost:3001/health
 ```
 
----
+### Gemini unavailable
 
-## 📄 License
+If Gemini returns an outage or rate-limit error, the platform still keeps the evidence pending for Bank Islam manual review.
 
-MIT — Built for Hackathon X Fintech Forward 2026
+### Monad gas error
 
----
+Fund both wallets with Monad testnet MON:
 
-*Every ringgit should reach someone who needs it.*
+```text
+SERVER_WALLET_PRIVATE_KEY wallet
+BANK_ISLAM_PRIVATE_KEY wallet
+```
+
+Use the Monad faucet for testnet MON.
+
+## Production Notes
+
+Hackathon demo:
+
+- Monad testnet
+- Simulated DuitNow
+- Simulated KYC
+- Gemini AI fraud scoring
+- Webhook.site for MACC alert simulation
+
+Production direction:
+
+- MYR remains on Bank Islam payment rails.
+- Permissioned blockchain such as Hyperledger Fabric can remove public gas fees.
+- Bank Islam writes the audit trail as a regulated institution.
+- MACC / regulators can receive alerts through a real integration.
+- Donors continue to use normal Malaysian payment methods.
+
+## License
+
+MIT

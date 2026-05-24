@@ -8,7 +8,7 @@ const session = getSession()
 const shell = document.querySelector('#app-shell')
 const params = new URLSearchParams(window.location.search)
 const campaignId = params.get('campaignId')
-const canViewNGOPage = session?.token && ['ORGANIZER', 'NGO'].includes(session.role)
+const canViewNGOPage = session?.token && isNGOSession(session)
 
 if (!session?.token) {
   window.location.href = './login.html'
@@ -188,6 +188,16 @@ function renderAccessDenied() {
     activeKey: 'my-campaigns',
     content: panel,
   })
+}
+
+function isNGOSession(value) {
+  const role = String(value?.role || value?.user?.role || '').toUpperCase()
+  return (
+    role === 'ORGANIZER' ||
+    role === 'NGO' ||
+    role === 'NGO_ORGANIZER' ||
+    Boolean(value?.ngo?.id)
+  )
 }
 
 function escapeHtml(value) {
