@@ -54,6 +54,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 24px;
   padding: 104px 24px 40px;
 }
 
@@ -168,6 +169,98 @@
   background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 40px 80px -20px rgba(0, 53, 39, 0.2);
   backdrop-filter: blur(20px);
+}
+
+.login-demo-card {
+  position: relative;
+  z-index: 3;
+  width: min(100%, 320px);
+  border: 1px solid rgba(6, 78, 59, 0.12);
+  border-radius: 28px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 30px 60px -30px rgba(0, 53, 39, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.login-demo-card h2 {
+  margin: 0 0 6px;
+  color: #064e3b;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.login-demo-card p {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.login-demo-card button {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  border: 1px solid #d8e0e8;
+  border-radius: 16px;
+  padding: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.login-demo-card button:hover,
+.login-demo-card button:focus {
+  border-color: rgba(6, 78, 59, 0.35);
+  box-shadow: 0 0 0 4px rgba(6, 78, 59, 0.08);
+  outline: none;
+}
+
+.login-demo-card button span,
+.login-demo-card button em {
+  color: #64748b;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.login-demo-card button strong {
+  color: #064e3b;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.login-demo-card a {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  color: #064e3b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.login-demo-card .login-demo-secondary-link {
+  margin-top: 10px;
+  border: 1px solid #d8e0e8;
+  background: #ffffff;
+  color: #475569;
+}
+
+body[data-login-mode="ngo"] .login-card {
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+body[data-login-mode="ngo"] .login-demo-card {
+  background: rgba(236, 253, 245, 0.9);
 }
 
 .login-card h1 {
@@ -335,7 +428,7 @@
   color: #b91c1c;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .login-page {
     height: auto;
     min-height: 100vh;
@@ -344,8 +437,19 @@
   .login-hero {
     min-height: 100vh;
     height: auto;
+    align-items: stretch;
+    flex-direction: column;
     padding: 104px 20px 32px;
   }
+
+  .login-card,
+  .login-demo-card {
+    width: min(100%, 464px);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
 
   .login-brand {
     font-size: 22px;

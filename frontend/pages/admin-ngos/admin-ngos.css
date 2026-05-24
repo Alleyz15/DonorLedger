@@ -1,23 +1,58 @@
 .admin-ngo-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 48px;
-  max-width: 1280px;
+  gap: 36px;
+  max-width: 1468px;
   margin: 0 auto;
+}
+
+.admin-review-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.admin-review-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.admin-review-hero p {
+  margin: 12px 0 0;
+  color: #667085;
+  font-size: 20px;
+}
+
+.admin-review-queue-button {
+  min-height: 56px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 28px;
+  background: #065f46;
+  color: #ffffff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .admin-ngo-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 40px;
+  gap: 32px;
 }
 
 .admin-ngo-summary-card {
-  min-height: 220px;
-  border: 1px solid #bcc8c0;
-  border-radius: 18px;
+  min-height: 210px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   padding: 34px;
   background: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .admin-summary-icon {
@@ -69,9 +104,10 @@
 
 .admin-ngo-panel {
   overflow: hidden;
-  border: 1px solid #bcc8c0;
-  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   background: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .admin-ngo-panel-header {
@@ -235,13 +271,12 @@
 }
 
 .admin-reject-button {
-  width: 48px;
-  height: 48px;
+  min-height: 48px;
   border: 1px solid #bcc8c0;
+  padding: 0 18px;
   background: #ffffff;
   color: #ef4444;
-  font-size: 30px;
-  line-height: 1;
+  font-size: 14px;
 }
 
 .admin-details-button {
