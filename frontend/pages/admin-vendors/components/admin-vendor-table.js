@@ -87,11 +87,10 @@ function renderRow(vendor) {
         <button
           class="admin-vendor-review-button"
           type="button"
-          data-action="approve"
+          data-action="review"
           data-vendor-id="${escapeHtml(vendor.id)}"
-          ${isPending ? '' : 'disabled'}
         >
-          Review
+          ${isPending ? 'Review' : 'View'}
         </button>
       </td>
     </tr>
@@ -106,8 +105,8 @@ function renderStatus(status) {
 
 function getStatusLabel(status) {
   if (status === 'PENDING_KYC') return 'PENDING_KYC'
-  if (status === 'APPROVED') return 'Approved'
-  if (status === 'REJECTED') return 'Rejected'
+  if (status === 'APPROVED') return 'APPROVED'
+  if (status === 'REJECTED') return 'REJECTED'
   return String(status || '-').replaceAll('_', ' ')
 }
 

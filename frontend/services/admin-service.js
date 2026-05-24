@@ -35,12 +35,13 @@ export function getAdminVendors(token) {
   })
 }
 
-export function approveVendor(token, vendorId) {
+export function approveVendor(token, vendorId, campaignId) {
   return apiRequest(`/admin/vendor/${vendorId}/approve`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    body: campaignId ? { campaignId } : {},
   })
 }
 
@@ -87,5 +88,35 @@ export function unfreezeCampaign(token, campaignId) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+  })
+}
+
+// ── New functions for Dashboard, Alerts, Evidence Reviews, Audit pages ──
+
+export function getAdminAlerts(token) {
+  return apiRequest('/admin/alerts', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export function getAdminEvidence(token) {
+  return apiRequest('/admin/evidence/pending', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export function approveDisbursement(token, evidenceId) {
+  return apiRequest('/disbursement/approve', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: { evidenceId },
+  })
+}
+
+export function rejectDisbursement(token, evidenceId, reason) {
+  return apiRequest('/disbursement/reject', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: { evidenceId, reason },
   })
 }

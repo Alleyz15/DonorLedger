@@ -6,6 +6,7 @@ const form = document.querySelector('.register-ngo-card')
 const submitButton = document.querySelector('.register-ngo-button')
 const statusElement = document.querySelector('.form-status')
 const addDirectorButton = document.querySelector('.add-director-button')
+const removeLastDirectorButton = document.querySelector('.remove-last-director-button')
 const directorsList = document.querySelector('.directors-list')
 const documentInputs = document.querySelectorAll('.document-drop input[type="file"]')
 const allocationInputs = [
@@ -16,6 +17,7 @@ const allocationInputs = [
 const allocationTotal = document.querySelector('.allocation-total strong')
 
 addDirectorButton?.addEventListener('click', addDirectorBox)
+removeLastDirectorButton?.addEventListener('click', removeLastDirectorBox)
 documentInputs.forEach((input) => {
   input.addEventListener('change', updateDocumentLabel)
 })
@@ -97,7 +99,45 @@ function addDirectorBox() {
   `
 
   directorsList.append(directorBox)
+  updateRemoveDirectorButton()
   directorBox.querySelector('input')?.focus()
+}
+
+function removeLastDirectorBox() {
+  if (!directorsList) return
+
+  const directorBoxes = directorsList.querySelectorAll('.director-box')
+  if (directorBoxes.length <= 1) return
+
+  directorBoxes[directorBoxes.length - 1].remove()
+  renumberDirectorBoxes()
+  updateRemoveDirectorButton()
+}
+
+function renumberDirectorBoxes() {
+  if (!directorsList) return
+
+  directorsList.querySelectorAll('.director-box').forEach((directorBox, index) => {
+    const directorNumber = index + 1
+    const nameLabel = directorBox.querySelector('.field:first-of-type > span')
+    const nameInput = directorBox.querySelector('.field:first-of-type input')
+    const myKadInput = directorBox.querySelector('.field:nth-of-type(2) input')
+
+    if (nameLabel) {
+      nameLabel.textContent =
+        directorNumber === 1
+          ? 'Director 1 Full Name'
+          : `Director ${directorNumber} Full Name (Optional)`
+    }
+    if (nameInput) nameInput.name = directorNumber === 1 ? 'directorName' : `directorName${directorNumber}`
+    if (myKadInput) myKadInput.name = directorNumber === 1 ? 'directorMyKad' : `directorMyKad${directorNumber}`
+  })
+}
+
+function updateRemoveDirectorButton() {
+  if (!directorsList || !removeLastDirectorButton) return
+  removeLastDirectorButton.disabled =
+    directorsList.querySelectorAll('.director-box').length <= 1
 }
 
 function updateDocumentLabel(event) {

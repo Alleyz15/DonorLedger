@@ -158,6 +158,32 @@ router.post(
   }
 )
 
+// GET /admin/ngos — list all NGOs for Bank Islam dashboard
+router.get('/ngos', async (req, res, next) => {
+  try {
+    const ngos = await prisma.nGO.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        registrationNum: true,
+        contactEmail: true,
+        riskTier: true,
+        status: true,
+        kycNotes: true,
+        kycApprovedAt: true,
+        onChainExpiry: true,
+        revokedReason: true,
+        createdAt: true,
+        _count: { select: { campaigns: true } },
+      },
+    })
+    res.json(ngos)
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.get('/vendors', async (req, res, next) => {
   try {
     const vendors = await prisma.vendor.findMany({
@@ -185,7 +211,10 @@ router.get('/vendors', async (req, res, next) => {
       },
     })
 
-    res.json(vendors)
+    res.json(vendors.map((v) => ({
+      ...v,
+      registrationDoc: toUploadUrl(v.registrationDoc),
+    })))
   } catch (e) {
     next(e)
   }
@@ -208,17 +237,43 @@ router.get('/alerts', async (req, res, next) => {
   }
 })
 
+// Convert an absolute upload path (stored in DB) to a browser-accessible URL.
+// e.g. "D:\...\uploads\invoices\file.pdf" → "/uploads/invoices/file.pdf"
+function toUploadUrl(absPath) {
+  if (!absPath) return null
+  const normalized = absPath.replace(/\\/g, '/')
+  const idx = normalized.lastIndexOf('/uploads/')
+  if (idx >= 0) return normalized.slice(idx)
+  return '/uploads/' + normalized.split('/').pop()
+}
+
 router.get('/evidence/pending', async (req, res, next) => {
   try {
+    // Include APPROVED so the Bank Islam UI can show the "Confirm Beneficiary
+    // Receipt" button — Gate 4 independent SMS confirmation step (Section 13).
     const items = await prisma.evidence.findMany({
-      where: { status: { in: ['PENDING_REVIEW', 'AUTO_FROZEN'] } },
+      where: { status: { in: ['PENDING_REVIEW', 'AUTO_FROZEN', 'APPROVED'] } },
       orderBy: { createdAt: 'desc' },
       include: {
         campaign: { select: { id: true, name: true, status: true } },
         vendor: { select: { id: true, name: true, serviceType: true } },
       },
     })
-    res.json(items)
+
+    // Map document paths to HTTP-accessible URLs so the Bank Admin
+    // frontend can open the actual PDFs that NGOs submitted (Gate 4 —
+    // Section 15 Limitation 2: human spot-check of uploaded documents).
+    res.json(items.map((item) => ({
+      ...item,
+      amount: Number(item.amount),
+      documents: {
+        ssmDoc:           toUploadUrl(item.ssmDoc),
+        serviceAgreement: toUploadUrl(item.serviceAgreement),
+        invoice:          toUploadUrl(item.invoice),
+        deliveryProof:    toUploadUrl(item.deliveryProof),
+        recipientConfirm: toUploadUrl(item.recipientConfirm),
+      },
+    })))
   } catch (e) {
     next(e)
   }
@@ -288,7 +343,7 @@ router.post(
     try {
       const campaign = await prisma.campaign.findUnique({
         where: { id: req.params.id },
-        include: { ngo: true },
+        include: { ngo: true, vendors: true },
       })
       if (!campaign) {
         const err = new Error('Campaign not found')
@@ -322,6 +377,20 @@ router.post(
         })
         contractAddress = deployed.contractAddress
         deployTxHash = deployed.deployTxHash
+      }
+
+      for (const vendor of campaign.vendors) {
+        if (vendor.status !== 'APPROVED' || !vendor.walletAddress) continue
+        const alreadyApproved = await contractService.isVendorApproved(
+          contractAddress,
+          vendor.walletAddress
+        )
+        if (!alreadyApproved) {
+          await contractService.addApprovedVendor(
+            contractAddress,
+            vendor.walletAddress
+          )
+        }
       }
 
       const updated = await prisma.campaign.update({

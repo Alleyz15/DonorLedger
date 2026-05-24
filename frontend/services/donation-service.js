@@ -6,3 +6,7 @@ export function submitDonation(payload) {
     body: payload,
   })
 }
+
+export function getDonationHistory(donorEmail) {
+  return apiRequest(`/donate/history?donorEmail=${encodeURIComponent(donorEmail)}`)
+}

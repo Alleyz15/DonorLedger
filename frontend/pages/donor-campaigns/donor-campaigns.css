@@ -1,74 +1,134 @@
 .donor-shell.app-shell {
-  grid-template-columns: 335px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
   background: #f8f8ff;
 }
 
 .donor-shell .app-sidebar {
-  padding: 38px 36px;
+  padding: 26px 18px;
   border-right-color: #dbe2ea;
 }
 
 .donor-shell .app-brand {
-  color: #c8d0cc;
-  font-size: 18px;
+  gap: 10px;
+  color: #064e3b;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .donor-shell .app-brand-mark {
-  display: none;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #34d399;
+  color: #064e3b;
+  font-size: 15px;
 }
 
 .donor-shell .app-menu {
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 34px;
 }
 
 .donor-shell .app-menu-link {
-  min-height: 56px;
-  gap: 18px;
-  border-radius: 14px;
-  padding: 0 18px;
+  position: relative;
+  min-height: 44px;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 0 14px;
   color: #4b5563;
-  font-size: 22px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 800;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
 .donor-shell .app-menu-link::before {
-  content: "";
-  width: 22px;
-  height: 22px;
-  border: 3px solid currentColor;
-  border-radius: 5px;
-  box-sizing: border-box;
+  content: none;
 }
 
-.donor-shell .app-menu-link:nth-child(2)::before {
-  border-radius: 50%;
+.donor-shell .app-menu-link:hover {
+  background: #f0fdf4;
+  color: #064e3b;
+  transform: translateX(2px);
 }
 
 .donor-shell .app-menu-link.is-active {
-  background: #eef1ef;
+  background: #e3f8ef;
   color: #064e3b;
+  box-shadow: inset 4px 0 0 #10b981;
+}
+
+.donor-shell .app-menu-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  box-sizing: border-box;
+}
+
+.donor-shell .app-menu-icon-home {
+  border-radius: 5px;
+}
+
+.donor-shell .app-menu-icon-home::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  bottom: -2px;
+  width: 5px;
+  height: 7px;
+  border-radius: 2px 2px 0 0;
+  background: currentColor;
+}
+
+.donor-shell .app-menu-icon-history {
+  border-radius: 50%;
+}
+
+.donor-shell .app-menu-icon-history::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 2px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.donor-shell .app-menu-icon-history::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  width: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
 }
 
 .donor-shell .app-header {
-  min-height: 120px;
-  padding: 30px 34px 30px 48px;
+  min-height: 76px;
+  padding: 14px 30px;
   border-bottom-color: #dbe2ea;
 }
 
 .donor-shell .app-search {
-  max-width: 670px;
+  max-width: 520px;
 }
 
 .donor-shell .app-search input {
-  height: 56px;
-  border-radius: 16px;
+  height: 44px;
+  border-radius: 14px;
   background: #eef2ff;
   color: #0f172a;
-  font-size: 22px;
+  font-size: 14px;
 }
 
 .donor-shell .app-search input::placeholder {
@@ -99,22 +159,22 @@
 
 .donor-shell .app-avatar {
   order: 1;
-  width: 56px;
-  height: 56px;
+  width: 42px;
+  height: 42px;
   background: #a7f3d0;
   color: #064e3b;
-  font-size: 18px;
+  font-size: 13px;
 }
 
 .donor-shell .app-user strong {
   color: #052e23;
-  font-size: 21px;
+  font-size: 14px;
   line-height: 1.1;
 }
 
 .donor-shell .app-user span {
   color: #4b5563;
-  font-size: 17px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.25;
 }
@@ -129,11 +189,11 @@
 }
 
 .donor-shell .app-content {
-  padding: 32px 32px 42px;
+  padding: 30px 26px 42px;
 }
 
 .donor-campaign-page {
-  max-width: 1528px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
@@ -142,29 +202,29 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
 .donor-page-heading h1 {
   margin: 0;
   color: #064e3b;
-  font-size: 42px;
+  font-size: 30px;
   line-height: 1;
   font-weight: 800;
 }
 
 .donor-filter-button {
   display: inline-flex;
-  min-height: 54px;
+  min-height: 38px;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   border: 1px solid #bac5be;
-  border-radius: 16px;
-  padding: 0 22px;
+  border-radius: 10px;
+  padding: 0 16px;
   background: #ffffff;
   color: #064e3b;
   font: inherit;
-  font-size: 21px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -197,21 +257,21 @@
 .donor-campaign-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 32px;
+  gap: 20px;
 }
 
 .donor-campaign-card {
   overflow: hidden;
-  min-height: 630px;
+  min-height: 360px;
   border: 1px solid #d7dee6;
-  border-radius: 22px;
+  border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .donor-campaign-image {
   position: relative;
-  height: 252px;
+  height: 145px;
   background-color: #d1fae5;
   background-position: center;
   background-size: cover;
@@ -219,16 +279,16 @@
 
 .donor-campaign-image span {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 12px;
+  left: 12px;
   display: inline-flex;
-  min-height: 28px;
+  min-height: 22px;
   align-items: center;
   border-radius: 999px;
-  padding: 0 14px;
+  padding: 0 10px;
   background: #064e3b;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.03em;
 }
@@ -243,14 +303,14 @@
 }
 
 .donor-campaign-body {
-  padding: 26px 24px 26px;
+  padding: 16px 16px 16px;
 }
 
 .donor-campaign-body h2 {
-  min-height: 60px;
-  margin: 0 0 6px;
+  min-height: 40px;
+  margin: 0 0 8px;
   color: #064e3b;
-  font-size: 24px;
+  font-size: 15px;
   line-height: 1.25;
   font-weight: 500;
 }
@@ -261,33 +321,33 @@
   gap: 7px;
   margin: 0;
   color: #4b5563;
-  font-size: 17px;
+  font-size: 11px;
 }
 
 .donor-campaign-ngo span {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   border: 2px solid currentColor;
   border-radius: 2px;
 }
 
 .donor-verified {
   display: inline-flex;
-  min-height: 30px;
+  min-height: 22px;
   align-items: center;
-  gap: 8px;
-  margin: 14px 0 68px;
-  border-radius: 8px;
-  padding: 0 10px;
+  gap: 6px;
+  margin: 8px 0 42px;
+  border-radius: 6px;
+  padding: 0 8px;
   background: #e8fbf4;
   color: #064e3b;
-  font-size: 15px;
+  font-size: 10px;
   font-weight: 800;
 }
 
 .donor-verified span {
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
   border: 2px solid #34d399;
   border-radius: 50%;
 }
@@ -300,7 +360,7 @@
 }
 
 .donor-campaign-stats div {
-  padding: 14px 10px;
+  padding: 10px 8px;
   text-align: center;
 }
 
@@ -315,27 +375,27 @@
 
 .donor-campaign-stats span {
   color: #68726f;
-  font-size: 13px;
+  font-size: 10px;
   text-transform: uppercase;
 }
 
 .donor-campaign-stats strong {
-  margin-top: 4px;
+  margin-top: 3px;
   color: #064e3b;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .donor-details-button {
   display: flex;
-  min-height: 58px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
-  margin-top: 18px;
-  border-radius: 14px;
+  margin-top: 12px;
+  border-radius: 8px;
   background: #3fcfa0;
   color: #052e23;
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 800;
 }
 

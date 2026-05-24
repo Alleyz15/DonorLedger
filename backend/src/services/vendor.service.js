@@ -66,10 +66,16 @@ export async function approveVendor({
       throw err
     }
 
-    await contractService.addApprovedVendor(
+    const alreadyApproved = await contractService.isVendorApproved(
       campaign.contractAddress,
       vendor.walletAddress
     )
+    if (!alreadyApproved) {
+      await contractService.addApprovedVendor(
+        campaign.contractAddress,
+        vendor.walletAddress
+      )
+    }
   }
 
   return prisma.vendor.update({

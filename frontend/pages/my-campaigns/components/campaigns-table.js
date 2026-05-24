@@ -99,7 +99,7 @@ function renderCampaignRow(campaign) {
 function renderCampaignAction(campaign) {
   if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status)) {
     return `
-      <a class="campaign-action-button" href="#submit-evidence" aria-disabled="true">
+      <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
         Submit Evidence
       </a>
     `
@@ -109,8 +109,9 @@ function renderCampaignAction(campaign) {
 }
 
 function getCampaignStatusLabel(status) {
-  if (['ACTIVE', 'APPROVED', 'VERIFIED'].includes(status)) return 'VERIFIED'
+  if (['ACTIVE', 'APPROVED', 'VERIFIED'].includes(status)) return 'ACTIVE'
   if (status === 'DRAFT') return 'PENDING REVIEW'
+  if (status === 'REJECTED') return 'REJECTED'
   return status
 }
 

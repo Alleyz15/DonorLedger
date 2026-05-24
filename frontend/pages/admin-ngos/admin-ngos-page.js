@@ -26,6 +26,15 @@ if (!session?.token) {
 function renderAdminNGOPage() {
   const content = document.createElement('div')
   content.className = 'admin-ngo-dashboard'
+  content.innerHTML = `
+    <section class="admin-review-hero">
+      <div>
+        <h1>Manage NGOs</h1>
+        <p>Review NGO KYC applications and manage verified organizations.</p>
+      </div>
+      <button class="admin-review-queue-button" type="button">Open Review Queue</button>
+    </section>
+  `
   const summary = createAdminNGOSummary()
   const table = createAdminNGOTable()
   content.append(summary, table)
@@ -37,6 +46,9 @@ function renderAdminNGOPage() {
     content,
   })
 
+  content.querySelector('.admin-review-queue-button')?.addEventListener('click', () => {
+    table.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
   table.addEventListener('click', (event) => handleTableAction(event, table, summary))
   loadNGOs(table, summary)
 }
@@ -62,7 +74,9 @@ async function handleTableAction(event, table, summary) {
     if (button.dataset.action === 'approve') {
       await approveNGO(session.token, ngoId)
     } else if (button.dataset.action === 'reject') {
-      await rejectNGO(session.token, ngoId, 'Rejected by Bank Admin review')
+      const reason = window.prompt('Reason for rejecting this NGO?', 'Rejected by Bank Admin review')
+      if (!reason) return
+      await rejectNGO(session.token, ngoId, reason)
     }
     await loadNGOs(table, summary)
   } catch (error) {

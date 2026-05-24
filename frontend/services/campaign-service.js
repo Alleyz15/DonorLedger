@@ -41,3 +41,7 @@ export function getActiveCampaigns() {
 export function getCampaignDetails(campaignId) {
   return apiRequest(`/campaign/${campaignId}`)
 }
+
+export function getCampaignVendors(campaignId) {
+  return apiRequest(`/campaign/${campaignId}/vendors`)
+}

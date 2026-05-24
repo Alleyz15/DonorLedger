@@ -3,17 +3,17 @@ const roleMenus = {
     { label: 'My Campaign', href: './my-campaigns.html', activeKey: 'my-campaigns' },
   ],
   BANK_ADMIN: [
-    { label: 'Dashboard', href: '#dashboard', activeKey: 'admin-dashboard', disabled: true },
-    { label: 'Alerts', href: '#alerts', activeKey: 'admin-alerts', disabled: true },
-    { label: 'NGOs', href: './admin-ngos.html', activeKey: 'admin-ngos' },
-    { label: 'Vendors', href: './admin-vendors.html', activeKey: 'admin-vendors' },
-    { label: 'Campaigns', href: './admin-campaigns.html', activeKey: 'admin-campaigns' },
-    { label: 'Evidence Reviews', href: '#evidence-reviews', activeKey: 'admin-evidence-reviews', disabled: true },
-    { label: 'Audit Logs', href: '#audit-logs', activeKey: 'admin-audit-logs', disabled: true },
+    { label: 'Dashboard',        href: './admin-dashboard.html', activeKey: 'admin-dashboard' },
+    { label: 'Alerts',           href: './admin-alerts.html',    activeKey: 'admin-alerts' },
+    { label: 'NGOs',             href: './admin-ngos.html',      activeKey: 'admin-ngos' },
+    { label: 'Vendors',          href: './admin-vendors.html',   activeKey: 'admin-vendors' },
+    { label: 'Campaigns',        href: './admin-campaigns.html', activeKey: 'admin-campaigns' },
+    { label: 'Evidence Reviews', href: './admin-evidence.html',  activeKey: 'admin-evidence-reviews' },
+    { label: 'Audit Logs',       href: './admin-audit.html',     activeKey: 'admin-audit-logs' },
   ],
   DONOR: [
-    { label: 'Home', href: './donor-campaigns.html', activeKey: 'donor-home' },
-    { label: 'History', href: '#history', activeKey: 'donor-history', disabled: true },
+    { label: 'Home', href: './donor-campaigns.html', activeKey: 'donor-home', icon: 'home' },
+    { label: 'History', href: './donor-history.html', activeKey: 'donor-history', icon: 'history' },
   ],
 }
 
@@ -81,6 +81,7 @@ function renderMenu(role, activeKey) {
       const ariaDisabled = item.disabled ? ' aria-disabled="true"' : ''
       return `
         <a class="app-menu-link${activeClass}${disabledClass}" href="${item.href}"${ariaDisabled}>
+          <span class="app-menu-icon app-menu-icon-${escapeHtml(item.icon || 'default')}" aria-hidden="true"></span>
           ${escapeHtml(item.label)}
         </a>
       `

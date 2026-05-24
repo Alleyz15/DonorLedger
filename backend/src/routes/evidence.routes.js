@@ -45,6 +45,12 @@ router.post(
 
       const campaign = await prisma.campaign.findUnique({
         where: { id: campaignId },
+        include: {
+          vendors: {
+            where: { id: vendorId },
+            select: { id: true, status: true, walletAddress: true },
+          },
+        },
       })
       if (!campaign) {
         const err = new Error('Campaign not found')
@@ -56,6 +62,30 @@ router.post(
         const err = new Error('Vendor is not Bank Islam-approved')
         err.status = 400
         throw err
+      }
+      if (!campaign.contractAddress || campaign.status !== 'ACTIVE') {
+        const err = new Error('Campaign must be active before evidence can be submitted')
+        err.status = 409
+        throw err
+      }
+      if (!campaign.vendors.some((linkedVendor) => linkedVendor.id === vendor.id)) {
+        const err = new Error('Vendor is not approved for this campaign')
+        err.status = 409
+        throw err
+      }
+
+      const vendorOnChain = await contractService.isVendorApproved(
+        campaign.contractAddress,
+        vendor.walletAddress
+      )
+      if (!vendorOnChain) {
+        // Repairs older demo data created before vendor approval was synced
+        // onto each campaign contract. The DB relation already proves Bank
+        // Islam approved this vendor for this campaign.
+        await contractService.addApprovedVendor(
+          campaign.contractAddress,
+          vendor.walletAddress
+        )
       }
 
       const files = req.files || {}

@@ -7,10 +7,16 @@
 @import './pages/my-campaigns/my-campaigns.css';
 @import './pages/start-campaign/start-campaign.css';
 @import './pages/submit-vendor/submit-vendor.css';
+@import './pages/submit-evidence/submit-evidence.css';
 @import './pages/admin-ngos/admin-ngos.css';
 @import './pages/admin-vendors/admin-vendors.css';
 @import './pages/admin-campaigns/admin-campaigns.css';
+@import './pages/admin-dashboard/admin-dashboard.css';
+@import './pages/admin-alerts/admin-alerts.css';
+@import './pages/admin-evidence/admin-evidence.css';
+@import './pages/admin-audit/admin-audit.css';
 @import './pages/donor-campaigns/donor-campaigns.css';
+@import './pages/donor-history/donor-history.css';
 @import './pages/campaign-details/campaign-details.css';
 @import './pages/confirm-payment/confirm-payment.css';
 @import './pages/payment-success/payment-success.css';
