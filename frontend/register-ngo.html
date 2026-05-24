@@ -65,9 +65,20 @@
         <section class="form-section" aria-labelledby="directors-title">
           <div class="section-heading-row">
             <h2 id="directors-title">Board Of Directors</h2>
-            <button class="text-action add-director-button" type="button">
-              Add Director
-            </button>
+            <div class="director-heading-actions">
+              <button class="text-action add-director-button" type="button">
+                Add Director
+              </button>
+              <button
+                class="remove-last-director-button"
+                type="button"
+                aria-label="Remove latest director"
+                title="Remove latest director"
+                disabled
+              >
+                <span aria-hidden="true">&#128465; Delete</span>
+              </button>
+            </div>
           </div>
 
           <div class="directors-list">

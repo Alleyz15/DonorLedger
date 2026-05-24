@@ -8,8 +8,7 @@ export function createAdminNGOTable() {
         <button class="admin-tool-button" type="button">Sort By: Date</button>
       </div>
       <button class="admin-primary-action" type="button" disabled>
-        <span aria-hidden="true">+</span>
-        Onboard New NGO
+        Open Review Queue
       </button>
     </div>
     <div class="admin-ngo-table-wrap">
@@ -102,11 +101,11 @@ function renderActions(ngo) {
   if (ngo.status === 'PENDING_KYC') {
     return `
       <div class="admin-action-row">
-        <button class="admin-verify-button" type="button" data-action="approve" data-ngo-id="${ngo.id}">
+        <button class="admin-verify-button" type="button" data-action="approve" data-ngo-id="${escapeHtml(ngo.id)}">
           Verify
         </button>
-        <button class="admin-reject-button" type="button" data-action="reject" data-ngo-id="${ngo.id}" aria-label="Reject NGO">
-          ×
+        <button class="admin-reject-button" type="button" data-action="reject" data-ngo-id="${escapeHtml(ngo.id)}">
+          Reject
         </button>
       </div>
     `
@@ -118,10 +117,10 @@ function renderActions(ngo) {
 function getStatusLabel(ngo) {
   if (ngo.status === 'PENDING_KYC') return 'Pending Review'
   if (ngo.status === 'APPROVED') return 'Verified'
-  if (ngo.riskTier === 'HIGH' || ['REJECTED', 'REVOKED'].includes(ngo.status)) {
-    return 'High Risk Flag'
-  }
-  return ngo.status.replaceAll('_', ' ')
+  if (ngo.status === 'REJECTED') return 'Rejected'
+  if (ngo.status === 'REVOKED') return 'Revoked'
+  if (ngo.riskTier === 'HIGH') return 'High Risk Flag'
+  return String(ngo.status || '-').replaceAll('_', ' ')
 }
 
 function getStatusClass(ngo) {

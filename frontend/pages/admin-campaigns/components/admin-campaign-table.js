@@ -100,6 +100,8 @@ function getStatusMeta(status) {
   if (status === 'UNDER_REVIEW') return { label: 'Under Review', className: 'is-review' }
   if (status === 'FROZEN') return { label: 'Frozen', className: 'is-frozen' }
   if (status === 'ACTIVE') return { label: 'Active', className: 'is-active' }
+  if (status === 'REJECTED') return { label: 'Rejected', className: 'is-rejected' }
+  if (status === 'COMPLETED') return { label: 'Completed', className: 'is-completed' }
   return { label: String(status || '-').replaceAll('_', ' '), className: 'is-default' }
 }
 

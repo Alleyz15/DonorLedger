@@ -35,12 +35,13 @@ export function getAdminVendors(token) {
   })
 }
 
-export function approveVendor(token, vendorId) {
+export function approveVendor(token, vendorId, campaignId) {
   return apiRequest(`/admin/vendor/${vendorId}/approve`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    body: campaignId ? { campaignId } : {},
   })
 }
 

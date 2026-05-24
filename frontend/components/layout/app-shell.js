@@ -12,8 +12,8 @@ const roleMenus = {
     { label: 'Audit Logs', href: '#audit-logs', activeKey: 'admin-audit-logs', disabled: true },
   ],
   DONOR: [
-    { label: 'Home', href: './donor-campaigns.html', activeKey: 'donor-home' },
-    { label: 'History', href: '#history', activeKey: 'donor-history', disabled: true },
+    { label: 'Home', href: './donor-campaigns.html', activeKey: 'donor-home', icon: 'home' },
+    { label: 'History', href: './donor-history.html', activeKey: 'donor-history', icon: 'history' },
   ],
 }
 
@@ -81,6 +81,7 @@ function renderMenu(role, activeKey) {
       const ariaDisabled = item.disabled ? ' aria-disabled="true"' : ''
       return `
         <a class="app-menu-link${activeClass}${disabledClass}" href="${item.href}"${ariaDisabled}>
+          <span class="app-menu-icon app-menu-icon-${escapeHtml(item.icon || 'default')}" aria-hidden="true"></span>
           ${escapeHtml(item.label)}
         </a>
       `

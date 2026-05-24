@@ -31,6 +31,15 @@ if (!session?.token) {
 function renderAdminCampaignPage() {
   const content = document.createElement('div')
   content.className = 'admin-campaign-dashboard'
+  content.innerHTML = `
+    <section class="admin-review-hero">
+      <div>
+        <h1>Manage Campaigns</h1>
+        <p>Approve or reject NGO campaign applications before they go live.</p>
+      </div>
+      <button class="admin-review-queue-button" type="button">Open Review Queue</button>
+    </section>
+  `
 
   const summary = createAdminCampaignSummary()
   const table = createAdminCampaignTable()
@@ -44,6 +53,9 @@ function renderAdminCampaignPage() {
     content,
   })
 
+  content.querySelector('.admin-review-queue-button')?.addEventListener('click', () => {
+    table.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
   table.addEventListener('click', (event) => handleCampaignAction(event, table, summary))
   loadCampaigns(table, summary)
 }
@@ -70,7 +82,9 @@ async function handleCampaignAction(event, table, summary) {
     if (action === 'approve') {
       await approveCampaign(session.token, campaignId)
     } else if (action === 'reject') {
-      await rejectCampaign(session.token, campaignId, 'Rejected by Bank Admin review')
+      const reason = window.prompt('Reason for rejecting this campaign?', 'Rejected by Bank Admin review')
+      if (!reason) return
+      await rejectCampaign(session.token, campaignId, reason)
     } else if (action === 'unfreeze') {
       await unfreezeCampaign(session.token, campaignId)
     }
