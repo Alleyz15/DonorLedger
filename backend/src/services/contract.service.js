@@ -50,6 +50,7 @@ const fallbackABIs = {
     'function pauseCampaign(string reason) external',
     'function unpauseCampaign() external',
     'function addApprovedVendor(address vendor) external',
+    'function approvedVendors(address vendor) external view returns (bool)',
     'function aidPercent() external view returns (uint256)',
     'function logisticsPercent() external view returns (uint256)',
     'function adminPercent() external view returns (uint256)',
@@ -351,6 +352,11 @@ export async function addApprovedVendor(campaignAddress, vendorAddress) {
   return { txHash: receipt.hash }
 }
 
+export async function isVendorApproved(campaignAddress, vendorAddress) {
+  if (!vendorAddress) return false
+  return getCampaign(campaignAddress).approvedVendors(vendorAddress)
+}
+
 // ----- Campaign — AI auto-freeze (server wallet, Section 14) -----------
 
 export async function pauseCampaign(campaignAddress, reason) {
@@ -424,6 +430,7 @@ export default {
   rejectDisbursement,
   unpauseCampaign,
   addApprovedVendor,
+  isVendorApproved,
   // ai auto-freeze
   pauseCampaign,
   // tracker
