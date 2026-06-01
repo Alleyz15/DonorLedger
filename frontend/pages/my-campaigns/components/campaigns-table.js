@@ -88,7 +88,7 @@ function renderCampaignRow(campaign) {
       </td>
       <td>${formatDate(campaign.createdAt)}</td>
       <td>${formatMoney(campaign.raisedAmount)} /<br />${formatMoney(campaign.targetAmount)}</td>
-      <td><span class="campaign-count-pill">0</span></td>
+      <td><span class="campaign-count-pill">${Number(campaign.pendingEvidenceCount || 0)}</span></td>
       <td><span class="campaign-count-pill is-alert">${campaign.status === 'UNDER_REVIEW' ? 1 : 0}</span></td>
       <td>${renderCampaignAction(campaign)}</td>
       <td><span class="campaign-status">${escapeHtml(getCampaignStatusLabel(campaign.status))}</span></td>
@@ -97,12 +97,16 @@ function renderCampaignRow(campaign) {
 }
 
 function renderCampaignAction(campaign) {
-  if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status)) {
+  const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
+  if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status) && availableAmount > 0) {
     return `
       <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
         Submit Evidence
       </a>
     `
+  }
+  if (['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) && availableAmount <= 0) {
+    return '<span class="campaign-action-empty">Fully Released</span>'
   }
 
   return '<span class="campaign-action-empty">-</span>'

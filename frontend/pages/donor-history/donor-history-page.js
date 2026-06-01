@@ -220,7 +220,7 @@ function renderReceipt(receipt, donation) {
       <p class="donor-receipt-kicker">Verified Donation Receipt</p>
       <h2 id="receipt-title">${escapeHtml(receipt.campaign.name)}</h2>
       <p class="donor-receipt-muted">
-        Your donation is anchored on the Ethereum Sepolia blockchain.
+        Your donation is anchored on the Monad testnet blockchain.
         Every step below was written by Bank Islam's cryptographic signature — nobody can alter it.
       </p>
 
@@ -288,10 +288,10 @@ function renderReceipt(receipt, donation) {
           On-chain transaction:
           <strong>${escapeHtml(formatHash(donation?.txHash))}</strong>
           ${donation?.txHash
-            ? `<a href="https://sepolia.etherscan.io/tx/${encodeURIComponent(donation.txHash)}"
+            ? `<a href="https://testnet.monadexplorer.com/tx/${encodeURIComponent(donation.txHash)}"
                  target="_blank" rel="noreferrer"
                  style="margin-left:8px;color:#10b981;font-size:11px;font-weight:800">
-                 View on Etherscan ↗
+                 View on Monad Explorer
                </a>`
             : ''}
         </p>

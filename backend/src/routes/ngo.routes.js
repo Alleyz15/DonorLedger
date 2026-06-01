@@ -194,14 +194,34 @@ router.get('/campaigns', requireNGO, async (req, res, next) => {
         pausedReason: true,
         contractAddress: true,
         createdAt: true,
+        evidence: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
       },
     })
     res.json(
-      campaigns.map((c) => ({
-        ...c,
-        targetAmount: Number(c.targetAmount),
-        raisedAmount: Number(c.raisedAmount),
-      }))
+      campaigns.map((c) => {
+        const reservedAmount = c.evidence
+          .filter((item) => item.status !== 'REJECTED')
+          .reduce((sum, item) => sum + Number(item.amount), 0)
+        const pendingEvidenceCount = c.evidence.filter((item) =>
+          ['PENDING_AI', 'PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+        ).length
+        const raisedAmount = Number(c.raisedAmount)
+        const { evidence, ...campaign } = c
+
+        return {
+          ...campaign,
+          targetAmount: Number(c.targetAmount),
+          raisedAmount,
+          reservedAmount,
+          availableAmount: Math.max(raisedAmount - reservedAmount, 0),
+          pendingEvidenceCount,
+        }
+      })
     )
   } catch (e) {
     next(e)
