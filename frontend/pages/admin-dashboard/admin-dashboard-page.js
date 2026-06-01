@@ -30,7 +30,7 @@ function renderDashboard() {
       </div>
       <div class="admin-dashboard-badge">
         <span aria-hidden="true"></span>
-        System Live — Sepolia Testnet
+        System Live — Monad Testnet
       </div>
     </section>
 
