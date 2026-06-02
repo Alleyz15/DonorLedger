@@ -1,5 +1,6 @@
+/* ── Card ── */
 .vendor-review-card {
-  width: min(100%, 860px);
+  width: min(100%, 600px);
   margin: 0 auto;
   overflow: hidden;
   border: 1px solid #cbd5d0;
@@ -7,225 +8,257 @@
   background: #ffffff;
 }
 
+/* ── Header ── */
 .vendor-review-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  padding: 36px 34px 18px;
+  gap: 16px;
+  padding: 20px 24px 14px;
   border-bottom: 1px solid #cbd5d0;
 }
 
 .vendor-review-header h1 {
   margin: 0;
   color: #064536;
-  font-size: 34px;
-  line-height: 1.1;
+  font-size: 20px;
+  line-height: 1.2;
   font-weight: 800;
 }
 
 .vendor-review-header p {
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   color: #525b57;
-  font-size: 23px;
-  line-height: 1.1;
+  font-size: 13px;
+  line-height: 1.3;
 }
 
-.vendor-review-header a {
-  color: #3b4541;
-  font-size: 42px;
-  line-height: 1;
-}
-
+/* ── Body ── */
 .vendor-review-body {
-  padding: 34px;
+  padding: 20px 24px 24px;
 }
 
+/* ── 2-column grid ── */
 .vendor-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 32px;
-  margin-top: 28px;
+  gap: 12px 16px;
+  margin-top: 12px;
 }
 
+/* ── Field labels & inputs ── */
 .vendor-review-card .field {
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .vendor-review-card .field span,
-.vendor-upload > span {
+.vendor-upload-label-text {
   color: #3b4541;
-  font-size: 20px;
+  font-size: 12px;
   line-height: 1.2;
   font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.vendor-upload-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.vendor-upload-label i {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #064536;
-  border-radius: 4px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .vendor-review-card .field input,
 .vendor-review-card .field select {
-  min-height: 68px;
+  height: 40px;
   border: 1px solid #b9c7c0;
-  border-radius: 10px;
-  padding: 16px 22px;
+  border-radius: 8px;
+  padding: 0 12px;
   background: #fbfbff;
   color: #111827;
   font: inherit;
-  font-size: 22px;
+  font-size: 13px;
   outline: none;
+  transition: border-color 0.15s;
 }
 
-.vendor-upload {
-  position: relative;
+.vendor-review-card .field input:focus,
+.vendor-review-card .field select:focus {
+  border-color: #3fcfa0;
+}
+
+.vendor-review-card .field input::placeholder {
+  color: #94a3b8;
+}
+
+/* ── Full-width vendor name ── */
+.vendor-field-full {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 30px;
+  gap: 5px;
 }
 
-.vendor-upload input {
-  position: absolute;
-  inset: 34px 0 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.vendor-upload strong,
-.vendor-upload small {
+/* ── Upload wrapper ── */
+.vendor-upload-wrapper {
+  margin-top: 14px;
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vendor-upload-label-text {
+  display: block;
+}
+
+/* ── Dropzone ── */
+.vendor-dropzone-box {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-inline: 2px dashed #b9c7c0;
+  gap: 4px;
+  min-height: 82px;
+  width: 100%;
+  border: 2px dashed #b9c7c0;
+  border-radius: 10px;
+  padding: 12px 16px;
   background: #eef2ff;
-  color: #111827;
-  font-size: 22px;
-  font-weight: 500;
   text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
 }
 
-.vendor-upload strong {
-  min-height: 86px;
-  gap: 10px;
-  border-top: 2px dashed #b9c7c0;
-  border-radius: 10px 10px 0 0;
-  padding: 22px 20px 6px;
-}
-
-.vendor-upload strong i {
-  position: relative;
-  width: 28px;
-  height: 18px;
-  border: 4px solid #3b4541;
-  border-top: 0;
-  border-radius: 0 0 8px 8px;
-}
-
-.vendor-upload strong i::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: -18px;
-  width: 12px;
-  height: 22px;
-  border-radius: 999px;
-  border: 4px solid #3b4541;
-  border-bottom: 0;
-}
-
-.vendor-upload small {
-  min-height: 46px;
-  padding: 0 20px 20px;
-  border-bottom: 2px dashed #b9c7c0;
-  border-radius: 0 0 10px 10px;
-  color: #3b4541;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.vendor-upload[data-has-file="true"] strong,
-.vendor-upload[data-has-file="true"] small {
+.vendor-dropzone-box:hover {
   border-color: #10b981;
   background: #ecfdf5;
 }
 
-.vendor-upload[data-has-file="true"] small {
-  color: #047857;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.vendor-dropzone-box.has-file {
+  border-color: #10b981;
+  background: #ecfdf5;
 }
 
+/* Upload icon */
+.vendor-dropzone-icon-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dbe7ff;
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
+.vendor-dropzone-icon-svg {
+  display: block;
+  position: relative;
+  width: 14px;
+  height: 10px;
+  border: 2.5px solid #3b4541;
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+}
+
+.vendor-dropzone-icon-svg::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: -11px;
+  width: 6px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2.5px solid #3b4541;
+  border-bottom: 0;
+}
+
+.vendor-dropzone-heading {
+  display: block;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vendor-dropzone-sub {
+  display: block;
+  color: #3b4541;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.vendor-dropzone-box.has-file .vendor-dropzone-sub {
+  color: #047857;
+  font-weight: 700;
+}
+
+/* ── Protocol note ── */
 .vendor-protocol-note {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  margin-top: 52px;
+  gap: 10px;
+  margin-top: 14px;
   border: 1px solid #d7f7ea;
-  border-radius: 10px;
-  padding: 24px 28px;
+  border-radius: 8px;
+  padding: 12px 14px;
   background: #f3fffa;
   color: #064536;
-  font-size: 20px;
+  font-size: 12px;
   line-height: 1.45;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .vendor-protocol-note > i {
   position: relative;
   flex: 0 0 auto;
-  width: 24px;
-  height: 28px;
-  border-radius: 0 0 12px 12px;
+  width: 18px;
+  height: 20px;
+  border-radius: 0 0 9px 9px;
   background: #064536;
+  margin-top: 1px;
 }
 
 .vendor-protocol-note > i::after {
   content: "";
   position: absolute;
-  left: 7px;
-  top: 7px;
-  width: 8px;
-  height: 13px;
+  left: 5px;
+  top: 5px;
+  width: 6px;
+  height: 9px;
   border: solid #ffffff;
-  border-width: 0 3px 3px 0;
+  border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
 .vendor-protocol-note strong,
 .vendor-protocol-note span {
   display: block;
+  font-size: 12px;
 }
 
+.vendor-protocol-note strong {
+  font-weight: 800;
+  margin-bottom: 1px;
+}
+
+/* ── Bottom actions ── */
 .vendor-form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 22px;
-  margin-top: 54px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .vendor-cancel-button,
 .vendor-submit-button {
   display: inline-flex;
-  min-height: 66px;
+  min-height: 40px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  padding: 0 34px;
+  border-radius: 8px;
+  padding: 0 20px;
   font: inherit;
-  font-size: 22px;
+  font-size: 13px;
   font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
 }
 
 .vendor-cancel-button {
@@ -234,12 +267,13 @@
   background: #ffffff;
 }
 
+.vendor-cancel-button:hover { border-color: #94a3b8; }
+
 .vendor-submit-button {
   border: 0;
   background: #064536;
   color: #ffffff;
-  box-shadow: 0 10px 18px rgba(6, 69, 54, 0.22);
-  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(6, 69, 54, 0.20);
 }
 
 .vendor-submit-button:disabled {
@@ -248,7 +282,8 @@
 }
 
 .vendor-review-card .form-status {
-  margin-top: 18px;
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 .vendor-access-denied {
@@ -256,10 +291,10 @@
   text-align: center;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .vendor-review-header,
   .vendor-review-body {
-    padding: 24px;
+    padding: 16px;
   }
 
   .vendor-form-grid {

@@ -40,7 +40,7 @@ function renderStartCampaignPage() {
   renderAppShell({
     mount: shell,
     session,
-    activeKey: 'start-campaign',
+    activeKey: 'my-campaigns',
     content: form,
   })
 
@@ -114,7 +114,7 @@ function renderAccessDenied() {
   renderAppShell({
     mount: shell,
     session,
-    activeKey: 'start-campaign',
+    activeKey: 'my-campaigns',
     content: panel,
   })
 }
