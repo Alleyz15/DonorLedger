@@ -30,14 +30,16 @@ export function renderCampaignDetail(campaign) {
           <div>
             <span>Donors</span>
             <strong>${formatNumber(campaign.donorCount || 0)}</strong>
+            <span class="campaign-chain-chip" title="Donor count derived from immutable on-chain records — cannot be inflated">⛓ Blockchain Verified</span>
           </div>
           <div>
             <span>Days Left</span>
             <strong>${getDaysLeft(campaign.endDate)}</strong>
           </div>
           <div>
-            <span>Verification</span>
-            <strong>On-Chain</strong>
+            <span>Total Raised</span>
+            <strong class="campaign-raised-verified">${formatCurrency(Number(campaign.raisedAmount ?? 0))}</strong>
+            <span class="campaign-chain-chip" title="Amount derived from on-chain donation records — nobody can alter it">⛓ On-Chain</span>
           </div>
         </div>
       </section>

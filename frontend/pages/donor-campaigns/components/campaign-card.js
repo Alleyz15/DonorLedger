@@ -22,7 +22,10 @@ function renderCampaignCard(campaign) {
       <div class="donor-campaign-body">
         <h2>${escapeHtml(campaign.name)}</h2>
         <p class="donor-campaign-ngo"><span aria-hidden="true"></span>${escapeHtml(campaign.ngoName || 'Verified NGO')}</p>
-        <p class="donor-verified"><span aria-hidden="true"></span>Verified by Bank Islam</p>
+        <p class="donor-verified">
+          <span class="donor-verified-tick" aria-hidden="true">✓</span>
+          Bank Islam KYC Verified
+        </p>
         <div class="donor-campaign-stats">
           <div>
             <span>Donors</span>
