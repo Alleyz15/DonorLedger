@@ -568,6 +568,17 @@
   font-weight: 800;
 }
 
+/* "Waiting for..." label on pending steps — tells donor who acts next.
+   Slate colour signals "in progress, no action needed from you." */
+.donor-flow-step-waiting {
+  display: block;
+  margin-top: 5px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+}
+
 /* widen the receipt card to accommodate the flow */
 .donor-receipt-card {
   width: min(100%, 680px);

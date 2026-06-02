@@ -1,9 +1,10 @@
+import { renderAppShell } from '../../components/layout/app-shell.js'
 import { getSession } from '../../services/auth-service.js'
 import { getCampaignDetails } from '../../services/campaign-service.js'
 import { renderCampaignDetail } from './components/campaign-detail-view.js'
 
 const session = getSession()
-const root = document.querySelector('#campaign-detail-root')
+const shell = document.querySelector('#app-shell')
 const canViewDonorPage = session?.token && session.role === 'DONOR'
 const campaignId = new URLSearchParams(window.location.search).get('id')
 
@@ -16,26 +17,41 @@ if (!session?.token) {
 }
 
 function renderCampaignDetailsPage() {
-  root.innerHTML = '<p class="campaign-detail-state">Loading campaign...</p>'
-  loadCampaign()
+  const content = document.createElement('div')
+  content.className = 'campaign-detail-page'
+  content.innerHTML = '<p class="campaign-detail-state">Loading campaign...</p>'
+
+  renderAppShell({
+    mount: shell,
+    session,
+    activeKey: 'donor-home',
+    searchPlaceholder: 'Search campaigns...',
+    showUserChevron: true,
+    content,
+  })
+
+  loadCampaign(content)
 }
 
-async function loadCampaign() {
+async function loadCampaign(content) {
   if (!campaignId) {
-    root.innerHTML = '<p class="campaign-detail-state is-error">Campaign id is missing.</p>'
+    content.innerHTML = '<p class="campaign-detail-state is-error">Campaign id is missing.</p>'
     return
   }
 
   try {
     const campaign = await getCampaignDetails(campaignId)
-    root.innerHTML = renderCampaignDetail(campaign)
+    content.innerHTML = renderCampaignDetail(campaign)
   } catch (error) {
-    root.innerHTML = `<p class="campaign-detail-state is-error">${escapeHtml(error.message)}</p>`
+    content.innerHTML = `<p class="campaign-detail-state is-error">${escapeHtml(error.message)}</p>`
   }
 }
 
 function renderAccessDenied() {
-  root.innerHTML = '<p class="campaign-detail-state">This page is only available for donor accounts.</p>'
+  const content = document.createElement('div')
+  content.className = 'campaign-detail-page'
+  content.innerHTML = '<p class="campaign-detail-state">This page is only available for donor accounts.</p>'
+  renderAppShell({ mount: shell, session, activeKey: 'donor-home', content })
 }
 
 function escapeHtml(value) {
