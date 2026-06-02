@@ -28,9 +28,18 @@ async function renderSubmitEvidencePage() {
         <h1>Submit Evidence</h1>
         <p data-campaign-label>Upload proof before Bank Islam releases funds.</p>
       </div>
-      <a href="./my-campaigns.html">×</a>
+      <a class="evidence-close-btn" href="./my-campaigns.html" aria-label="Back to My Campaigns">← Back</a>
     </header>
     <section class="evidence-body">
+
+      <div class="evidence-ai-gate">
+        <span class="evidence-ai-gate-icon" aria-hidden="true">🤖</span>
+        <div>
+          <strong>Gemini AI will analyse this submission before Bank Islam reviews it.</strong>
+          <span>Ensure invoice amounts match Malaysian market rates. Inflated prices, vague line items, or mismatched amounts will be flagged and may result in an auto-freeze.</span>
+        </div>
+      </div>
+
       <div class="evidence-grid">
         <label class="field">
           <span>Approved Vendor</span>
@@ -52,20 +61,21 @@ async function renderSubmitEvidencePage() {
         </label>
       </div>
 
+      <div class="evidence-checklist-header">
+        <span>Required Documents</span>
+        <span class="evidence-checklist-counter" data-checklist-counter>0 / 5 uploaded</span>
+      </div>
+
       <div class="evidence-upload-grid">
         ${renderFileInput('ssmDoc', 'SSM / ROS Document', true)}
         ${renderFileInput('serviceAgreement', 'Service Agreement', true)}
-        ${renderFileInput('invoice', 'Invoice', true)}
+        ${renderFileInput('invoice', 'Itemised Invoice', true)}
         ${renderFileInput('deliveryProof', 'Delivery Proof', true)}
         ${renderFileInput('recipientConfirm', 'Recipient Confirmation', true)}
       </div>
 
-      <p class="evidence-note">
-        Bank Islam and AI review this evidence before any disbursement is approved.
-      </p>
-
       <div class="evidence-actions">
-        <a href="./my-campaigns.html">Cancel</a>
+        <a class="evidence-cancel-link" href="./my-campaigns.html">Cancel</a>
         <button class="evidence-submit-button" type="submit">Submit Evidence for Review</button>
       </div>
       <div class="form-status" role="status" aria-live="polite"></div>
@@ -171,11 +181,28 @@ function renderFileInput(name, label, required = false) {
 
 function handleFileChange(event) {
   if (!event.target.matches('input[type="file"]')) return
-  const upload = event.target.closest('.evidence-upload')
-  const small = upload?.querySelector('small')
+  const form     = event.target.closest('form')
+  const upload   = event.target.closest('.evidence-upload')
+  const small    = upload?.querySelector('small')
   const fileName = event.target.files?.[0]?.name
+
+  // Update individual upload tile
   if (upload) upload.dataset.hasFile = fileName ? 'true' : 'false'
-  if (small && fileName) small.textContent = fileName
+  if (small) small.textContent = fileName || small.dataset.default || 'PDF, JPG or PNG'
+
+  // Update "X / 5 uploaded" counter
+  if (form) {
+    const total   = evidenceFields.length
+    const uploaded = evidenceFields.filter((field) => {
+      const input = form.querySelector(`input[name="${field}"]`)
+      return input?.files?.[0]?.size > 0
+    }).length
+    const counter = form.querySelector('[data-checklist-counter]')
+    if (counter) {
+      counter.textContent = `${uploaded} / ${total} uploaded`
+      counter.dataset.complete = uploaded === total ? 'true' : 'false'
+    }
+  }
 }
 
 function renderAccessDenied() {

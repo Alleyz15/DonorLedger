@@ -209,13 +209,39 @@
   font-weight: 800;
 }
 
+/* Base status pill */
 .campaign-status {
-  min-width: 82px;
-  padding: 0 16px;
-  background: #e0f2fe;
-  color: #0369a1;
-  font-size: 14px;
+  min-width: 100px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  /* default — fallback colour */
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Colour-coded status variants */
+.campaign-status.is-active    { background: #dcfce7; color: #166534; }
+.campaign-status.is-pending   { background: #fef9c3; color: #854d0e; }
+.campaign-status.is-frozen    { background: #fee2e2; color: #991b1b; }
+.campaign-status.is-rejected  { background: #fee2e2; color: #991b1b; }
+.campaign-status.is-completed { background: #e0f2fe; color: #0369a1; }
+
+/* Action column labels */
+.campaign-action-pending {
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.campaign-action-frozen {
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .campaign-action-button {
