@@ -2,6 +2,7 @@ export function renderCampaignDetail(campaign) {
   const raised = Number(campaign.raisedAmount ?? campaign.raised ?? 0)
   const target = Number(campaign.targetAmount ?? campaign.target ?? 0)
   const percent = target > 0 ? Math.min(100, Math.round((raised / target) * 100)) : 0
+  const goalReached = percent >= 100
   const vendors = Array.isArray(campaign.vendors) ? campaign.vendors : []
 
   return `
@@ -15,16 +16,23 @@ export function renderCampaignDetail(campaign) {
         <p class="campaign-detail-ngo"><span aria-hidden="true"></span>by ${escapeHtml(campaign.ngo?.name || campaign.ngoName || 'Verified NGO')}</p>
       </header>
 
+      ${goalReached ? `
+        <div class="campaign-goal-reached">
+          🎉 <strong>Donation Goal Reached!</strong>
+          This campaign has been fully funded. Funds are now being verified and disbursed to beneficiaries through Bank Islam.
+        </div>
+      ` : ''}
+
       <section class="campaign-progress-card">
         <div class="campaign-progress-top">
           <div>
             <span>Total Raised</span>
             <strong>${formatCurrency(raised)} <small>/ ${formatCurrency(target)} goal</small></strong>
           </div>
-          <strong class="campaign-progress-percent">${percent}% Funded</strong>
+          <strong class="campaign-progress-percent ${goalReached ? 'is-complete' : ''}">${percent}% Funded</strong>
         </div>
         <div class="campaign-progress-track">
-          <span style="width: ${percent}%"></span>
+          <span style="width: ${percent}%" class="${goalReached ? 'is-complete' : ''}"></span>
         </div>
         <div class="campaign-progress-stats">
           <div>
@@ -52,10 +60,16 @@ export function renderCampaignDetail(campaign) {
             <strong>Notes</strong>
             <span>Every cent donated to this campaign is tracked on the public ledger. You can see exact fund movements to vendors, ensuring your contribution reaches those in need without compromise.</span>
           </aside>
-          <a class="campaign-donate-button" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
-            <span aria-hidden="true"></span>
-            Donate Now
-          </a>
+          ${goalReached
+            ? `<div class="campaign-donate-button is-funded">
+                <span aria-hidden="true">🎉</span>
+                Goal Reached — Fully Funded
+               </div>`
+            : `<a class="campaign-donate-button" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
+                <span aria-hidden="true"></span>
+                Donate Now
+               </a>`
+          }
         </section>
 
         <section class="campaign-vendors-card">
@@ -92,7 +106,7 @@ function getVendorDescription(vendor) {
 }
 
 function formatCurrency(value) {
-  return `$${new Intl.NumberFormat('en-MY', { maximumFractionDigits: 0 }).format(Number(value || 0))}`
+  return `RM ${new Intl.NumberFormat('en-MY', { maximumFractionDigits: 0 }).format(Number(value || 0))}`
 }
 
 function formatNumber(value) {

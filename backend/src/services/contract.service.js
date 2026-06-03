@@ -51,6 +51,7 @@ const fallbackABIs = {
     'function unpauseCampaign() external',
     'function addApprovedVendor(address vendor) external',
     'function approvedVendors(address vendor) external view returns (bool)',
+    'function evidenceCount() external view returns (uint256)',
     'function aidPercent() external view returns (uint256)',
     'function logisticsPercent() external view returns (uint256)',
     'function adminPercent() external view returns (uint256)',
@@ -297,11 +298,18 @@ export async function submitEvidence({
   )
   const receipt = await tx.wait()
 
-  // Parse EvidenceSubmitted event to extract evidenceId
+  // Parse EvidenceSubmitted event to extract evidenceId.
+  // Use topic hash matching first (robust across chains including Monad),
+  // then fall back to full iface.parseLog.
   const iface = getCampaign(campaignAddress).interface
+  const eventFragment = iface.getEvent('EvidenceSubmitted')
+  const topicHash = eventFragment ? iface.getEventTopic('EvidenceSubmitted') : null
+
   for (const log of receipt.logs) {
     try {
-      const parsed = iface.parseLog(log)
+      // Primary: match by topic hash before attempting decode
+      if (topicHash && log.topics[0] !== topicHash) continue
+      const parsed = iface.parseLog({ topics: [...log.topics], data: log.data })
       if (parsed && parsed.name === 'EvidenceSubmitted') {
         return {
           txHash: receipt.hash,
@@ -312,6 +320,19 @@ export async function submitEvidence({
       // ignore non-matching logs
     }
   }
+
+  // Last resort: try to read evidenceId directly from the contract state
+  // (evidenceList.length - 1 is the last submitted id)
+  try {
+    const campaign = getCampaign(campaignAddress)
+    const count = await campaign.evidenceCount()
+    if (count > 0n) {
+      return { txHash: receipt.hash, evidenceId: Number(count) - 1 }
+    }
+  } catch {
+    // contract may not expose evidenceCount — skip
+  }
+
   return { txHash: receipt.hash, evidenceId: null }
 }
 

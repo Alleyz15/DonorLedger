@@ -282,6 +282,7 @@ router.get('/evidence/pending', async (req, res, next) => {
 router.get('/campaigns', async (req, res, next) => {
   try {
     const campaigns = await prisma.campaign.findMany({
+      where: { status: { not: 'DRAFT' } },
       orderBy: { createdAt: 'desc' },
       include: {
         ngo: {
@@ -310,7 +311,7 @@ router.get('/campaigns', async (req, res, next) => {
 router.get('/campaign/pending', async (req, res, next) => {
   try {
     const campaigns = await prisma.campaign.findMany({
-      where: { status: { in: ['DRAFT', 'UNDER_REVIEW'] } },
+      where: { status: 'UNDER_REVIEW' },
       orderBy: { createdAt: 'desc' },
       include: {
         ngo: {
