@@ -14,7 +14,7 @@ export function createCampaignsTable() {
         <thead>
           <tr>
             <th>Campaign Name</th>
-            <th>Submission Date</th>
+            <th>End Date</th>
             <th>Raised / Target</th>
             <th>Pending Evidence</th>
             <th>AI Alerts</th>
@@ -86,7 +86,7 @@ function renderCampaignRow(campaign) {
           </div>
         </div>
       </td>
-      <td>${formatDate(campaign.createdAt)}</td>
+      <td>${campaign.endDate ? formatDate(campaign.endDate) : '-'}</td>
       <td>${formatMoney(campaign.raisedAmount)} /<br />${formatMoney(campaign.targetAmount)}</td>
       <td><span class="campaign-count-pill">${Number(campaign.pendingEvidenceCount || 0)}</span></td>
       <td><span class="campaign-count-pill ${aiAlerts > 0 ? 'is-alert' : ''}">${aiAlerts}</span></td>
@@ -99,8 +99,17 @@ function renderCampaignRow(campaign) {
 function renderCampaignAction(campaign) {
   const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
 
-  // Campaign is awaiting Bank Islam review — tell the NGO clearly
-  if (['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
+  // Draft — NGO can still edit before Bank Islam sees it
+  if (campaign.status === 'DRAFT') {
+    return `
+      <a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">
+        Edit Draft
+      </a>
+    `
+  }
+
+  // Submitted for review — awaiting Bank Islam approval, no edits allowed
+  if (campaign.status === 'UNDER_REVIEW') {
     return '<span class="campaign-action-pending">⏳ Awaiting Bank Islam approval</span>'
   }
 
@@ -134,7 +143,7 @@ function getCampaignStatusMeta(status) {
     case 'VERIFIED':
       return { label: 'Active',         statusClass: 'is-active' }
     case 'DRAFT':
-      return { label: 'Pending Review', statusClass: 'is-pending' }
+      return { label: 'Draft',          statusClass: 'is-draft' }
     case 'UNDER_REVIEW':
       return { label: 'Under Review',   statusClass: 'is-pending' }
     case 'FROZEN':
@@ -151,8 +160,7 @@ function getCampaignStatusMeta(status) {
 // AI alert count — FROZEN is the highest severity (auto-frozen by Gemini AI),
 // UNDER_REVIEW means Gemini flagged it for human review.
 function getAIAlertCount(status) {
-  if (status === 'FROZEN')       return 1
-  if (status === 'UNDER_REVIEW') return 1
+  if (status === 'FROZEN') return 1
   return 0
 }
 

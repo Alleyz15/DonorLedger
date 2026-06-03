@@ -26,6 +26,26 @@ export function createNGOCampaign(token, payload) {
   })
 }
 
+export function updateNGOCampaignDraft(token, campaignId, payload) {
+  return apiRequest(`/ngo/campaign/${campaignId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: payload,
+  })
+}
+
+export function saveNGOCampaignDraft(token, payload) {
+  return apiRequest('/ngo/campaign/save-draft', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: payload,
+  })
+}
+
 export function getApprovedVendors(token) {
   return apiRequest('/ngo/vendors?status=APPROVED', {
     headers: {

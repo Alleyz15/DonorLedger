@@ -1,7 +1,7 @@
 import { renderAppShell } from '../../components/layout/app-shell.js'
 import { getSession } from '../../services/auth-service.js'
 import { getCampaignDetails } from '../../services/campaign-service.js'
-import { renderCampaignDetail } from './components/campaign-detail-view.js'
+import { renderCampaignDetail } from './components/campaign-detail-view.js?v=3'
 
 const session = getSession()
 const shell = document.querySelector('#app-shell')

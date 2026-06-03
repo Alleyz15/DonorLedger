@@ -8,10 +8,6 @@ export function createVendorsPanel() {
         <option value="">Select from Approved List</option>
       </select>
     </label>
-    <a class="submit-vendor-placeholder" href="./submit-vendor.html">
-      <span aria-hidden="true"></span>
-      Submit New Vendor for Review
-    </a>
   `
   return section
 }
@@ -19,6 +15,11 @@ export function createVendorsPanel() {
 export function renderVendors(panel, vendors) {
   const list = panel.querySelector('[data-vendors-list]')
   if (!list) return
+
+  if (!vendors || vendors.length === 0) {
+    list.innerHTML = '<option value="">No approved vendors available</option>'
+    return
+  }
 
   list.innerHTML = '<option value="">Select from Approved List</option>'
   vendors.forEach((vendor) => {
@@ -29,10 +30,10 @@ export function renderVendors(panel, vendors) {
   })
 }
 
-export function renderVendorsError(panel, message) {
+export function renderVendorsError(panel, _message) {
   const list = panel.querySelector('[data-vendors-list]')
   if (!list) return
-  list.innerHTML = `<option value="">${escapeHtml(message)}</option>`
+  list.innerHTML = `<option value="">No approved vendors available</option>`
 }
 
 function escapeHtml(value) {

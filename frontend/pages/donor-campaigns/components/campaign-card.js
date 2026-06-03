@@ -14,10 +14,15 @@ export function renderCampaignCards(campaigns) {
 
 function renderCampaignCard(campaign) {
   const visual = getCampaignVisual(campaign)
+  const raised = Number(campaign.raised ?? campaign.raisedAmount ?? 0)
+  const target = Number(campaign.target ?? campaign.targetAmount ?? 0)
+  const percent = target > 0 ? Math.min(100, Math.round((raised / target) * 100)) : 0
+  const goalReached = percent >= 100
+
   return `
     <article class="donor-campaign-card">
       <div class="donor-campaign-image" style="background-image: url('${visual.image}')">
-        <span>${visual.tag}</span>
+        <span>${goalReached ? '🎉 FULLY FUNDED' : visual.tag}</span>
       </div>
       <div class="donor-campaign-body">
         <h2>${escapeHtml(campaign.name)}</h2>
@@ -26,6 +31,15 @@ function renderCampaignCard(campaign) {
           <span class="donor-verified-tick" aria-hidden="true">✓</span>
           Bank Islam KYC Verified
         </p>
+        <div class="donor-campaign-progress">
+          <div class="donor-progress-track">
+            <span class="donor-progress-fill ${goalReached ? 'is-complete' : ''}" style="width:${percent}%"></span>
+          </div>
+          <div class="donor-progress-labels">
+            <span>RM ${formatNumber(raised)} raised</span>
+            <strong>${percent}%</strong>
+          </div>
+        </div>
         <div class="donor-campaign-stats">
           <div>
             <span>Donors</span>
@@ -36,8 +50,8 @@ function renderCampaignCard(campaign) {
             <strong>${getDaysLeft(campaign.endDate)}</strong>
           </div>
         </div>
-        <a class="donor-details-button" href="./campaign-details.html?id=${encodeURIComponent(campaign.id)}">
-          View Details
+        <a class="donor-details-button ${goalReached ? 'is-funded' : ''}" href="./campaign-details.html?id=${encodeURIComponent(campaign.id)}">
+          ${goalReached ? '🎉 Fully Funded — View Details' : 'View Details'}
         </a>
       </div>
     </article>
