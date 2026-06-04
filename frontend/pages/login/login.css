@@ -428,6 +428,30 @@ body[data-login-mode="ngo"] .login-demo-card {
   color: #b91c1c;
 }
 
+.login-register-prompt {
+  margin: -6px 0 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.login-register-prompt[hidden] {
+  display: none;
+}
+
+.login-register-prompt a {
+  color: #064e3b;
+  font-weight: 800;
+}
+
+.login-register-prompt a:hover,
+.login-register-prompt a:focus {
+  text-decoration: underline;
+  outline: none;
+}
+
 @media (max-width: 900px) {
   .login-page {
     height: auto;
