@@ -7,12 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body class="introduction-screen">
+    <div class="bg-blur-ambient" aria-hidden="true"></div>
+    <div class="bg-blur-ambient bg-blur-ambient-2" aria-hidden="true"></div>
+
     <main class="hero-page">
       <nav class="top-nav" aria-label="Primary navigation">
         <a class="brand" href="./introduction.html">DonorLedger</a>
@@ -25,9 +28,7 @@
           <h1 id="hero-title" class="hero-title">
             <span>The Most</span>
             <span class="accent">Trusted</span>
-            <span>Charity</span>
-            <span>Platform in</span>
-            <span>Malaysia</span>
+            <span>Charity Platform in Malaysia</span>
           </h1>
 
           <p class="hero-summary">
@@ -36,9 +37,7 @@
           </p>
 
           <div class="hero-actions">
-            <a class="button button-primary" href="./login.html">
-              Get Started
-            </a>
+            <a class="button button-primary" href="./login.html">Join Us</a>
             <a class="button button-secondary" href="./login.html?role=ngo">
               Join Us As Organizer
             </a>
@@ -50,58 +49,114 @@
               <span></span>
               <span></span>
             </div>
-            <p>Joined by <strong id="ngo-count">—</strong> Verified NGOs</p>
+            <p>Joined by <strong id="ngo-count">&mdash;</strong> Verified NGOs</p>
           </div>
         </div>
 
-        <div class="logo-collage" aria-hidden="true">
-          <article class="logo-card card-education">
-            <img
-              src="./assets/children-education.png"
-              alt=""
-              loading="eager"
-            />
-          </article>
-          <article class="logo-card card-wwf">
-            <img src="./assets/wwf-logo.png" alt="" loading="eager" />
-          </article>
-          <article class="logo-card card-medicaid">
-            <img
-              src="./assets/medicaid-alliance.png"
-              alt=""
-              loading="eager"
-            />
-          </article>
-          <article class="logo-card card-global">
-            <img src="./assets/global-relief.png" alt="" loading="eager" />
-          </article>
-          <article class="logo-card card-ocean">
-            <img src="./assets/ocean-guardians.png" alt="" loading="lazy" />
-          </article>
-          <article class="logo-card card-earthcare">
-            <img
-              src="./assets/earthcare-sustainability-charity.png"
-              alt=""
-              loading="lazy"
-            />
-          </article>
+        <div class="perspective-stage" aria-hidden="true">
+          <div class="perspective-canvas">
+            <div class="marquee-col col-up">
+              <article class="logo-card logo-card-education">
+                <img src="./assets/children-education.png" alt="" loading="eager" />
+              </article>
+              <article class="logo-card logo-card-wwf">
+                <img src="./assets/wwf-logo.png" alt="" loading="eager" />
+              </article>
+              <article class="logo-card logo-card-medicaid">
+                <img src="./assets/medicaid-alliance.png" alt="" loading="eager" />
+              </article>
+              <article class="logo-card logo-card-education">
+                <img src="./assets/children-education.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-wwf">
+                <img src="./assets/wwf-logo.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-medicaid">
+                <img src="./assets/medicaid-alliance.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-education">
+                <img src="./assets/children-education.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-wwf">
+                <img src="./assets/wwf-logo.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-medicaid">
+                <img src="./assets/medicaid-alliance.png" alt="" loading="lazy" />
+              </article>
+            </div>
+
+            <div class="marquee-col col-down">
+              <article class="logo-card logo-card-global">
+                <img src="./assets/global-relief.png" alt="" loading="eager" />
+              </article>
+              <article class="logo-card logo-card-ocean">
+                <img src="./assets/ocean-guardians.png" alt="" loading="eager" />
+              </article>
+              <article class="logo-card logo-card-earthcare">
+                <img
+                  src="./assets/earthcare-sustainability-charity.png"
+                  alt=""
+                  loading="eager"
+                />
+              </article>
+              <article class="logo-card logo-card-global">
+                <img src="./assets/global-relief.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-ocean">
+                <img src="./assets/ocean-guardians.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-earthcare">
+                <img
+                  src="./assets/earthcare-sustainability-charity.png"
+                  alt=""
+                  loading="lazy"
+                />
+              </article>
+              <article class="logo-card logo-card-global">
+                <img src="./assets/global-relief.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-ocean">
+                <img src="./assets/ocean-guardians.png" alt="" loading="lazy" />
+              </article>
+              <article class="logo-card logo-card-earthcare">
+                <img
+                  src="./assets/earthcare-sustainability-charity.png"
+                  alt=""
+                  loading="lazy"
+                />
+              </article>
+            </div>
+          </div>
         </div>
       </section>
     </main>
+
     <script>
       const API = window.DONORLEDGER_API_BASE_URL || 'http://127.0.0.1:3001/api'
-      const el  = document.getElementById('ngo-count')
+      const el = document.getElementById('ngo-count')
+
       if (el) {
         fetch(API + '/campaign?status=ALL')
-          .then(function(r) { return r.json() })
+          .then(function(response) {
+            if (!response.ok) {
+              throw new Error('Campaign request failed')
+            }
+            return response.json()
+          })
           .then(function(campaigns) {
             var ngoIds = new Set(
               Array.isArray(campaigns)
-                ? campaigns.map(function(c) { return c.ngoName }).filter(Boolean)
+                ? campaigns.map(function(campaign) {
+                    return campaign.ngoName
+                  }).filter(Boolean)
                 : []
             )
-            el.textContent = ngoIds.size > 0 ? String(ngoIds.size) : '—'
+            el.textContent = ngoIds.size > 0 ? String(ngoIds.size) : '\u2014'
           })
-          .catch(function() { el.textContent = '—' })
+          .catch(function() {
+            el.textContent = '\u2014'
+          })
       }
     </script>
+  </body>
+</html>
