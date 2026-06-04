@@ -23,18 +23,28 @@ export async function submitVendor({
     err.status = 403
     throw err
   }
-  return prisma.vendor.create({
-    data: {
-      ngoId,
-      name,
-      ssmNumber,
-      serviceType,
-      bankAccount,
-      walletAddress,
-      registrationDoc,
-      status: 'PENDING_KYC',
-    },
-  })
+  try {
+    return await prisma.vendor.create({
+      data: {
+        ngoId,
+        name,
+        ssmNumber,
+        serviceType,
+        bankAccount,
+        walletAddress,
+        registrationDoc,
+        status: 'PENDING_KYC',
+      },
+    })
+  } catch (e) {
+    // Prisma unique constraint violation — walletAddress already registered
+    if (e.code === 'P2002') {
+      const err = new Error('This wallet address is already registered as a vendor')
+      err.status = 409
+      throw err
+    }
+    throw e
+  }
 }
 
 export async function approveVendor({

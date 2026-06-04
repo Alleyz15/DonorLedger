@@ -11,6 +11,7 @@ import alertService from '../services/alert.service.js'
 import { requireAdmin, requireRole } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { DONOR_MILESTONE_TEXT } from '../utils/format.utils.js'
+import { env } from '../config/env.js'
 
 const router = Router()
 
@@ -36,17 +37,23 @@ router.post(
         err.status = 409
         throw err
       }
-      if (evidence.onChainId === null) {
-        const err = new Error('Evidence missing on-chain id')
+      // Section 8 — Bank Islam wallet signs the approval on-chain.
+      // In demo mode (no deployed contract), skip the chain call and use a
+      // placeholder tx hash so the rest of the approval flow works normally.
+      let txHash = 'demo-tx-' + Date.now()
+      const hasContract = evidence.campaign.contractAddress && evidence.onChainId !== null
+      if (!env.demo.enabled && !hasContract) {
+        const err = new Error('Evidence missing on-chain id or contract address')
         err.status = 400
         throw err
       }
-
-      // Section 8 — Bank Islam wallet signs the approval on-chain.
-      const { txHash } = await contractService.approveDisbursement(
-        evidence.campaign.contractAddress,
-        evidence.onChainId
-      )
+      if (hasContract) {
+        const result = await contractService.approveDisbursement(
+          evidence.campaign.contractAddress,
+          evidence.onChainId
+        )
+        txHash = result.txHash
+      }
 
       const updated = await prisma.evidence.update({
         where: { id: evidence.id },
@@ -104,11 +111,15 @@ router.post(
         throw err
       }
 
-      const { txHash } = await contractService.rejectDisbursement(
-        evidence.campaign.contractAddress,
-        evidence.onChainId,
-        req.body.reason
-      )
+      let txHash = 'demo-tx-' + Date.now()
+      if (evidence.campaign.contractAddress && evidence.onChainId !== null) {
+        const result = await contractService.rejectDisbursement(
+          evidence.campaign.contractAddress,
+          evidence.onChainId,
+          req.body.reason
+        )
+        txHash = result.txHash
+      }
 
       await prisma.evidence.update({
         where: { id: evidence.id },

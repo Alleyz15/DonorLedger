@@ -8,7 +8,6 @@ export function createVendorForm() {
         <h1>Submit New Vendor for Review</h1>
         <p>Registration for the DonorLedger Institutional Portal</p>
       </div>
-      <a href="./start-campaign.html" aria-label="Close">×</a>
     </header>
 
     <section class="vendor-review-body">
@@ -46,14 +45,23 @@ export function createVendorForm() {
         </label>
       </div>
 
-      <label class="vendor-upload">
-        <span class="vendor-upload-label"><i aria-hidden="true"></i>Registration Document</span>
-        <input name="registrationDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
-        <strong><i aria-hidden="true"></i>Click to upload or drag and drop</strong>
-        <small data-empty-text="PDF, JPG or PNG (max. 10MB)">
-          PDF, JPG or PNG (max. 10MB)
-        </small>
-      </label>
+      <div class="vendor-upload-wrapper">
+        <span class="vendor-upload-label-text">Registration Document</span>
+        <label class="vendor-dropzone-box" for="vendor-reg-doc-input">
+          <span class="vendor-dropzone-icon-area" aria-hidden="true">
+            <i class="vendor-dropzone-icon-svg"></i>
+          </span>
+          <strong class="vendor-dropzone-heading">Click to upload or drag and drop</strong>
+          <span class="vendor-dropzone-sub" data-default="PDF, JPG or PNG (max. 10MB)">PDF, JPG or PNG (max. 10MB)</span>
+          <input
+            id="vendor-reg-doc-input"
+            name="registrationDoc"
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            style="display:none"
+          />
+        </label>
+      </div>
 
       <section class="vendor-protocol-note">
         <i aria-hidden="true"></i>
@@ -66,7 +74,7 @@ export function createVendorForm() {
       </section>
 
       <div class="vendor-form-actions">
-        <a class="vendor-cancel-button" href="./start-campaign.html">Cancel</a>
+        <a class="vendor-cancel-button" href="./my-campaigns.html">Cancel</a>
         <button class="vendor-submit-button" type="submit">
           Submit Vendor for Review
         </button>
@@ -95,15 +103,14 @@ export function getVendorPayload(form, ngoId) {
 }
 
 export function bindVendorUploadFeedback(form) {
-  const input = form.querySelector('input[name="registrationDoc"]')
-  const upload = form.querySelector('.vendor-upload')
-  const hint = upload?.querySelector('small')
-  if (!input || !upload || !hint) return
+  const input    = form.querySelector('input[name="registrationDoc"]')
+  const dropzone = form.querySelector('.vendor-dropzone-box')
+  const hint     = dropzone?.querySelector('.vendor-dropzone-sub')
+  if (!input || !dropzone || !hint) return
 
   input.addEventListener('change', () => {
     const fileName = input.files?.[0]?.name
-    upload.dataset.hasFile = fileName ? 'true' : 'false'
-    hint.textContent = fileName || hint.dataset.emptyText || 'PDF, JPG or PNG (max. 10MB)'
-    hint.title = fileName || ''
+    dropzone.classList.toggle('has-file', !!fileName)
+    hint.textContent = fileName || hint.dataset.default || 'PDF, JPG or PNG (max. 10MB)'
   })
 }

@@ -205,11 +205,30 @@ async function handleAction(e, content) {
       // Section 13 — Bank Islam independently SMS-confirms beneficiary receipt.
       // This fires CONFIRMED + COMPLETED milestones on donor tracker (steps 4 & 5).
       // Independent of the NGO — Bank Islam goes directly to beneficiary.
-      const originalText = btn.textContent
       btn.textContent = '⏳ Sending SMS confirmation...'
       await triggerRecipientConfirm(campaignId)
-      btn.textContent = '✅ Confirmed!'
-      setTimeout(() => loadEvidence(content), 1500)
+
+      // Replace the entire actions div in-place — do NOT reload the evidence
+      // list because the DB status stays APPROVED (no CONFIRMED enum value yet)
+      // and a reload would just bring the button back.
+      const actionsDiv = btn.closest('.admin-evidence-actions')
+      if (actionsDiv) {
+        actionsDiv.innerHTML = `
+          <p class="admin-evidence-confirm-note" style="color:#16a34a;font-weight:600;">
+            ✅ Beneficiary confirmed receipt. Donor tracker updated to COMPLETED.
+          </p>
+        `
+      }
+
+      // Also update the card status badge to reflect completion
+      const card = btn.closest('article')
+      if (card) {
+        const badge = card.querySelector('.admin-evidence-status')
+        if (badge) {
+          badge.textContent = 'Completed'
+          badge.className = 'admin-evidence-status is-confirmed'
+        }
+      }
       return
     }
     await loadEvidence(content)

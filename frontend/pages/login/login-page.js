@@ -50,7 +50,7 @@ form?.addEventListener('submit', async (event) => {
       }, 500)
     } else if (session.role === 'BANK_ADMIN') {
       window.setTimeout(() => {
-        window.location.href = './admin-ngos.html'
+        window.location.href = './admin-dashboard.html'
       }, 500)
     } else if (session.role === 'DONOR') {
       window.setTimeout(() => {

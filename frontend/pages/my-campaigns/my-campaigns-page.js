@@ -5,7 +5,7 @@ import {
   createCampaignsTable,
   renderCampaignError,
   renderCampaignRows,
-} from './components/campaigns-table.js'
+} from './components/campaigns-table.js?v=5'
 import { createSummaryCards, updateSummaryCards } from './components/summary-cards.js'
 
 const session = getSession()
@@ -37,9 +37,40 @@ async function renderMyCampaignsPage() {
     const campaigns = await getNGOCampaigns(session.token)
     updateSummaryCards(summaryCards, campaigns)
     renderCampaignRows(table, campaigns)
+    patchDraftRows(table, campaigns)
   } catch (error) {
     renderCampaignError(table, error.message)
   }
+}
+
+// Patch draft rows directly in the DOM in case campaigns-table.js is cached.
+// Finds every row whose status badge says the old "Pending Review" text,
+// cross-checks against the campaigns data, and replaces with Draft + Edit button.
+function patchDraftRows(table, campaigns) {
+  const tbody = table.querySelector('[data-campaign-rows]')
+  if (!tbody) return
+
+  const rows = Array.from(tbody.querySelectorAll('tr'))
+  rows.forEach((row, index) => {
+    const campaign = campaigns[index]
+    if (!campaign) return
+
+    if (campaign.status === 'DRAFT') {
+      // Fix status badge
+      const badge = row.querySelector('.campaign-status')
+      if (badge) {
+        badge.textContent = 'Draft'
+        badge.className = 'campaign-status is-draft'
+      }
+
+      // Fix action cell — replace anything in it with Edit Draft link
+      const cells = row.querySelectorAll('td')
+      const actionCell = cells[5] // Actions is the 6th column (index 5)
+      if (actionCell) {
+        actionCell.innerHTML = `<a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">Edit Draft</a>`
+      }
+    }
+  })
 }
 
 function renderAccessDenied() {

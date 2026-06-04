@@ -159,7 +159,7 @@ router.post(
           adminPercent,
           targetAmount,
           endDate: new Date(endDate),
-          status: 'DRAFT',
+          status: 'UNDER_REVIEW',
           vendors: {
             connect: { id: vendor.id },
           },
@@ -176,6 +176,121 @@ router.post(
     }
   }
 )
+
+// Save a partial campaign as DRAFT — no vendor or allocation required.
+// NGO can return later to complete and submit for Bank Islam review.
+router.post('/campaign/save-draft', requireNGO, async (req, res, next) => {
+  try {
+    const ngo = await prisma.nGO.findUnique({ where: { id: req.ngo.sub } })
+    if (!ngo) {
+      const err = new Error('NGO not found')
+      err.status = 404
+      throw err
+    }
+
+    const {
+      name,
+      causeType,
+      description,
+      aidPercent,
+      logisticsPercent,
+      adminPercent,
+      targetAmount,
+      endDate,
+    } = req.body
+
+    if (!name || String(name).trim().length < 2) {
+      const err = new Error('Campaign title is required to save a draft')
+      err.status = 400
+      throw err
+    }
+
+    const campaign = await prisma.campaign.create({
+      data: {
+        ngoId: ngo.id,
+        name: String(name).trim(),
+        causeType: causeType || 'Uncategorised',
+        description: description || '',
+        aidPercent:        Number(aidPercent)        || 80,
+        logisticsPercent:  Number(logisticsPercent)  || 10,
+        adminPercent:      Number(adminPercent)       || 10,
+        targetAmount:      String(Number(targetAmount) || 0),
+        endDate: endDate ? new Date(endDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        status: 'DRAFT',
+      },
+    })
+
+    res.status(201).json({
+      campaignId: campaign.id,
+      status: campaign.status,
+      message: 'Draft saved.',
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+// Update an existing DRAFT campaign — used by "Save Draft & Exit" and
+// "Submit for Bank Review" when editing. Only allowed while status is DRAFT.
+router.patch('/campaign/:id', requireNGO, async (req, res, next) => {
+  try {
+    const campaign = await prisma.campaign.findFirst({
+      where: { id: req.params.id, ngoId: req.ngo.sub },
+    })
+    if (!campaign) {
+      const err = new Error('Campaign not found')
+      err.status = 404
+      throw err
+    }
+    if (campaign.status !== 'DRAFT') {
+      const err = new Error('Only draft campaigns can be edited')
+      err.status = 403
+      throw err
+    }
+
+    const {
+      name,
+      causeType,
+      description,
+      aidPercent,
+      logisticsPercent,
+      adminPercent,
+      targetAmount,
+      endDate,
+      vendorId,
+      submit,
+    } = req.body
+
+    const data = {}
+    if (name)           data.name           = String(name).trim()
+    if (causeType)      data.causeType      = causeType
+    if (description !== undefined) data.description = description || ''
+    if (aidPercent !== undefined)        data.aidPercent        = Number(aidPercent)
+    if (logisticsPercent !== undefined)  data.logisticsPercent  = Number(logisticsPercent)
+    if (adminPercent !== undefined)      data.adminPercent      = Number(adminPercent)
+    if (targetAmount !== undefined)      data.targetAmount      = String(Number(targetAmount))
+    if (endDate)        data.endDate        = new Date(endDate)
+    if (submit === true) data.status        = 'UNDER_REVIEW'
+
+    // If a vendor is provided, connect it to the campaign
+    const updatePayload = vendorId
+      ? { ...data, vendors: { connect: { id: vendorId } } }
+      : data
+
+    const updated = await prisma.campaign.update({
+      where: { id: campaign.id },
+      data: updatePayload,
+    })
+
+    res.json({
+      campaignId: updated.id,
+      status: updated.status,
+      message: 'Draft updated.',
+    })
+  } catch (e) {
+    next(e)
+  }
+})
 
 router.get('/campaigns', requireNGO, async (req, res, next) => {
   try {
@@ -194,14 +309,34 @@ router.get('/campaigns', requireNGO, async (req, res, next) => {
         pausedReason: true,
         contractAddress: true,
         createdAt: true,
+        evidence: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
       },
     })
     res.json(
-      campaigns.map((c) => ({
-        ...c,
-        targetAmount: Number(c.targetAmount),
-        raisedAmount: Number(c.raisedAmount),
-      }))
+      campaigns.map((c) => {
+        const reservedAmount = c.evidence
+          .filter((item) => item.status !== 'REJECTED')
+          .reduce((sum, item) => sum + Number(item.amount), 0)
+        const pendingEvidenceCount = c.evidence.filter((item) =>
+          ['PENDING_AI', 'PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+        ).length
+        const raisedAmount = Number(c.raisedAmount)
+        const { evidence, ...campaign } = c
+
+        return {
+          ...campaign,
+          targetAmount: Number(c.targetAmount),
+          raisedAmount,
+          reservedAmount,
+          availableAmount: Math.max(raisedAmount - reservedAmount, 0),
+          pendingEvidenceCount,
+        }
+      })
     )
   } catch (e) {
     next(e)

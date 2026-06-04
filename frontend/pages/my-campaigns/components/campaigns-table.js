@@ -3,10 +3,7 @@ export function createCampaignsTable() {
   section.className = 'campaigns-panel'
   section.innerHTML = `
     <div class="campaigns-panel-header">
-      <div>
-        <button class="campaign-tool-button" type="button">Filter</button>
-        <button class="campaign-tool-button" type="button">Sort By: Date</button>
-      </div>
+      <div></div>
       <a class="campaigns-primary-action" href="./start-campaign.html">
         <span aria-hidden="true">+</span>
         Start New Campaign
@@ -17,7 +14,7 @@ export function createCampaignsTable() {
         <thead>
           <tr>
             <th>Campaign Name</th>
-            <th>Submission Date</th>
+            <th>End Date</th>
             <th>Raised / Target</th>
             <th>Pending Evidence</th>
             <th>AI Alerts</th>
@@ -75,6 +72,9 @@ export function renderCampaignError(table, message) {
 }
 
 function renderCampaignRow(campaign) {
+  const { label, statusClass } = getCampaignStatusMeta(campaign.status)
+  const aiAlerts = getAIAlertCount(campaign.status)
+
   return `
     <tr>
       <td>
@@ -86,18 +86,40 @@ function renderCampaignRow(campaign) {
           </div>
         </div>
       </td>
-      <td>${formatDate(campaign.createdAt)}</td>
+      <td>${campaign.endDate ? formatDate(campaign.endDate) : '-'}</td>
       <td>${formatMoney(campaign.raisedAmount)} /<br />${formatMoney(campaign.targetAmount)}</td>
-      <td><span class="campaign-count-pill">0</span></td>
-      <td><span class="campaign-count-pill is-alert">${campaign.status === 'UNDER_REVIEW' ? 1 : 0}</span></td>
+      <td><span class="campaign-count-pill">${Number(campaign.pendingEvidenceCount || 0)}</span></td>
+      <td><span class="campaign-count-pill ${aiAlerts > 0 ? 'is-alert' : ''}">${aiAlerts}</span></td>
       <td>${renderCampaignAction(campaign)}</td>
-      <td><span class="campaign-status">${escapeHtml(getCampaignStatusLabel(campaign.status))}</span></td>
+      <td><span class="campaign-status ${statusClass}">${escapeHtml(label)}</span></td>
     </tr>
   `
 }
 
 function renderCampaignAction(campaign) {
-  if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status)) {
+  const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
+
+  // Draft — NGO can still edit before Bank Islam sees it
+  if (campaign.status === 'DRAFT') {
+    return `
+      <a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">
+        Edit Draft
+      </a>
+    `
+  }
+
+  // Submitted for review — awaiting Bank Islam approval, no edits allowed
+  if (campaign.status === 'UNDER_REVIEW') {
+    return '<span class="campaign-action-pending">⏳ Awaiting Bank Islam approval</span>'
+  }
+
+  // Campaign frozen — show frozen message
+  if (campaign.status === 'FROZEN') {
+    return '<span class="campaign-action-frozen">⚠ Campaign frozen — contact Bank Islam</span>'
+  }
+
+  // Active campaign with funds available — submit evidence
+  if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status) && availableAmount > 0) {
     return `
       <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
         Submit Evidence
@@ -105,14 +127,41 @@ function renderCampaignAction(campaign) {
     `
   }
 
-  return '<span class="campaign-action-empty">-</span>'
+  // Active but fully released
+  if (['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) && availableAmount <= 0) {
+    return '<span class="campaign-action-empty">Fully Released</span>'
+  }
+
+  return '<span class="campaign-action-empty">—</span>'
 }
 
-function getCampaignStatusLabel(status) {
-  if (['ACTIVE', 'APPROVED', 'VERIFIED'].includes(status)) return 'ACTIVE'
-  if (status === 'DRAFT') return 'PENDING REVIEW'
-  if (status === 'REJECTED') return 'REJECTED'
-  return status
+// Returns human-readable label + CSS modifier class for each campaign status.
+function getCampaignStatusMeta(status) {
+  switch (status) {
+    case 'ACTIVE':
+    case 'APPROVED':
+    case 'VERIFIED':
+      return { label: 'Active',         statusClass: 'is-active' }
+    case 'DRAFT':
+      return { label: 'Draft',          statusClass: 'is-draft' }
+    case 'UNDER_REVIEW':
+      return { label: 'Under Review',   statusClass: 'is-pending' }
+    case 'FROZEN':
+      return { label: 'AI Frozen',      statusClass: 'is-frozen' }
+    case 'REJECTED':
+      return { label: 'Rejected',       statusClass: 'is-rejected' }
+    case 'COMPLETED':
+      return { label: 'Completed',      statusClass: 'is-completed' }
+    default:
+      return { label: status,           statusClass: '' }
+  }
+}
+
+// AI alert count — FROZEN is the highest severity (auto-frozen by Gemini AI),
+// UNDER_REVIEW means Gemini flagged it for human review.
+function getAIAlertCount(status) {
+  if (status === 'FROZEN') return 1
+  return 0
 }
 
 function updateCount(table, count) {

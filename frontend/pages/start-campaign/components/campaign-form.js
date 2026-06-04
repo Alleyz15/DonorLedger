@@ -89,7 +89,7 @@ export function createCampaignForm() {
     </section>
 
     <button class="start-campaign-submit" type="submit">Submit for Bank Review</button>
-    <a class="start-campaign-exit" href="./my-campaigns.html">Save Draft &amp; Exit</a>
+    <button class="start-campaign-exit" type="button">Save Draft &amp; Exit</button>
     <div class="form-status" role="status" aria-live="polite"></div>
     <p class="start-campaign-terms">
       By submitting, you agree to DonorLedger's

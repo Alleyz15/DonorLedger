@@ -1,6 +1,7 @@
 const roleMenus = {
   ORGANIZER: [
-    { label: 'My Campaign', href: './my-campaigns.html', activeKey: 'my-campaigns' },
+    { label: 'My Campaigns',    href: './my-campaigns.html',  activeKey: 'my-campaigns' },
+    { label: 'Register Vendor', href: './submit-vendor.html', activeKey: 'submit-vendor' },
   ],
   BANK_ADMIN: [
     { label: 'Dashboard',        href: './admin-dashboard.html', activeKey: 'admin-dashboard' },

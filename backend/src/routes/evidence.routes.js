@@ -50,6 +50,10 @@ router.post(
             where: { id: vendorId },
             select: { id: true, status: true, walletAddress: true },
           },
+          evidence: {
+            where: { status: { not: 'REJECTED' } },
+            select: { amount: true },
+          },
         },
       })
       if (!campaign) {
@@ -71,6 +75,21 @@ router.post(
       if (!campaign.vendors.some((linkedVendor) => linkedVendor.id === vendor.id)) {
         const err = new Error('Vendor is not approved for this campaign')
         err.status = 409
+        throw err
+      }
+      const requestedAmount = Number(amount)
+      const reservedAmount = campaign.evidence.reduce(
+        (sum, item) => sum + Number(item.amount),
+        0
+      )
+      const availableAmount = Number(campaign.raisedAmount) - reservedAmount
+      if (requestedAmount > availableAmount) {
+        const err = new Error(
+          availableAmount <= 0
+            ? 'No releasable funds remaining for this campaign.'
+            : `Requested amount exceeds remaining releasable balance of RM${availableAmount.toFixed(2)}.`
+        )
+        err.status = 400
         throw err
       }
 
@@ -98,6 +117,14 @@ router.post(
         deliveryProof: pickPath('deliveryProof'),
         recipientConfirm: pickPath('recipientConfirm'),
       }
+      const missingFiles = Object.entries(filePaths)
+        .filter(([, filePath]) => !filePath)
+        .map(([name]) => name)
+      if (missingFiles.length) {
+        const err = new Error(`Missing evidence documents: ${missingFiles.join(', ')}`)
+        err.status = 400
+        throw err
+      }
 
       // Section 13 — one bundle hash that goes on-chain. The files
       // themselves stay on the VPS (uploads/).
@@ -108,7 +135,7 @@ router.post(
         campaignAddress: campaign.contractAddress,
         packageHash,
         category,
-        amount: Number(amount),
+        amount: requestedAmount,
         vendorAddress: vendor.walletAddress,
       })
 
@@ -117,7 +144,7 @@ router.post(
           campaignId,
           vendorId,
           category,
-          amount: Number(amount),
+          amount: requestedAmount,
           onChainId,
           packageHash,
           ssmDoc: filePaths.ssmDoc,

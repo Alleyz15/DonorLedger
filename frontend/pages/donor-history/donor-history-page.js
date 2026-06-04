@@ -62,6 +62,16 @@ function renderDonorHistoryPage() {
   })
 
   loadHistory(content)
+
+  // Wire Export Statement button — downloads a CSV of all donations.
+  // The on-chain tx hash column is the differentiator no other platform can offer.
+  content.querySelector('.donor-export-button')?.addEventListener('click', () => {
+    if (!donationHistory?.donations?.length) {
+      alert('No donations to export yet.')
+      return
+    }
+    exportDonationsCSV(donationHistory.donations)
+  })
 }
 
 async function loadHistory(content) {
@@ -220,7 +230,7 @@ function renderReceipt(receipt, donation) {
       <p class="donor-receipt-kicker">Verified Donation Receipt</p>
       <h2 id="receipt-title">${escapeHtml(receipt.campaign.name)}</h2>
       <p class="donor-receipt-muted">
-        Your donation is anchored on the Ethereum Sepolia blockchain.
+        Your donation is anchored on the Monad testnet blockchain.
         Every step below was written by Bank Islam's cryptographic signature — nobody can alter it.
       </p>
 
@@ -288,10 +298,10 @@ function renderReceipt(receipt, donation) {
           On-chain transaction:
           <strong>${escapeHtml(formatHash(donation?.txHash))}</strong>
           ${donation?.txHash
-            ? `<a href="https://sepolia.etherscan.io/tx/${encodeURIComponent(donation.txHash)}"
+            ? `<a href="https://testnet.monadexplorer.com/tx/${encodeURIComponent(donation.txHash)}"
                  target="_blank" rel="noreferrer"
                  style="margin-left:8px;color:#10b981;font-size:11px;font-weight:800">
-                 View on Etherscan ↗
+                 View on Monad Explorer
                </a>`
             : ''}
         </p>
@@ -311,6 +321,16 @@ function renderReceipt(receipt, donation) {
  * Renders one step in the Donor → Bank → NGO → Vendor → Beneficiary flow.
  * Checks if this milestone exists in the journey array to mark it done/pending.
  */
+// Explains who is responsible for each pending step so the donor never wonders
+// "do I need to do something?" — the answer is always visible.
+const WAITING_LABEL = {
+  RECEIVED:  null, // step 1 is always done immediately after donation
+  ALLOCATED: 'Waiting for Bank Islam to lock your funds in escrow',
+  RELEASED:  'Waiting for NGO to submit evidence and Bank Islam to approve disbursement',
+  CONFIRMED: 'Waiting for Bank Islam to confirm delivery directly with the beneficiary',
+  COMPLETED: 'Waiting for Bank Islam to close the accountability loop',
+}
+
 function renderFlowStep(receipt, milestone, stepNum, actor, title, description) {
   const reached = receipt.journey.find((j) => j.milestone === milestone)
   const isFrozen = receipt.campaign.status === 'FROZEN' || receipt.campaign.status === 'UNDER_REVIEW'
@@ -333,6 +353,8 @@ function renderFlowStep(receipt, milestone, stepNum, actor, title, description) 
   const icon = state === 'done' ? '✓'
     : state === 'frozen' ? '⏸' : stepNum
 
+  const waitingLabel = state === 'pending' ? WAITING_LABEL[milestone] : null
+
   return `
     <div class="donor-flow-step ${stateClass}">
       <div class="donor-flow-step-icon">${escapeHtml(icon)}</div>
@@ -342,6 +364,7 @@ function renderFlowStep(receipt, milestone, stepNum, actor, title, description) 
         <p class="donor-flow-step-desc">${escapeHtml(reached ? reached.description : description)}</p>
         ${reached ? `<span class="donor-flow-step-time">${escapeHtml(reached.at)}</span>` : ''}
         ${state === 'frozen' ? '<span class="donor-flow-step-frozen">⚠ Paused — under Bank Islam review</span>' : ''}
+        ${waitingLabel ? `<span class="donor-flow-step-waiting">⏳ ${escapeHtml(waitingLabel)}</span>` : ''}
       </div>
     </div>
   `
@@ -359,6 +382,58 @@ function getCampaignStatusMeta(status) {
   if (status === 'UNDER_REVIEW') return { label: 'Under Review', color: '#f59e0b' }
   if (status === 'DRAFT')        return { label: 'Pending',      color: '#94a3b8' }
   return { label: status || '—', color: '#94a3b8' }
+}
+
+// ── CSV Export ──────────────────────────────────────────────────────────────
+// Generates a donor statement CSV and triggers a browser download.
+// The Transaction Hash column is the key differentiator — no other Malaysian
+// charity platform can provide an immutable on-chain reference per donation.
+function exportDonationsCSV(donations) {
+  const headers = [
+    'Date',
+    'Campaign',
+    'NGO',
+    'Cause',
+    'Amount (RM)',
+    'Status',
+    'Transaction Hash',
+  ]
+
+  const rows = donations.map((d) => [
+    formatDateFull(d.createdAt),
+    d.campaignName || '—',
+    d.ngoName || '—',
+    formatCause(d.causeType || '—'),
+    Number(d.amount || 0).toFixed(2),
+    d.campaignStatus || 'Active',
+    d.txHash || 'Pending',
+  ])
+
+  const csv = [headers, ...rows]
+    .map((row) => row.map(csvCell).join(','))
+    .join('\r\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href     = url
+  link.download = `DonorLedger-Statement-${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+// Wraps a cell value in quotes and escapes internal quotes for CSV safety.
+function csvCell(value) {
+  const str = String(value ?? '').replaceAll('"', '""')
+  return `"${str}"`
+}
+
+function formatDateFull(value) {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('en-MY', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(new Date(value))
 }
 
 function formatHash(value) {

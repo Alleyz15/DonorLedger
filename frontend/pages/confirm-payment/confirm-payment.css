@@ -5,177 +5,198 @@
 
 #confirm-payment-root {
   min-height: 100vh;
-  padding: 74px 98px;
+  padding: 32px 40px 48px;
 }
 
 .payment-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.42fr) minmax(460px, 1fr);
-  gap: 38px;
-  max-width: 1760px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: 20px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
+/* ── Cards ── */
 .payment-personal-card,
 .payment-details-card {
-  border: 1px solid #b8c4bd;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   background: #ffffff;
 }
 
 .payment-personal-card {
-  padding: 56px 50px 52px;
+  padding: 28px 28px 24px;
 }
 
 .payment-details-card {
-  padding: 56px 50px;
-  background: #eef2ff;
+  padding: 28px 28px;
+  background: #f0f4ff;
 }
 
+/* ── Headings ── */
 .payment-personal-card h1,
 .payment-details-card h2 {
   margin: 0;
   color: #0f172a;
-  font-size: 48px;
-  line-height: 1.1;
+  font-size: 20px;
+  line-height: 1.2;
   font-weight: 800;
 }
 
 .payment-details-card h2 {
-  font-size: 38px;
+  font-size: 18px;
 }
 
 .payment-personal-card > p {
-  margin: 22px 0 64px;
-  color: #3b4541;
-  font-size: 25px;
+  margin: 8px 0 24px;
+  color: #64748b;
+  font-size: 13px;
 }
 
+/* ── Field labels ── */
 .payment-campaign-field > span,
 .payment-field > span,
 .payment-bank-section h3,
 .payment-amount-field > span {
   display: block;
-  margin-bottom: 14px;
-  color: #3b4541;
-  font-size: 23px;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
+/* ── Campaign chip ── */
 .payment-campaign-field strong {
   display: flex;
-  min-height: 86px;
+  min-height: 44px;
   align-items: center;
-  gap: 24px;
-  border: 1px solid #b8c4bd;
-  border-radius: 9px;
-  padding: 0 26px;
-  background: #eef2ff;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #f0f4ff;
   color: #064e3b;
-  font-size: 26px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .payment-campaign-field i {
-  width: 28px;
-  height: 34px;
-  border-radius: 50% 50% 50% 6px;
+  width: 14px;
+  height: 17px;
+  border-radius: 50% 50% 50% 3px;
   background: #064e3b;
   transform: rotate(-45deg);
+  flex-shrink: 0;
 }
 
+/* ── Name / Email grid ── */
 .payment-field-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 36px;
-  margin: 48px 0;
+  gap: 14px;
+  margin: 18px 0;
 }
 
 .payment-field input {
   width: 100%;
-  height: 88px;
-  border: 1px solid #b8c4bd;
-  border-radius: 10px;
-  padding: 0 26px;
+  height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0 12px;
   background: #ffffff;
   color: #0f172a;
   font: inherit;
-  font-size: 25px;
+  font-size: 13px;
   outline: none;
+  transition: border-color 0.15s;
+}
+
+.payment-field input:focus {
+  border-color: #3fcfa0;
 }
 
 .payment-field input::placeholder {
-  color: #748094;
+  color: #94a3b8;
 }
 
+/* ── Important notice ── */
 .payment-notice {
-  border-left: 7px solid #047857;
-  border-radius: 10px;
-  padding: 36px 38px;
-  background: #eef2ff;
+  border-left: 4px solid #047857;
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #f0f4ff;
 }
 
 .payment-notice strong {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   color: #064e3b;
-  font-size: 22px;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .payment-notice strong i {
-  width: 18px;
-  height: 18px;
-  border: 2px solid currentColor;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .payment-notice p {
-  margin: 18px 0 0;
-  color: #0f172a;
-  font-size: 26px;
+  margin: 8px 0 0;
+  color: #334155;
+  font-size: 12px;
   line-height: 1.55;
 }
 
+/* ── Pay Now button ── */
 .payment-pay-button {
   display: flex;
   width: 100%;
-  min-height: 110px;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-top: 76px;
+  gap: 10px;
+  margin-top: 20px;
   border: 0;
   border-radius: 10px;
   background: #3fcfa0;
   color: #064e3b;
   font: inherit;
-  font-size: 36px;
+  font-size: 15px;
   font-weight: 800;
-  box-shadow: 0 16px 22px rgba(16, 185, 129, 0.22);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
   cursor: pointer;
+  transition: background 0.15s;
+}
+
+.payment-pay-button:hover:not(:disabled) {
+  background: #34b88d;
 }
 
 .payment-pay-button span {
-  width: 32px;
-  height: 22px;
-  border: 4px solid currentColor;
-  border-radius: 4px;
+  width: 16px;
+  height: 12px;
+  border: 2.5px solid currentColor;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .payment-pay-button:disabled {
-  opacity: 0.75;
+  opacity: 0.65;
   cursor: default;
 }
 
 .payment-status {
-  min-height: 28px;
-  margin-top: 16px;
+  min-height: 20px;
+  margin-top: 8px;
   color: #047857;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -183,65 +204,69 @@
   color: #b91c1c;
 }
 
+/* ── Payment Details side ── */
 .payment-bank-section {
-  margin-top: 54px;
+  margin-top: 20px;
 }
 
 .payment-bank-section h3,
 .payment-amount-field > span,
 .payment-summary h3 {
-  font-size: 22px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
 .payment-bank-option {
   display: flex;
-  min-height: 104px;
+  min-height: 52px;
   align-items: center;
-  gap: 18px;
-  border: 4px solid #064e3b;
+  gap: 12px;
+  border: 2px solid #064e3b;
   border-radius: 8px;
-  padding: 0 24px;
+  padding: 0 14px;
   background: #ffffff;
 }
 
 .payment-bank-option span {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
   background: #e8fbf4;
+  flex-shrink: 0;
 }
 
 .payment-bank-option strong {
   flex: 1;
   color: #0f172a;
-  font-size: 25px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .payment-bank-option i {
-  width: 32px;
-  height: 32px;
-  border: 4px solid #064e3b;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid #064e3b;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
+/* ── Amount input ── */
 .payment-amount-field {
   display: block;
-  margin-top: 48px;
+  margin-top: 20px;
 }
 
 .payment-amount-field strong {
   display: flex;
-  min-height: 160px;
+  min-height: 72px;
   align-items: center;
-  gap: 16px;
-  border: 3px solid #b8c4bd;
+  gap: 10px;
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
-  padding: 0 34px;
+  padding: 0 16px;
   background: #ffffff;
-  color: #3b4541;
-  font-size: 24px;
+  color: #94a3b8;
+  font-size: 15px;
   font-weight: 500;
 }
 
@@ -252,31 +277,32 @@
   color: #0f172a;
   background: transparent;
   font: inherit;
-  font-size: 72px;
+  font-size: 32px;
   line-height: 1;
   font-weight: 800;
   outline: none;
 }
 
 .payment-ledger-note {
-  margin: 26px 0 64px;
-  color: #3b4541;
-  font-size: 18px;
+  margin: 10px 0 20px;
+  color: #64748b;
+  font-size: 11px;
 }
 
+/* ── Donation summary ── */
 .payment-summary {
-  border: 1px solid #b8c4bd;
+  border: 1px solid #e2e8f0;
   border-radius: 9px;
-  padding: 36px;
+  padding: 16px 18px;
   background: #ffffff;
 }
 
 .payment-summary h3 {
-  margin: 0 0 22px;
-  border-bottom: 2px solid #b8c4bd;
-  padding-bottom: 18px;
-  color: #3b4541;
-  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  color: #64748b;
+  letter-spacing: 0.07em;
 }
 
 .payment-summary dl {
@@ -286,10 +312,10 @@
 .payment-summary div {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  padding: 18px 0;
-  color: #3b4541;
-  font-size: 24px;
+  gap: 16px;
+  padding: 9px 0;
+  color: #475569;
+  font-size: 13px;
 }
 
 .payment-summary dd {
@@ -300,36 +326,37 @@
 
 .payment-total-row {
   align-items: center;
-  margin-top: 8px;
+  margin-top: 6px;
   border-radius: 6px;
-  padding: 16px 14px !important;
-  background: #eef2ff;
+  padding: 10px 10px !important;
+  background: #f0f4ff;
 }
 
 .payment-total-row dt,
 .payment-total-row dd {
   color: #064e3b;
-  font-size: 36px;
+  font-size: 16px;
   font-weight: 800;
 }
 
+/* ── State ── */
 .payment-state {
-  min-height: 240px;
+  min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #64748b;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .payment-state.is-error {
   color: #b91c1c;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 860px) {
   #confirm-payment-root {
-    padding: 36px 20px;
+    padding: 20px 16px 32px;
   }
 
   .payment-layout,
