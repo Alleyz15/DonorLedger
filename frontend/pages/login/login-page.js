@@ -5,21 +5,13 @@ import { setFormStatus } from '../../components/form-status.js'
 const form = document.querySelector('.login-card')
 const submitButton = document.querySelector('.login-button')
 const statusElement = document.querySelector('.form-status')
-const demoButtons = document.querySelectorAll('[data-demo-email]')
+const registerPrompt = document.querySelector('.login-register-prompt')
 const query = new URLSearchParams(window.location.search)
 const loginRole = query.get('role')
 
 if (loginRole === 'ngo') {
   renderNGOLoginMode()
 }
-
-demoButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    form.querySelector('input[name="email"]').value = button.dataset.demoEmail
-    form.querySelector('input[name="password"]').value = button.dataset.demoPassword
-    setFormStatus(statusElement, `${button.querySelector('span').textContent} demo account loaded.`, 'success')
-  })
-})
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -75,7 +67,6 @@ function renderNGOLoginMode() {
   const title = document.querySelector('#login-title')
   const intro = document.querySelector('.login-card > p')
   const emailInput = form?.querySelector('input[name="email"]')
-  const demoCard = document.querySelector('.login-demo-card')
 
   if (title) title.textContent = 'NGO Organizer Login'
   if (intro) {
@@ -85,15 +76,7 @@ function renderNGOLoginMode() {
   if (emailInput) {
     emailInput.placeholder = 'Enter NGO organizer email'
   }
-  if (demoCard) {
-    demoCard.innerHTML = `
-      <h2>New NGO?</h2>
-      <p>
-        If your organization does not have an account yet, submit the NGO application first.
-        After submission, you will create the organizer login account.
-      </p>
-      <a href="./register-ngo.html">Register NGO Application</a>
-      <a class="login-demo-secondary-link" href="./login.html">Use donor or bank login</a>
-    `
+  if (registerPrompt) {
+    registerPrompt.hidden = false
   }
 }
