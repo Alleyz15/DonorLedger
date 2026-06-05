@@ -3,192 +3,380 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register NGO | DonorLedger</title>
+    <title>NGO Registration | DonorLedger</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./pages/register-ngo/register-ngo-page.js"></script>
   </head>
   <body class="register-ngo-screen">
-    <main class="register-ngo-page">
-      <form class="register-ngo-card" novalidate>
-        <header class="register-ngo-header">
-          <h1 id="register-ngo-title">Register Your NGO</h1>
-          <p>
-            Join the most transparent social impact network. Onboard your
-            organization to start receiving verified ledger-tracked donations.
-          </p>
-        </header>
+    <nav class="top-nav" aria-label="Registration navigation">
+      <a class="nav-brand" href="./introduction.html">
+        <span class="nav-dot" aria-hidden="true"></span>
+        DonorLedger
+      </a>
+      <span class="nav-chevron" aria-hidden="true">/</span>
+      <span class="nav-page">NGO Registration</span>
+    </nav>
 
-        <section class="form-section" aria-labelledby="organisation-info-title">
-          <h2 id="organisation-info-title">Organisation Info</h2>
-          <label class="field field-full">
-            <span>Legal Organisation Name</span>
-            <input
-              name="name"
-              type="text"
-              placeholder="e.g. Hope Foundation International"
-            />
-          </label>
-
-          <div class="form-row registration-details-row">
-            <fieldset class="radio-field">
-              <legend>Registration Type</legend>
-              <label><input type="radio" name="registrationType" value="ROS" /> ROS</label>
-              <label><input type="radio" name="registrationType" value="SSM" /> SSM</label>
-            </fieldset>
-
-            <label class="field">
-              <span>Registration Number</span>
-              <input
-                name="registrationNum"
-                type="text"
-                placeholder="e.g. 199001012345"
-              />
-            </label>
-          </div>
-
-          <label class="field field-full">
-            <span>Registered Address</span>
-            <textarea
-              name="registeredAddress"
-              rows="4"
-              placeholder="Enter complete physical address..."
-            ></textarea>
-          </label>
-        </section>
-
-        <section class="form-section" aria-labelledby="directors-title">
-          <div class="section-heading-row">
-            <h2 id="directors-title">Board Of Directors</h2>
-            <div class="director-heading-actions">
-              <button class="text-action add-director-button" type="button">
-                Add Director
-              </button>
-              <button
-                class="remove-last-director-button"
-                type="button"
-                aria-label="Remove latest director"
-                title="Remove latest director"
-                disabled
-              >
-                <span aria-hidden="true">&#128465; Delete</span>
-              </button>
+    <main class="page">
+      <form id="reg-form" class="reg-form" novalidate>
+        <section class="hero-card">
+          <div class="hero-body">
+            <div>
+              <h1 class="form-title" id="register-ngo-title">Register Your NGO</h1>
+              <p class="form-desc">
+                Join the most transparent social impact network. Onboard your
+                organization to start receiving verified ledger-tracked donations.
+              </p>
             </div>
           </div>
 
-          <div class="directors-list">
-            <div class="director-box">
-              <label class="field">
-                <span>Director 1 Full Name</span>
+          <div class="hero-divider"></div>
+
+          <div class="steps-area" aria-label="Application Progress">
+            <p class="steps-label">Application Progress</p>
+            <div class="steps-wrap">
+              <div class="steps-track" aria-hidden="true">
+                <span class="steps-progress" id="steps-progress"></span>
+              </div>
+              <ol class="steps">
+                <li class="step" data-section="organisation">
+                  <span class="step-num">1</span>
+                  <span class="step-lbl">Organisation</span>
+                </li>
+                <li class="step" data-section="directors">
+                  <span class="step-num">2</span>
+                  <span class="step-lbl">Directors</span>
+                </li>
+                <li class="step" data-section="banking">
+                  <span class="step-num">3</span>
+                  <span class="step-lbl">Banking</span>
+                </li>
+                <li class="step" data-section="mission">
+                  <span class="step-num">4</span>
+                  <span class="step-lbl">Mission</span>
+                </li>
+                <li class="step" data-section="allocation">
+                  <span class="step-num">5</span>
+                  <span class="step-lbl">Allocation</span>
+                </li>
+                <li class="step" data-section="documents">
+                  <span class="step-num">6</span>
+                  <span class="step-lbl">Documents</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-org" data-progress-section="organisation">
+          <header class="s-head">
+            <span class="s-num">01</span>
+            <div>
+              <h2 class="s-title">Organisation Info</h2>
+              <p class="s-desc">Legal identity and registered operating details.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="row c1">
+              <div class="field">
+                <label for="legal-name">Legal Organisation Name <span class="req">*</span></label>
                 <input
-                  name="directorName"
+                  id="legal-name"
+                  name="name"
                   type="text"
-                  placeholder="Name as per MyKad"
+                  placeholder="e.g. Hope Foundation International"
                 />
-              </label>
+              </div>
+            </div>
 
-              <label class="field">
-                <span>MyKad Number</span>
-                <input name="directorMyKad" type="text" placeholder="XXXXXX-XX-XXXX" />
+            <div class="row c2">
+              <div class="field">
+                <label>Registration Type <span class="req">*</span></label>
+                <div class="reg-type-row">
+                  <label class="rt-opt">
+                    <input type="radio" name="registrationType" value="ROS" />
+                    <span class="rt-check" aria-hidden="true"></span>
+                    ROS
+                  </label>
+                  <label class="rt-opt">
+                    <input type="radio" name="registrationType" value="SSM" />
+                    <span class="rt-check" aria-hidden="true"></span>
+                    SSM
+                  </label>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="reg-num">Registration Number <span class="req">*</span></label>
+                <input
+                  id="reg-num"
+                  name="registrationNum"
+                  type="text"
+                  placeholder="e.g. 199001012345"
+                />
+              </div>
+            </div>
+
+            <div class="row c1">
+              <div class="field">
+                <label for="address">Registered Address <span class="req">*</span></label>
+                <textarea
+                  id="address"
+                  name="registeredAddress"
+                  rows="4"
+                  placeholder="Enter complete physical address..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-dir" data-progress-section="directors">
+          <header class="s-head s-head-action">
+            <span class="s-num">02</span>
+            <div>
+              <h2 class="s-title">Board Of Directors</h2>
+              <p class="s-desc">Primary director information for verification.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="directors-list" id="directors-list">
+              <div class="director-card">
+                <div class="dir-header">
+                  <div class="dir-label">
+                    <span class="dir-bubble">1</span>
+                    Director 1
+                    <em>(Required)</em>
+                  </div>
+                </div>
+                <div class="director-fields">
+                  <div class="field">
+                    <label for="dir-name-1">Full Name <span class="req">*</span></label>
+                    <input
+                      id="dir-name-1"
+                      name="directorName"
+                      type="text"
+                      placeholder="As per MyKad"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="dir-mykad-1">MyKad Number <span class="req">*</span></label>
+                    <input
+                      id="dir-mykad-1"
+                      name="directorMyKad"
+                      type="text"
+                      placeholder="e.g. 850612045678"
+                    />
+                    <span class="hint">12 digits, no dashes</span>
+                  </div>
+                </div>
+              </div>
+              <div class="director-card">
+                <div class="dir-header">
+                  <div class="dir-label">
+                    <span class="dir-bubble">2</span>
+                    Director 2
+                  </div>
+                </div>
+                <div class="director-fields">
+                  <div class="field">
+                    <label for="dir-name-2">Full Name</label>
+                    <input
+                      id="dir-name-2"
+                      name="directorName2"
+                      type="text"
+                      placeholder="As per MyKad"
+                    />
+                  </div>
+                  <div class="field">
+                    <label for="dir-mykad-2">MyKad Number</label>
+                    <input
+                      id="dir-mykad-2"
+                      name="directorMyKad2"
+                      type="text"
+                      placeholder="e.g. 850612045678"
+                    />
+                    <span class="hint">12 digits, no dashes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-add add-director-button" type="button">
+              Add Director
+            </button>
+            <button class="btn-del remove-last-director-button" type="button" disabled>
+              Remove Latest Director
+            </button>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-bank" data-progress-section="banking">
+          <header class="s-head">
+            <span class="s-num">03</span>
+            <div>
+              <h2 class="s-title">Banking Details</h2>
+              <p class="s-desc">Bank account used for approved campaign disbursements.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="row c2">
+              <div class="field">
+                <label for="acc-num">Account Number <span class="req">*</span></label>
+                <input
+                  id="acc-num"
+                  name="bankAccount"
+                  type="text"
+                  placeholder="Enter NGO bank account"
+                />
+              </div>
+
+              <div class="field">
+                <label for="bank-name">Bank Name <span class="req">*</span></label>
+                <select id="bank-name" name="bankName">
+                  <option value="">Select bank</option>
+                  <option>Bank Islam</option>
+                  <option>Maybank</option>
+                  <option>CIMB Bank</option>
+                  <option>Public Bank</option>
+                  <option>RHB Bank</option>
+                  <option>Hong Leong Bank</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-cause" data-progress-section="mission">
+          <header class="s-head">
+            <span class="s-num">04</span>
+            <div>
+              <h2 class="s-title">Cause & Mission</h2>
+              <p class="s-desc">Tell donors what your organisation serves.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="row c1">
+              <div class="field">
+                <label for="category">Primary Category <span class="req">*</span></label>
+                <select id="category" name="causeType">
+                  <option value="">Select primary category</option>
+                  <option>Poverty Alleviation</option>
+                  <option>Disaster Relief</option>
+                  <option>Food Aid</option>
+                  <option>Medical Aid</option>
+                  <option>Education</option>
+                  <option>Community Development</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row c1">
+              <div class="field">
+                <label for="mission">Mission Statement <span class="req">*</span></label>
+                <textarea
+                  id="mission"
+                  name="description"
+                  rows="5"
+                  placeholder="Briefly describe your organization's core mission and impact..."
+                ></textarea>
+                <span class="hint">At least 20 characters.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-alloc" data-progress-section="allocation">
+          <header class="s-head">
+            <span class="s-num">05</span>
+            <div>
+              <h2 class="s-title">Fund Allocation</h2>
+              <p class="s-desc">Define how every RM1 donated is spent.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="alloc-grid">
+              <div class="alloc-box">
+                <div class="alloc-lbl">Direct Aid</div>
+                <div class="alloc-input-wrap">
+                  <input class="alloc-input" name="aidPercent" type="number" value="80" min="0" max="100" />
+                  <span class="alloc-pct">%</span>
+                </div>
+              </div>
+              <div class="alloc-box">
+                <div class="alloc-lbl">Logistics</div>
+                <div class="alloc-input-wrap">
+                  <input class="alloc-input" name="logisticsPercent" type="number" value="10" min="0" max="100" />
+                  <span class="alloc-pct">%</span>
+                </div>
+              </div>
+              <div class="alloc-box">
+                <div class="alloc-lbl">Admin</div>
+                <div class="alloc-input-wrap">
+                  <input class="alloc-input" name="adminPercent" type="number" value="10" min="0" max="100" />
+                  <span class="alloc-pct">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="alloc-summary">
+              <div class="alloc-row">
+                <span class="alloc-row-lbl">Total Allocation</span>
+                <strong class="alloc-row-val allocation-total">100% / 100%</strong>
+              </div>
+              <div class="alloc-bar" aria-hidden="true">
+                <span class="alloc-fill allocation-fill"></span>
+              </div>
+              <p class="alloc-msg ok">Perfect. All funds accounted for.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="s-card" id="sec-docs" data-progress-section="documents">
+          <header class="s-head">
+            <span class="s-num">06</span>
+            <div>
+              <h2 class="s-title">Required Documents</h2>
+              <p class="s-desc">Upload documents for Bank Islam review.</p>
+            </div>
+          </header>
+
+          <div class="fields">
+            <div class="upload-grid">
+              <label class="upload-zone document-drop">
+                <input name="registrationDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+                <span class="upload-title">SSM/ROS Certificate</span>
+                <small data-empty-text="PDF, PNG, or JPG. Max 10MB">PDF, PNG, or JPG. Max 10MB</small>
+              </label>
+              <label class="upload-zone document-drop">
+                <input name="financialDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+                <span class="upload-title">Audited Financial Statement</span>
+                <small data-empty-text="PDF, PNG, or JPG. Max 10MB">PDF, PNG, or JPG. Max 10MB</small>
               </label>
             </div>
           </div>
         </section>
 
-        <section class="form-section" aria-labelledby="banking-title">
-          <h2 id="banking-title">Banking Details</h2>
-          <div class="form-row">
-            <label class="field">
-              <span>Account Number</span>
-              <input name="bankAccount" type="text" placeholder="Enter NGO bank account" />
-            </label>
-
-            <label class="field">
-              <span>Bank Name</span>
-              <select name="bankName">
-                <option>Bank Islam</option>
-                <option>Maybank</option>
-                <option>CIMB Bank</option>
-                <option>Public Bank</option>
-                <option>RHB Bank</option>
-                <option>Hong Leong Bank</option>
-              </select>
-            </label>
-          </div>
-        </section>
-
-        <section class="form-section" aria-labelledby="mission-title">
-          <h2 id="mission-title">Cause & Mission</h2>
-          <label class="field field-full">
-            <span>Primary Category</span>
-            <select name="causeType">
-              <option>Poverty Alleviation</option>
-              <option>Disaster Relief</option>
-              <option>Food Aid</option>
-              <option>Medical Aid</option>
-              <option>Education</option>
-              <option>Community Development</option>
-            </select>
-          </label>
-
-          <label class="field field-full">
-            <span>Mission Statement</span>
-            <textarea
-              name="description"
-              rows="5"
-              placeholder="Briefly describe your organization's core mission and impact..."
-            ></textarea>
-          </label>
-        </section>
-
-        <section class="allocation-card" aria-labelledby="allocation-title">
-          <h2 id="allocation-title">Fund Allocation</h2>
-          <p>Define how every $1 donated is spent. This will be visible on your public ledger profile.</p>
-
-          <div class="allocation-grid">
-            <label class="field">
-              <span>Direct Aid %</span>
-              <input name="aidPercent" type="number" value="80" min="0" max="100" />
-            </label>
-            <label class="field">
-              <span>Logistics %</span>
-              <input name="logisticsPercent" type="number" value="10" min="0" max="100" />
-            </label>
-            <label class="field">
-              <span>Admin %</span>
-              <input name="adminPercent" type="number" value="10" min="0" max="100" />
-            </label>
-          </div>
-
-          <p class="allocation-total">Total Allocation: <strong>100% / 100%</strong></p>
-        </section>
-
-        <section class="form-section" aria-labelledby="documents-title">
-          <h2 id="documents-title">Required Documents</h2>
-          <div class="document-grid">
-            <label class="document-drop">
-              <input name="registrationDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
-              <span>SSM/ROS Certificate</span>
-              <small data-empty-text="PDF only, max 10MB">PDF only, max 10MB</small>
-            </label>
-            <label class="document-drop">
-              <input name="financialDoc" type="file" accept=".pdf,.png,.jpg,.jpeg" />
-              <span>Audited Financial Statement</span>
-              <small data-empty-text="PDF only, max 10MB">PDF only, max 10MB</small>
-            </label>
-          </div>
-        </section>
-
-        <button class="register-ngo-button" type="submit">Submit Application</button>
-        <div class="form-status" role="status" aria-live="polite"></div>
-        <p class="terms-note">
-          By submitting, you agree to DonorLedger's Radical Transparency Terms.
-        </p>
+        <div class="submit-wrap">
+          <button class="btn-submit register-ngo-button" type="submit">
+            Submit Application
+          </button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+          <p class="terms-note">
+            By submitting, you agree to DonorLedger's Radical Transparency Terms.
+          </p>
+        </div>
       </form>
     </main>
   </body>
