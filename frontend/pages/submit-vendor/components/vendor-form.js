@@ -1,3 +1,11 @@
+const serviceOptions = [
+  { value: 'FOOD', label: 'Food' },
+  { value: 'LOGISTICS', label: 'Logistics' },
+  { value: 'MEDICAL', label: 'Medical' },
+  { value: 'CONSTRUCTION', label: 'Construction' },
+  { value: 'OTHER', label: 'Other' },
+]
+
 export function createVendorForm() {
   const form = document.createElement('form')
   form.className = 'vendor-review-card'
@@ -22,17 +30,26 @@ export function createVendorForm() {
           <input name="ssmNumber" type="text" placeholder="202301XXXXXX" />
         </label>
 
-        <label class="field">
+        <div class="field">
           <span>Service Type</span>
-          <select name="serviceType">
-            <option value="">Select service...</option>
-            <option value="FOOD">Food</option>
-            <option value="LOGISTICS">Logistics</option>
-            <option value="MEDICAL">Medical</option>
-            <option value="CONSTRUCTION">Construction</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </label>
+          <div class="custom-select-wrapper" data-custom-select>
+            <select name="serviceType" class="native-service-select" aria-label="Service type">
+              <option value=""></option>
+              ${serviceOptions.map((option) => (
+                `<option value="${option.value}">${option.label}</option>`
+              )).join('')}
+            </select>
+            <button class="custom-select-trigger" type="button" data-custom-select-trigger>
+              <span class="placeholder" data-custom-select-label>Select service...</span>
+              <i class="custom-select-arrow" aria-hidden="true"></i>
+            </button>
+            <div class="custom-options-menu" data-custom-options>
+              ${serviceOptions.map((option) => (
+                `<button class="custom-option" type="button" data-value="${option.value}">${option.label}</button>`
+              )).join('')}
+            </div>
+          </div>
+        </div>
 
         <label class="field">
           <span>Bank Account Number</span>
@@ -58,7 +75,6 @@ export function createVendorForm() {
             name="registrationDoc"
             type="file"
             accept=".pdf,.png,.jpg,.jpeg"
-            style="display:none"
           />
         </label>
       </div>
@@ -67,9 +83,7 @@ export function createVendorForm() {
         <i aria-hidden="true"></i>
         <div>
           <strong>By submitting, you agree to DonorLedger's transparency protocols.</strong>
-          <span>
-            All transactions with this vendor will be recorded on the public ledger for donor verification.
-          </span>
+          <span>All transactions with this vendor will be recorded on the public ledger for donor verification.</span>
         </div>
       </section>
 
@@ -103,14 +117,64 @@ export function getVendorPayload(form, ngoId) {
 }
 
 export function bindVendorUploadFeedback(form) {
-  const input    = form.querySelector('input[name="registrationDoc"]')
+  const input = form.querySelector('input[name="registrationDoc"]')
   const dropzone = form.querySelector('.vendor-dropzone-box')
-  const hint     = dropzone?.querySelector('.vendor-dropzone-sub')
+  const hint = dropzone?.querySelector('.vendor-dropzone-sub')
   if (!input || !dropzone || !hint) return
 
-  input.addEventListener('change', () => {
-    const fileName = input.files?.[0]?.name
-    dropzone.classList.toggle('has-file', !!fileName)
-    hint.textContent = fileName || hint.dataset.default || 'PDF, JPG or PNG (max. 10MB)'
+  const setFile = (file) => {
+    if (!file) return
+    const transfer = new DataTransfer()
+    transfer.items.add(file)
+    input.files = transfer.files
+    updateFileState(input, dropzone, hint)
+  }
+
+  input.addEventListener('change', () => updateFileState(input, dropzone, hint))
+  dropzone.addEventListener('dragover', (event) => {
+    event.preventDefault()
+    dropzone.classList.add('is-dragging')
   })
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('is-dragging')
+  })
+  dropzone.addEventListener('drop', (event) => {
+    event.preventDefault()
+    dropzone.classList.remove('is-dragging')
+    setFile(event.dataTransfer?.files?.[0])
+  })
+}
+
+export function bindVendorServiceSelect(form) {
+  const wrapper = form.querySelector('[data-custom-select]')
+  const trigger = form.querySelector('[data-custom-select-trigger]')
+  const label = form.querySelector('[data-custom-select-label]')
+  const select = form.querySelector('select[name="serviceType"]')
+  const options = Array.from(form.querySelectorAll('.custom-option'))
+  if (!wrapper || !trigger || !label || !select || !options.length) return
+
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation()
+    wrapper.classList.toggle('is-open')
+  })
+
+  options.forEach((option) => {
+    option.addEventListener('click', (event) => {
+      event.stopPropagation()
+      const value = option.dataset.value || ''
+      select.value = value
+      label.textContent = option.textContent || 'Select service...'
+      label.classList.remove('placeholder')
+      options.forEach((item) => item.classList.toggle('is-selected', item === option))
+      wrapper.classList.remove('is-open')
+    })
+  })
+
+  document.addEventListener('click', () => wrapper.classList.remove('is-open'))
+}
+
+function updateFileState(input, dropzone, hint) {
+  const fileName = input.files?.[0]?.name
+  dropzone.classList.toggle('has-file', !!fileName)
+  hint.textContent = fileName || hint.dataset.default || 'PDF, JPG or PNG (max. 10MB)'
 }
