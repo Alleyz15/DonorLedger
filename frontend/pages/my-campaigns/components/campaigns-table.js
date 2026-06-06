@@ -1,41 +1,65 @@
+const statusFilters = ['all', 'active', 'completed', 'flagged', 'pending', 'draft']
+const filterLabels = {
+  all: 'All Status',
+  active: 'Active',
+  completed: 'Completed',
+  flagged: 'Flagged',
+  pending: 'Under Review',
+  draft: 'Draft',
+}
+const pageSize = 5
+
 export function createCampaignsTable() {
   const section = document.createElement('section')
   section.className = 'campaigns-panel'
+  section.dataset.filterStatus = 'all'
   section.innerHTML = `
     <div class="campaigns-panel-header">
-      <div></div>
-      <a class="campaigns-primary-action" href="./start-campaign.html">
-        <span aria-hidden="true">+</span>
-        Start New Campaign
-      </a>
+      <div class="campaigns-title-group">
+        <h2>Campaign List</h2>
+        <p data-campaign-count>Showing 0 campaigns</p>
+      </div>
+      <div class="campaigns-toolbar">
+        <label class="campaign-search">
+          <span aria-hidden="true"></span>
+          <input data-campaign-search type="search" placeholder="Search campaigns..." />
+        </label>
+        <label class="campaign-status-filter">
+          <span>Status</span>
+          <select data-campaign-filter>
+            ${statusFilters.map((key) => `<option value="${key}">${filterLabels[key]}</option>`).join('')}
+          </select>
+        </label>
+        <a class="campaigns-primary-action" href="./start-campaign.html">
+          <span aria-hidden="true">+</span>
+          Start New Campaign
+        </a>
+      </div>
     </div>
     <div class="campaigns-table-wrap">
       <table class="campaigns-table">
         <thead>
           <tr>
             <th>Campaign Name</th>
+            <th>Start Date</th>
             <th>End Date</th>
-            <th>Raised / Target</th>
-            <th>Pending Evidence</th>
-            <th>AI Alerts</th>
-            <th>Actions</th>
+            <th>Raise Target</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody data-campaign-rows>
           <tr>
-            <td class="campaigns-loading-cell" colspan="7">Loading campaigns...</td>
+            <td class="campaigns-loading-cell" colspan="6">Loading campaigns...</td>
           </tr>
         </tbody>
       </table>
     </div>
     <footer class="campaigns-pagination">
-      <span data-campaign-count>Showing 0 entries</span>
+      <span data-campaign-page-summary>Page 1 of 1 - 0 campaigns total</span>
       <div>
         <button type="button" disabled>&lt;</button>
         <button class="is-active" type="button">1</button>
-        <button type="button" disabled>2</button>
-        <button type="button" disabled>3</button>
         <button type="button" disabled>&gt;</button>
       </div>
     </footer>
@@ -43,22 +67,37 @@ export function createCampaignsTable() {
   return section
 }
 
+export function bindCampaignTableControls(table, campaigns) {
+  const search = table.querySelector('[data-campaign-search]')
+  const filter = table.querySelector('[data-campaign-filter]')
+
+  search?.addEventListener('input', () => renderCampaignRows(table, campaigns))
+  filter?.addEventListener('change', () => {
+    table.dataset.filterStatus = filter.value || 'all'
+    renderCampaignRows(table, campaigns)
+  })
+}
+
 export function renderCampaignRows(table, campaigns) {
   const rows = table.querySelector('[data-campaign-rows]')
   if (!rows) return
 
-  if (!campaigns.length) {
+  const filtered = filterCampaigns(table, campaigns)
+
+  const visible = filtered.slice(0, pageSize)
+
+  if (!visible.length) {
     rows.innerHTML = `
       <tr>
-        <td class="campaigns-empty-cell" colspan="7">No campaigns created yet.</td>
+        <td class="campaigns-empty-cell" colspan="6">No campaigns found.</td>
       </tr>
     `
-    updateCount(table, 0)
+    updateCount(table, filtered.length, campaigns.length)
     return
   }
 
-  rows.innerHTML = campaigns.map(renderCampaignRow).join('')
-  updateCount(table, campaigns.length)
+  rows.innerHTML = visible.map(renderCampaignRow).join('')
+  updateCount(table, filtered.length, campaigns.length)
 }
 
 export function renderCampaignError(table, message) {
@@ -66,40 +105,85 @@ export function renderCampaignError(table, message) {
   if (!rows) return
   rows.innerHTML = `
     <tr>
-      <td class="campaigns-error-cell" colspan="7">${escapeHtml(message)}</td>
+      <td class="campaigns-error-cell" colspan="6">${escapeHtml(message)}</td>
     </tr>
   `
 }
 
+function filterCampaigns(table, campaigns) {
+  const query = table.querySelector('[data-campaign-search]')?.value.trim().toLowerCase() || ''
+  const filter = table.dataset.filterStatus || 'all'
+
+  return campaigns.filter((campaign) => {
+    const statusKey = getStatusKey(campaign.status)
+    const matchesStatus = filter === 'all' || filter === statusKey
+    const searchable = `${campaign.name || ''} ${campaign.causeType || ''}`.toLowerCase()
+    return matchesStatus && searchable.includes(query)
+  })
+}
+
 function renderCampaignRow(campaign) {
   const { label, statusClass } = getCampaignStatusMeta(campaign.status)
-  const aiAlerts = getAIAlertCount(campaign.status)
+  const raised = Number(campaign.raisedAmount || 0)
+  const target = Number(campaign.targetAmount || 0)
+  const progress = target > 0 ? Math.min(100, Math.round((raised / target) * 100)) : 0
 
   return `
     <tr>
       <td>
         <div class="campaign-title-cell">
-          <span class="campaign-logo-placeholder"></span>
+          <span class="campaign-logo-placeholder" aria-hidden="true">${escapeHtml(getInitial(campaign.name))}</span>
           <div>
             <strong>${escapeHtml(campaign.name)}</strong>
-            <span>${escapeHtml(campaign.causeType)}</span>
+            <span>${escapeHtml(campaign.causeType || 'Campaign')}</span>
           </div>
         </div>
       </td>
-      <td>${campaign.endDate ? formatDate(campaign.endDate) : '-'}</td>
-      <td>${formatMoney(campaign.raisedAmount)} /<br />${formatMoney(campaign.targetAmount)}</td>
-      <td><span class="campaign-count-pill">${Number(campaign.pendingEvidenceCount || 0)}</span></td>
-      <td><span class="campaign-count-pill ${aiAlerts > 0 ? 'is-alert' : ''}">${aiAlerts}</span></td>
+      <td>
+        <div class="campaign-date-cell">${campaign.createdAt ? formatDate(campaign.createdAt) : '-'}</div>
+      </td>
+      <td>
+        <div class="campaign-date-cell">${campaign.endDate ? formatDate(campaign.endDate) : '-'}</div>
+      </td>
+      <td>
+        <div class="campaign-target-cell">${formatMoney(target)}</div>
+        <div class="campaign-progress-copy">${formatMoney(raised)} raised - ${progress}%</div>
+        <div class="campaign-progress-bar" aria-hidden="true">
+          <span style="width: ${progress}%"></span>
+        </div>
+      </td>
+      <td>${renderStatusSelect(campaign.status, label, statusClass)}</td>
       <td>${renderCampaignAction(campaign)}</td>
-      <td><span class="campaign-status ${statusClass}">${escapeHtml(label)}</span></td>
     </tr>
+  `
+}
+
+function renderStatusSelect(status, label, statusClass) {
+  const options = [
+    ['ACTIVE', 'Active'],
+    ['UNDER_REVIEW', 'Under Review'],
+    ['DRAFT', 'Draft'],
+    ['COMPLETED', 'Completed'],
+    ['FROZEN', 'Flagged'],
+    ['REJECTED', 'Rejected'],
+  ]
+  const normalized = ['APPROVED', 'VERIFIED'].includes(status) ? 'ACTIVE' : status
+  const optionHtml = options
+    .map(([value, text]) => (
+      `<option value="${value}"${value === normalized ? ' selected' : ''}>${text}</option>`
+    ))
+    .join('')
+
+  return `
+    <select class="campaign-status-select ${statusClass}" aria-label="Campaign status" disabled>
+      ${optionHtml || `<option>${escapeHtml(label)}</option>`}
+    </select>
   `
 }
 
 function renderCampaignAction(campaign) {
   const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
 
-  // Draft — NGO can still edit before Bank Islam sees it
   if (campaign.status === 'DRAFT') {
     return `
       <a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">
@@ -108,17 +192,14 @@ function renderCampaignAction(campaign) {
     `
   }
 
-  // Submitted for review — awaiting Bank Islam approval, no edits allowed
   if (campaign.status === 'UNDER_REVIEW') {
-    return '<span class="campaign-action-pending">⏳ Awaiting Bank Islam approval</span>'
+    return '<span class="campaign-action-pending">Awaiting Bank Islam approval</span>'
   }
 
-  // Campaign frozen — show frozen message
   if (campaign.status === 'FROZEN') {
-    return '<span class="campaign-action-frozen">⚠ Campaign frozen — contact Bank Islam</span>'
+    return '<span class="campaign-action-frozen">Campaign frozen</span>'
   }
 
-  // Active campaign with funds available — submit evidence
   if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status) && availableAmount > 0) {
     return `
       <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
@@ -127,46 +208,54 @@ function renderCampaignAction(campaign) {
     `
   }
 
-  // Active but fully released
   if (['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) && availableAmount <= 0) {
     return '<span class="campaign-action-empty">Fully Released</span>'
   }
 
-  return '<span class="campaign-action-empty">—</span>'
+  return '<span class="campaign-action-empty">-</span>'
 }
 
-// Returns human-readable label + CSS modifier class for each campaign status.
 function getCampaignStatusMeta(status) {
   switch (status) {
     case 'ACTIVE':
     case 'APPROVED':
     case 'VERIFIED':
-      return { label: 'Active',         statusClass: 'is-active' }
+      return { label: 'Active', statusClass: 'is-active' }
     case 'DRAFT':
-      return { label: 'Draft',          statusClass: 'is-draft' }
+      return { label: 'Draft', statusClass: 'is-draft' }
     case 'UNDER_REVIEW':
-      return { label: 'Under Review',   statusClass: 'is-pending' }
+      return { label: 'Under Review', statusClass: 'is-pending' }
     case 'FROZEN':
-      return { label: 'AI Frozen',      statusClass: 'is-frozen' }
+      return { label: 'Flagged', statusClass: 'is-frozen' }
     case 'REJECTED':
-      return { label: 'Rejected',       statusClass: 'is-rejected' }
+      return { label: 'Rejected', statusClass: 'is-rejected' }
     case 'COMPLETED':
-      return { label: 'Completed',      statusClass: 'is-completed' }
+      return { label: 'Completed', statusClass: 'is-completed' }
     default:
-      return { label: status,           statusClass: '' }
+      return { label: status || 'Unknown', statusClass: '' }
   }
 }
 
-// AI alert count — FROZEN is the highest severity (auto-frozen by Gemini AI),
-// UNDER_REVIEW means Gemini flagged it for human review.
-function getAIAlertCount(status) {
-  if (status === 'FROZEN') return 1
-  return 0
+function getStatusKey(status) {
+  if (['ACTIVE', 'APPROVED', 'VERIFIED'].includes(status)) return 'active'
+  if (status === 'COMPLETED') return 'completed'
+  if (['FROZEN', 'REJECTED'].includes(status)) return 'flagged'
+  if (status === 'UNDER_REVIEW') return 'pending'
+  if (status === 'DRAFT') return 'draft'
+  return 'all'
 }
 
-function updateCount(table, count) {
-  const element = table.querySelector('[data-campaign-count]')
-  if (element) element.textContent = `Showing ${count} entries`
+function updateCount(table, visibleCount, totalCount) {
+  const count = table.querySelector('[data-campaign-count]')
+  const pageSummary = table.querySelector('[data-campaign-page-summary]')
+  const shown = Math.min(visibleCount, pageSize)
+  const pages = Math.max(1, Math.ceil(visibleCount / pageSize))
+  if (count) count.textContent = `Showing ${shown} of ${visibleCount} campaigns`
+  if (pageSummary) pageSummary.textContent = `Page 1 of ${pages} - ${totalCount} campaigns total`
+}
+
+function getInitial(value) {
+  return String(value || 'C').trim().charAt(0).toUpperCase() || 'C'
 }
 
 function formatMoney(value) {
