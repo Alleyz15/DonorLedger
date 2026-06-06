@@ -3,6 +3,9 @@ export function renderCampaignDetail(campaign) {
   const target = Number(campaign.targetAmount ?? campaign.target ?? 0)
   const percent = target > 0 ? Math.min(100, Math.round((raised / target) * 100)) : 0
   const goalReached = percent >= 100
+  const daysLeft = getDaysLeft(campaign.endDate)
+  const hasEnded = daysLeft === 'Ended'
+  const canDonate = !goalReached && !hasEnded
   const vendors = Array.isArray(campaign.vendors) ? campaign.vendors : []
 
   return `
@@ -10,7 +13,7 @@ export function renderCampaignDetail(campaign) {
       <header class="campaign-detail-hero">
         <div class="campaign-detail-meta">
           <span>${escapeHtml(campaign.causeType || 'Community')}</span>
-          <time>${formatDate(campaign.createdAt)}</time>
+          ${campaign.endDate ? `<time>Ends ${formatDate(campaign.endDate)}</time>` : ''}
         </div>
         <h1>${escapeHtml(campaign.name)}</h1>
         <p class="campaign-detail-ngo"><span aria-hidden="true"></span>by ${escapeHtml(campaign.ngo?.name || campaign.ngoName || 'Verified NGO')}</p>
@@ -42,12 +45,11 @@ export function renderCampaignDetail(campaign) {
           </div>
           <div>
             <span>Days Left</span>
-            <strong>${getDaysLeft(campaign.endDate)}</strong>
+            <strong ${hasEnded ? 'style="color:#ef4444"' : ''}>${daysLeft}</strong>
           </div>
           <div>
-            <span>Total Raised</span>
-            <strong class="campaign-raised-verified">${formatCurrency(Number(campaign.raisedAmount ?? 0))}</strong>
-            <span class="campaign-chain-chip" title="Amount derived from on-chain donation records — nobody can alter it">⛓ On-Chain</span>
+            <span>Campaign Status</span>
+            <strong>${hasEnded ? '🔴 Ended' : goalReached ? '🎉 Fully Funded' : '🟢 Active'}</strong>
           </div>
         </div>
       </section>
@@ -65,10 +67,15 @@ export function renderCampaignDetail(campaign) {
                 <span aria-hidden="true">🎉</span>
                 Goal Reached — Fully Funded
                </div>`
-            : `<a class="campaign-donate-button" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
-                <span aria-hidden="true"></span>
-                Donate Now
-               </a>`
+            : hasEnded
+              ? `<div class="campaign-donate-button is-funded" style="background:#94a3b8;">
+                  <span aria-hidden="true">🔴</span>
+                  Campaign Has Ended
+                 </div>`
+              : `<a class="campaign-donate-button" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
+                  <span aria-hidden="true"></span>
+                  Donate Now
+                 </a>`
           }
         </section>
 
@@ -123,11 +130,11 @@ function formatDate(value) {
 }
 
 function getDaysLeft(value) {
-  if (!value) return '0'
+  if (!value) return 'Ended'
   const today = new Date()
   const end = new Date(value)
   const diff = Math.ceil((end.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0)) / 86400000)
-  return String(Math.max(0, diff))
+  return diff <= 0 ? 'Ended' : String(diff)
 }
 
 function escapeHtml(value) {

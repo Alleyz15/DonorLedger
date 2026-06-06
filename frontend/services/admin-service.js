@@ -55,6 +55,12 @@ export function rejectVendor(token, vendorId, reason) {
   })
 }
 
+export function getAdminCampaignDetail(token, campaignId) {
+  return apiRequest(`/admin/campaign/${campaignId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
 export function getAdminCampaigns(token) {
   return apiRequest('/admin/campaigns', {
     headers: {

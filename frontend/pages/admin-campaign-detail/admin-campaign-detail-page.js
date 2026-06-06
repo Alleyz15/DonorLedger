@@ -1,7 +1,6 @@
 import { renderAppShell } from '../../components/layout/app-shell.js'
 import { getSession } from '../../services/auth-service.js'
-import { getCampaignDetails } from '../../services/campaign-service.js'
-import { approveCampaign, rejectCampaign } from '../../services/admin-service.js'
+import { getAdminCampaignDetail, approveCampaign, rejectCampaign } from '../../services/admin-service.js'
 
 const session = getSession()
 const shell = document.querySelector('#app-shell')
@@ -36,7 +35,7 @@ async function loadCampaign() {
     return
   }
   try {
-    const campaign = await getCampaignDetails(campaignId)
+    const campaign = await getAdminCampaignDetail(session.token, campaignId)
     content.innerHTML = renderDetail(campaign)
     bindActions(campaign)
   } catch (err) {

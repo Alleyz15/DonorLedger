@@ -101,7 +101,7 @@ export async function processDuitNowPayment({
 }
 
 function buildTrackerUrl(donorHash) {
-  return `/track/${donorHash}`
+  return `/donor-history.html?highlight=${donorHash}`
 }
 
 export default { processDuitNowPayment }
