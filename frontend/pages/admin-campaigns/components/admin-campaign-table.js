@@ -53,7 +53,9 @@ function renderRow(campaign) {
     <tr>
       <td>
         <div class="admin-campaign-name">
-          <strong>${escapeHtml(campaign.name)}</strong>
+          <a class="admin-campaign-name-link" href="./admin-campaign-detail.html?id=${encodeURIComponent(campaign.id)}">
+            ${escapeHtml(campaign.name)}
+          </a>
           <span>${escapeHtml(campaign.ngo?.name || campaign.causeType || '-')}</span>
           ${campaign.pausedReason ? `<small>${escapeHtml(campaign.pausedReason)}</small>` : ''}
         </div>

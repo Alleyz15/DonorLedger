@@ -20,3 +20,73 @@
 @import './pages/campaign-details/campaign-details.css';
 @import './pages/confirm-payment/confirm-payment.css';
 @import './pages/payment-success/payment-success.css';
+
+/* ── NGO Campaign Detail ─────────────────────────────────────── */
+.ngo-detail-page { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+.ngo-detail-back { font-size: 13px; color: #64748b; text-decoration: none; display:inline-block; margin-bottom:8px; }
+.ngo-detail-back:hover { color: #0f766e; }
+.ngo-detail-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; gap:16px; }
+.ngo-detail-title { font-size:28px; font-weight:800; color:#0f172a; margin:0; }
+.ngo-detail-cause { font-size:13px; color:#64748b; font-weight:600; margin-top:4px; display:block; }
+.ngo-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.ngo-detail-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:24px; }
+.ngo-detail-card h2 { font-size:14px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin:0 0 16px; }
+.ngo-detail-card-full { grid-column:1/-1; }
+.ngo-detail-progress-top { display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px; }
+.ngo-detail-progress-track { height:8px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:16px; }
+.ngo-detail-progress-track span { display:block; height:100%; background:#0d9488; border-radius:99px; }
+.ngo-detail-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.ngo-detail-stats div { display:flex; flex-direction:column; gap:2px; }
+.ngo-detail-stats span { font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; }
+.ngo-detail-stats strong { font-size:16px; font-weight:700; color:#0f172a; }
+.ngo-detail-alloc-row { display:grid; grid-template-columns:100px 1fr 48px; align-items:center; gap:12px; margin-bottom:10px; font-size:13px; }
+.ngo-detail-alloc-bar { height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden; }
+.ngo-detail-alloc-bar span { display:block; height:100%; border-radius:99px; }
+.ngo-detail-alloc-bar .is-aid      { background:#0d9488; }
+.ngo-detail-alloc-bar .is-logistics{ background:#3b82f6; }
+.ngo-detail-alloc-bar .is-admin    { background:#f59e0b; }
+.ngo-detail-alloc-note { font-size:11px; color:#94a3b8; margin-top:8px; }
+.ngo-detail-desc { font-size:14px; line-height:1.7; color:#475569; }
+.ngo-detail-actions-card { background:#f0fdf4; border-color:#bbf7d0; }
+.ngo-detail-action-btn { display:inline-block; padding:10px 20px; background:#0d9488; color:#fff; border-radius:8px; font-weight:700; font-size:14px; text-decoration:none; margin-right:12px; }
+.ngo-detail-action-btn.is-secondary { background:#fff; color:#0d9488; border:1.5px solid #0d9488; }
+.ngo-detail-state { padding:48px; text-align:center; color:#94a3b8; font-size:16px; font-weight:600; }
+.ngo-detail-state.is-error { color:#ef4444; }
+
+/* ── Admin Campaign Detail ───────────────────────────────────── */
+.admin-campaign-detail-page { max-width:960px; margin:0 auto; padding:32px 24px; }
+.admin-detail-back { font-size:13px; color:#64748b; text-decoration:none; display:inline-block; margin-bottom:8px; }
+.admin-detail-back:hover { color:#0f766e; }
+.admin-detail-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; gap:16px; }
+.admin-detail-title { font-size:28px; font-weight:800; color:#0f172a; margin:0; }
+.admin-detail-cause { font-size:13px; color:#64748b; font-weight:600; margin-top:4px; display:block; }
+.admin-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.admin-detail-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:24px; }
+.admin-detail-card h2 { font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin:0 0 16px; }
+.admin-detail-card-full { grid-column:1/-1; }
+.admin-detail-dl { display:flex; flex-direction:column; gap:10px; }
+.admin-detail-dl > div { display:flex; justify-content:space-between; font-size:14px; border-bottom:1px solid #f1f5f9; padding-bottom:8px; }
+.admin-detail-dl dt { color:#64748b; font-weight:500; }
+.admin-detail-dl dd { font-weight:600; color:#0f172a; margin:0; text-align:right; }
+.admin-detail-mono { font-family:monospace; font-size:12px; }
+.admin-detail-progress-top { display:flex; justify-content:space-between; font-size:14px; margin-bottom:8px; }
+.admin-detail-progress-track { height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:16px; }
+.admin-detail-progress-track span { display:block; height:100%; background:#0d9488; border-radius:99px; }
+.admin-detail-vendor-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+.admin-detail-vendor-list li { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#f8fafc; border-radius:8px; font-size:13px; }
+.admin-detail-vendor-list li strong { color:#0f172a; }
+.admin-detail-vendor-list li span { color:#64748b; }
+.admin-detail-empty { color:#94a3b8; font-size:13px; }
+.admin-detail-desc { font-size:14px; line-height:1.7; color:#475569; }
+.admin-detail-actions-card { background:#fffbeb; border-color:#fde68a; }
+.admin-detail-actions-note { font-size:13px; color:#92400e; margin-bottom:16px; }
+.admin-detail-action-row { display:flex; gap:12px; }
+.admin-detail-status-msg { font-size:13px; font-weight:600; margin-top:12px; color:#0f766e; }
+.admin-detail-state { padding:48px; text-align:center; color:#94a3b8; font-size:16px; font-weight:600; }
+.admin-detail-state.is-error { color:#ef4444; }
+
+/* Clickable campaign name links in tables */
+.campaign-name-link { color:#0f172a; font-weight:700; text-decoration:none; }
+.campaign-name-link:hover { color:#0d9488; text-decoration:underline; }
+.admin-campaign-name-link { color:#0f172a; font-weight:700; text-decoration:none; display:block; }
+.admin-campaign-name-link:hover { color:#0d9488; text-decoration:underline; }

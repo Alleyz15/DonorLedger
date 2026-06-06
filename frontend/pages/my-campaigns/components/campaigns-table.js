@@ -134,7 +134,9 @@ function renderCampaignRow(campaign) {
         <div class="campaign-title-cell">
           <span class="campaign-logo-placeholder" aria-hidden="true">${escapeHtml(getInitial(campaign.name))}</span>
           <div>
-            <strong>${escapeHtml(campaign.name)}</strong>
+            <a class="campaign-name-link" href="./ngo-campaign-detail.html?id=${encodeURIComponent(campaign.id)}">
+              ${escapeHtml(campaign.name)}
+            </a>
             <span>${escapeHtml(campaign.causeType || 'Campaign')}</span>
           </div>
         </div>

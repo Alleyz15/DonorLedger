@@ -1,0 +1,263 @@
+.admin-campaign-detail-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.admin-campaign-detail-shell .app-content {
+  padding: 48px 50px;
+}
+
+/* ── Page wrapper ── */
+.admin-campaign-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Back link ── */
+.admin-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.admin-detail-back:hover { color: #065f46; }
+
+/* ── Hero ── */
+.admin-detail-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-detail-hero h1 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.admin-detail-hero-sub {
+  color: #667085;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ── Grid ── */
+.admin-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.admin-detail-card-full { grid-column: 1 / -1; }
+
+/* ── Cards ── */
+.admin-detail-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+.admin-detail-card h2 {
+  margin: 0 0 20px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Definition list ── */
+.admin-detail-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.admin-detail-dl > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+
+.admin-detail-dl > div:last-child { border-bottom: none; }
+
+.admin-detail-dl dt { color: #64748b; font-weight: 500; }
+.admin-detail-dl dd { font-weight: 700; color: #0f172a; margin: 0; }
+.admin-detail-mono { font-family: monospace; font-size: 12px; color: #475569; }
+
+/* ── Progress ── */
+.admin-detail-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.admin-detail-progress-row strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.admin-detail-progress-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.admin-detail-progress-fill {
+  height: 100%;
+  background: #065f46;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Vendor list ── */
+.admin-detail-vendor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-detail-vendor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.admin-detail-vendor-item strong { color: #0f172a; font-weight: 700; }
+.admin-detail-vendor-item span { color: #64748b; font-size: 12px; }
+
+/* ── Decision card (Under Review) ── */
+.admin-detail-decision-card {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.admin-detail-decision-card h2 {
+  margin: 0 0 8px;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-detail-decision-note {
+  font-size: 14px;
+  color: #78350f;
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.admin-detail-decision-row {
+  display: flex;
+  gap: 12px;
+}
+
+.admin-detail-decision-row .admin-campaign-action {
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-detail-decision-row .admin-campaign-action.is-approve {
+  background: #065f46;
+  color: #fff;
+}
+
+.admin-detail-decision-row .admin-campaign-action.is-approve:hover:not(:disabled) {
+  background: #047857;
+}
+
+.admin-detail-decision-row .admin-campaign-action.is-reject {
+  background: #fff;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+}
+
+.admin-detail-decision-row .admin-campaign-action.is-reject:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.admin-detail-decision-row .admin-campaign-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-detail-status-msg {
+  margin: 14px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+/* ── Allocation bars ── */
+.admin-detail-alloc-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 52px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.admin-detail-alloc-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.admin-detail-alloc-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+}
+
+.admin-detail-alloc-bar .is-aid      { background: #065f46; }
+.admin-detail-alloc-bar .is-logistics { background: #3b82f6; }
+.admin-detail-alloc-bar .is-admin    { background: #f59e0b; }
+
+.admin-detail-alloc-pct { font-weight: 700; color: #0f172a; text-align: right; }
+
+/* ── Empty / states ── */
+.admin-detail-empty { color: #94a3b8; font-size: 13px; margin: 0; }
+.admin-detail-desc { font-size: 14px; line-height: 1.75; color: #475569; margin: 0; }
+.admin-detail-state { padding: 64px; text-align: center; color: #94a3b8; font-size: 16px; font-weight: 600; }
+.admin-detail-state.is-error { color: #ef4444; }

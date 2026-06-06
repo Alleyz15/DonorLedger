@@ -29,7 +29,7 @@ function renderDashboard() {
         <p>Live overview of DonorLedger's NGO transparency platform.</p>
       </div>
       <div class="admin-dashboard-badge">
-        <span aria-hidden="true"></span>
+        <span class="admin-dashboard-live-dot" aria-hidden="true"></span>
         System Live — Monad Testnet
       </div>
     </section>

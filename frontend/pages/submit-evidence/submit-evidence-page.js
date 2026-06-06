@@ -147,7 +147,7 @@ async function submitEvidence(event) {
   setFormStatus(status, 'Submitting evidence for Bank review...', 'loading')
 
   try {
-    await submitEvidenceForReview(payload)
+    await submitEvidenceForReview(payload, session.token)
     setFormStatus(status, 'Evidence submitted. AI analysis and Bank review are now pending.', 'success')
     window.setTimeout(() => {
       window.location.href = './my-campaigns.html'

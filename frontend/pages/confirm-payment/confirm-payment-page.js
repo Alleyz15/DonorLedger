@@ -56,7 +56,7 @@ async function handleSubmit(event, form, campaign) {
 
   try {
     const result = await submitDonation(payload)
-    sessionStorage.setItem(
+    localStorage.setItem(
       PAYMENT_RESULT_KEY,
       JSON.stringify({
         ...result,
