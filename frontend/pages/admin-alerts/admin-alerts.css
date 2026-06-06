@@ -195,3 +195,8 @@
   .admin-alerts-shell .app-content { padding: 24px 16px; }
   .admin-alerts-hero h1 { font-size: 28px; }
 }
+
+/* Severity left-border colour coding */
+.admin-alerts-card.is-critical { border-left: 4px solid #ef4444; }
+.admin-alerts-card.is-warning  { border-left: 4px solid #f59e0b; }
+.admin-alerts-card.is-info     { border-left: 4px solid #3b82f6; }

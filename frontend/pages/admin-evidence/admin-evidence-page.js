@@ -105,11 +105,12 @@ function renderList(content) {
 }
 
 function renderCard(ev) {
-  const isFrozen   = ev.status === 'AUTO_FROZEN'
-  const isApproved = ev.status === 'APPROVED'
-  const cardClass  = isFrozen ? 'is-frozen' : isApproved ? 'is-approved' : 'is-review'
-  const statusLabel = isFrozen ? 'AI Frozen' : isApproved ? 'Approved — Awaiting SMS Confirm' : 'Pending Review'
-  const statusClass = isFrozen ? 'is-frozen' : isApproved ? 'is-approved' : 'is-review'
+  const isFrozen    = ev.status === 'AUTO_FROZEN'
+  const isApproved  = ev.status === 'APPROVED'
+  const isConfirmed = ev.status === 'CONFIRMED'
+  const cardClass   = isFrozen ? 'is-frozen' : isConfirmed ? 'is-confirmed' : isApproved ? 'is-approved' : 'is-review'
+  const statusLabel = isFrozen ? 'AI Frozen' : isConfirmed ? 'Completed' : isApproved ? 'Approved — Awaiting SMS Confirm' : 'Pending Review'
+  const statusClass = isFrozen ? 'is-frozen' : isConfirmed ? 'is-confirmed' : isApproved ? 'is-approved' : 'is-review'
 
   const score = ev.aiConfidenceScore
   const scoreClass = score >= 85 ? 'is-freeze' : score >= 60 ? 'is-review' : 'is-ok'
@@ -149,6 +150,9 @@ function renderCard(ev) {
             <span class="admin-evidence-ai-label">Gemini AI Analysis</span>
             <span class="admin-evidence-score ${scoreClass}">Score: ${score}/100</span>
           </div>
+          <div class="admin-evidence-score-bar-track">
+            <div class="admin-evidence-score-bar-fill ${scoreClass}" style="width:${score}%"></div>
+          </div>
           ${ev.aiReason ? `<p class="admin-evidence-ai-reason">${escapeHtml(ev.aiReason)}</p>` : ''}
           ${priceAnalysis ? `<p class="admin-evidence-price-note">📊 ${escapeHtml(priceAnalysis)}</p>` : ''}
           ${patterns.length ? `
@@ -162,15 +166,25 @@ function renderCard(ev) {
       ${renderDocuments(ev.documents)}
 
       <div class="admin-evidence-actions">
-        ${isApproved ? `
+        ${isConfirmed ? `
+          <p class="admin-evidence-gate-label" style="color:#16a34a;">
+            ✅ Gate 4 Complete — Beneficiary confirmed receipt. Donor tracker updated to COMPLETED.
+          </p>
+        ` : isApproved ? `
+          <p class="admin-evidence-gate-label">
+            🔒 Gate 4 — Independent Beneficiary Confirmation
+          </p>
           <button class="admin-evidence-btn is-confirm" type="button"
             data-action="confirm" data-id="${escapeHtml(ev.id)}" data-campaign-id="${escapeHtml(ev.campaign?.id || '')}">
             ✅ Confirm Beneficiary Receipt
           </button>
           <p class="admin-evidence-confirm-note">
-            Simulates Bank Islam SMS to beneficiary — independent of NGO. Updates donor tracker to COMPLETED.
+            Bank Islam SMS to beneficiary — independent of NGO. Updates donor tracker to COMPLETED.
           </p>
         ` : `
+          <p class="admin-evidence-gate-label">
+            🔒 Gate 3 — AI Screening Complete · Score ${score !== null ? score + '/100' : 'N/A'}
+          </p>
           <button class="admin-evidence-btn is-approve" type="button"
             data-action="approve" data-id="${escapeHtml(ev.id)}">
             Approve Disbursement

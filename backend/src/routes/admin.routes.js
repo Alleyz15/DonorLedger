@@ -351,8 +351,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
-        const err = new Error('Only pending or under-review campaign applications can be approved')
+      if (campaign.status !== 'UNDER_REVIEW') {
+        const err = new Error('Only campaigns submitted for review can be approved')
         err.status = 409
         throw err
       }
@@ -436,8 +436,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
-        const err = new Error('Only pending or under-review campaign applications can be rejected')
+      if (campaign.status !== 'UNDER_REVIEW') {
+        const err = new Error('Only campaigns submitted for review can be rejected')
         err.status = 409
         throw err
       }

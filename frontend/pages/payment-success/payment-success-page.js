@@ -17,7 +17,7 @@ if (!session?.token) {
 }
 
 function readPaymentResult() {
-  const value = sessionStorage.getItem(PAYMENT_RESULT_KEY)
+  const value = localStorage.getItem(PAYMENT_RESULT_KEY)
   if (!value) return null
   try {
     return JSON.parse(value)

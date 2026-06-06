@@ -1,0 +1,186 @@
+.ngo-campaign-detail-shell.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f8fafc;
+}
+
+.ngo-campaign-detail-shell .app-content {
+  padding: 48px 50px;
+}
+
+/* ── Page wrapper ── */
+.ngo-campaign-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Back link ── */
+.ngo-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.ngo-detail-back:hover { color: #065f46; }
+
+/* ── Hero ── */
+.ngo-detail-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.ngo-detail-hero h1 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.ngo-detail-hero-sub {
+  color: #667085;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ── Grid ── */
+.ngo-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.ngo-detail-card-full { grid-column: 1 / -1; }
+
+/* ── Cards ── */
+.ngo-detail-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+.ngo-detail-card h2 {
+  margin: 0 0 20px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Progress ── */
+.ngo-detail-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.ngo-detail-progress-row strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ngo-detail-progress-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.ngo-detail-progress-fill {
+  height: 100%;
+  background: #065f46;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Summary stats ── */
+.ngo-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ngo-detail-stats div { display: flex; flex-direction: column; gap: 4px; }
+.ngo-detail-stats span { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.ngo-detail-stats strong { font-size: 18px; font-weight: 800; color: #0f172a; }
+
+/* ── Allocation ── */
+.ngo-detail-alloc-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 52px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.ngo-detail-alloc-bar { height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+.ngo-detail-alloc-bar span { display: block; height: 100%; border-radius: 99px; }
+.ngo-detail-alloc-bar .is-aid        { background: #065f46; }
+.ngo-detail-alloc-bar .is-logistics  { background: #3b82f6; }
+.ngo-detail-alloc-bar .is-admin      { background: #f59e0b; }
+.ngo-detail-alloc-pct { font-weight: 700; color: #0f172a; text-align: right; }
+
+/* ── Vendor list ── */
+.ngo-detail-vendor-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.ngo-detail-vendor-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 10px; font-size: 14px;
+}
+.ngo-detail-vendor-item strong { color: #0f172a; font-weight: 700; }
+.ngo-detail-vendor-item span { color: #64748b; font-size: 12px; }
+
+/* ── Description ── */
+.ngo-detail-desc { font-size: 14px; line-height: 1.75; color: #475569; margin: 0; }
+
+/* ── Actions card ── */
+.ngo-detail-actions-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+}
+
+.ngo-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  background: #065f46;
+  color: #fff;
+}
+.ngo-detail-btn:hover { background: #047857; }
+.ngo-detail-btn.is-secondary { background: #fff; color: #065f46; border: 1.5px solid #bbf7d0; }
+.ngo-detail-btn.is-secondary:hover { background: #f0fdf4; }
+
+/* ── State ── */
+.ngo-detail-empty { color: #94a3b8; font-size: 13px; margin: 0; }
+.ngo-detail-state { padding: 64px; text-align: center; color: #94a3b8; font-size: 16px; font-weight: 600; }
+.ngo-detail-state.is-error { color: #ef4444; }
