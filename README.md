@@ -23,9 +23,12 @@ Built for Hackathon X Fintech Forward 2026, Be U by Bank Islam x UMPSA.
 
 - Registers through the NGO application form.
 - Logs in after the account exists.
-- Creates campaign applications.
-- Adds or selects approved vendors.
-- Tracks campaign status.
+- Creates a campaign — can save as draft and return later to complete it.
+- Edits draft campaigns before submitting for Bank Islam review.
+- Submits campaign for Bank Islam review when ready.
+- Views campaign detail page showing funding progress, allocation breakdown, and vendor list.
+- Adds or selects approved vendors through the Register Vendor page.
+- Tracks campaign status in My Campaigns dashboard.
 - Submits evidence before money can be released.
 - Evidence upload requires five documents:
   - SSM / ROS document
@@ -38,12 +41,14 @@ Built for Hackathon X Fintech Forward 2026, Be U by Bank Islam x UMPSA.
 
 - Logs in with the seeded admin account.
 - Reviews NGO applications.
-- Approves or rejects campaign applications.
+- Approves or rejects campaign applications from the campaign detail page, which shows full NGO info, fund allocation, contract address, and linked vendors.
 - Reviews vendor KYC.
 - Approves or rejects vendors.
-- Reviews evidence and AI fraud results.
+- Reviews evidence with Gate 3 (AI Screening) and Gate 4 (Beneficiary Confirmation) labels.
+- AI fraud score shown as a colour-coded progress bar — green below 60, amber 60–85, red above 85.
 - Approves or rejects disbursement.
-- Can view alerts, audit logs, campaigns, NGOs, vendors, and evidence reviews.
+- Confirms beneficiary receipt independently of the NGO, which updates donor tracker to COMPLETED.
+- Can view alerts with severity colour coding, audit logs, campaigns, NGOs, vendors, and evidence reviews.
 
 ## Demo Accounts
 
@@ -326,6 +331,7 @@ frontend/donor-history.html
 
 ```text
 frontend/my-campaigns.html
+frontend/ngo-campaign-detail.html
 frontend/start-campaign.html
 frontend/submit-vendor.html
 frontend/submit-evidence.html
@@ -338,6 +344,7 @@ frontend/admin-dashboard.html
 frontend/admin-ngos.html
 frontend/admin-vendors.html
 frontend/admin-campaigns.html
+frontend/admin-campaign-detail.html
 frontend/admin-evidence.html
 frontend/admin-alerts.html
 frontend/admin-audit.html
@@ -366,13 +373,15 @@ GET  /api/tracker/:donorHash
 ### NGO
 
 ```text
-POST /api/ngo/register
-POST /api/ngo/campaign/create
-GET  /api/ngo/campaigns
-GET  /api/ngo/campaigns/:id
-GET  /api/ngo/vendors
-POST /api/vendor/submit
-POST /api/evidence/submit
+POST  /api/ngo/register
+POST  /api/ngo/campaign/create
+POST  /api/ngo/campaign/save-draft
+PATCH /api/ngo/campaign/:id
+GET   /api/ngo/campaigns
+GET   /api/ngo/campaigns/:id
+GET   /api/ngo/vendors
+POST  /api/vendor/submit
+POST  /api/evidence/submit
 ```
 
 ### Bank Admin
