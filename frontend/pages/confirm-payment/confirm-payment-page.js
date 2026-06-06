@@ -31,8 +31,11 @@ async function renderConfirmPaymentPage() {
 
   root.innerHTML = '<p class="payment-state">Loading payment details...</p>'
   try {
-    const campaign = await getCampaignDetails(campaignId)
-    root.innerHTML = renderPaymentForm({ campaign, session })
+    const [campaign, vendors] = await Promise.all([
+      getCampaignDetails(campaignId),
+      import('../../services/campaign-service.js').then(m => m.getCampaignVendors(campaignId)).catch(() => []),
+    ])
+    root.innerHTML = renderPaymentForm({ campaign, session, vendors })
     const form = root.querySelector('form')
     bindPaymentSummary(form)
     form.addEventListener('submit', (event) => handleSubmit(event, form, campaign))
@@ -44,6 +47,7 @@ async function renderConfirmPaymentPage() {
 async function handleSubmit(event, form, campaign) {
   event.preventDefault()
   const payload = readPaymentPayload(form, campaignId)
+  payload.vendorId = form.querySelector('[name="vendorId"]')?.value || undefined
   const validationMessage = validateDonationForm(payload)
 
   if (validationMessage) {

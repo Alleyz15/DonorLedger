@@ -17,10 +17,16 @@ if (!session?.token) {
 }
 
 function readPaymentResult() {
+  // Try localStorage first, fall back to sessionStorage for cached old pages
   const value = localStorage.getItem(PAYMENT_RESULT_KEY)
+    || sessionStorage.getItem(PAYMENT_RESULT_KEY)
   if (!value) return null
   try {
-    return JSON.parse(value)
+    const result = JSON.parse(value)
+    // Migrate sessionStorage entry to localStorage so future reads work
+    localStorage.setItem(PAYMENT_RESULT_KEY, value)
+    sessionStorage.removeItem(PAYMENT_RESULT_KEY)
+    return result
   } catch {
     return null
   }

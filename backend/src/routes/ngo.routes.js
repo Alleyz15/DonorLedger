@@ -270,7 +270,32 @@ router.patch('/campaign/:id', requireNGO, async (req, res, next) => {
     if (adminPercent !== undefined)      data.adminPercent      = Number(adminPercent)
     if (targetAmount !== undefined)      data.targetAmount      = String(Number(targetAmount))
     if (endDate)        data.endDate        = new Date(endDate)
-    if (submit === true) data.status        = 'UNDER_REVIEW'
+    // Validate allocation when submitting for Bank Islam review
+    if (submit === true) {
+      const aid  = Number(aidPercent      ?? campaign.aidPercent)
+      const logi = Number(logisticsPercent ?? campaign.logisticsPercent)
+      const adm  = Number(adminPercent    ?? campaign.adminPercent)
+      if (aid + logi + adm !== 100) {
+        const err = new Error(`Allocation percentages must sum to 100 (currently ${aid + logi + adm}%)`)
+        err.status = 400
+        throw err
+      }
+      data.status = 'UNDER_REVIEW'
+    }
+
+    // If submitting for review, at least one vendor must be linked
+    if (submit === true) {
+      const existingVendors = await prisma.campaign.findUnique({
+        where: { id: campaign.id },
+        select: { vendors: { select: { id: true } } },
+      })
+      const hasVendor = (existingVendors?.vendors?.length ?? 0) > 0 || !!vendorId
+      if (!hasVendor) {
+        const err = new Error('At least one approved vendor must be selected before submitting for Bank Islam review')
+        err.status = 400
+        throw err
+      }
+    }
 
     // If a vendor is provided, connect it to the campaign
     const updatePayload = vendorId

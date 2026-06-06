@@ -67,11 +67,11 @@ function getCampaignVisual(campaign) {
 }
 
 function getDaysLeft(value) {
-  if (!value) return '0'
+  if (!value) return 'Ended'
   const today = new Date()
   const end = new Date(value)
   const diff = Math.ceil((end.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0)) / 86400000)
-  return String(Math.max(0, diff))
+  return diff <= 0 ? 'Ended' : String(diff)
 }
 
 function formatNumber(value) {
