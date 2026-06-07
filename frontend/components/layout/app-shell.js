@@ -1,4 +1,6 @@
 // ── Icons ──────────────────────────────────────────────────────────────
+import { clearSession } from '../../services/auth-service.js'
+
 const ICONS = {
   'my-campaigns': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>`,
   'submit-vendor': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`,
@@ -12,6 +14,7 @@ const ICONS = {
   'admin-audit-logs': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>`,
   'donor-home': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`,
   'donor-history': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><polyline points="12,8 12,12 14,14"/><path d="M3.05 11a9 9 0 1 0 .5-4"/><polyline points="3,3 3,7 7,7"/></svg>`,
+  'logout': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
   'default': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"/></svg>`,
 }
 
@@ -80,14 +83,20 @@ export function renderAppShell({
         </label>
 
         <div class="app-header-end">
-          <div class="app-user">
+          <div class="app-user" data-user-menu>
             <div class="app-user-info">
               <strong>${escapeHtml(displayName)}</strong>
               <span>${getRoleLabel(role)}</span>
             </div>
-            <button class="app-avatar" type="button" title="Logout" aria-label="Logout">
+            <button class="app-avatar" type="button" title="Account menu" aria-label="Open account menu" aria-haspopup="menu" aria-expanded="false">
               ${escapeHtml(initials)}
             </button>
+            <div class="app-user-dropdown" role="menu" aria-hidden="true">
+              <button class="app-user-dropdown-item" type="button" role="menuitem" data-logout>
+                <span class="app-user-dropdown-icon" aria-hidden="true">${ICONS.logout}</span>
+                <span>Log out</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -99,11 +108,7 @@ export function renderAppShell({
   // Mount page content
   mount.querySelector('.app-content')?.append(content)
 
-  // Logout
-  mount.querySelector('.app-avatar')?.addEventListener('click', () => {
-    localStorage.removeItem('donorledger.auth')
-    window.location.href = './login.html'
-  })
+  bindUserMenu(mount)
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -128,6 +133,39 @@ function renderMenu(role, activeKey) {
 
 function getMenu(role)           { return roleMenus[role] || [] }
 function normalizeRole(role)     { return role === 'NGO' ? 'ORGANIZER' : role }
+
+function bindUserMenu(mount) {
+  const userMenu = mount.querySelector('[data-user-menu]')
+  const avatarButton = userMenu?.querySelector('.app-avatar')
+  const dropdown = userMenu?.querySelector('.app-user-dropdown')
+  const logoutButton = userMenu?.querySelector('[data-logout]')
+
+  if (!userMenu || !avatarButton || !dropdown || !logoutButton) return
+
+  const setOpen = (isOpen) => {
+    userMenu.classList.toggle('is-open', isOpen)
+    avatarButton.setAttribute('aria-expanded', String(isOpen))
+    dropdown.setAttribute('aria-hidden', String(!isOpen))
+  }
+
+  avatarButton.addEventListener('click', (event) => {
+    event.stopPropagation()
+    setOpen(!userMenu.classList.contains('is-open'))
+  })
+
+  logoutButton.addEventListener('click', () => {
+    clearSession()
+    window.location.href = './login.html'
+  })
+
+  document.addEventListener('click', (event) => {
+    if (!userMenu.contains(event.target)) setOpen(false)
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false)
+  })
+}
 
 function getRoleLabel(role) {
   if (role === 'ORGANIZER') return 'NGO ORGANIZER'
