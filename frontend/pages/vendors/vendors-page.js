@@ -1,13 +1,16 @@
 import { renderAppShell } from '../../components/layout/app-shell.js'
-import { getNGOCampaigns } from '../../services/campaign-service.js'
 import { getSession } from '../../services/auth-service.js'
+import { getNGOVendors } from '../../services/vendor-service.js'
 import {
-  bindCampaignTableControls,
-  createCampaignsTable,
-  renderCampaignError,
-  renderCampaignRows,
-} from './components/campaigns-table.js?v=10'
-import { createSummaryCards, updateSummaryCards } from './components/summary-cards.js'
+  createVendorSummaryCards,
+  updateVendorSummaryCards,
+} from './components/vendor-summary-cards.js'
+import {
+  bindVendorTableControls,
+  createVendorsTable,
+  renderVendorError,
+  renderVendorRows,
+} from './components/vendors-table.js'
 
 const session = getSession()
 const shell = document.querySelector('#app-shell')
@@ -18,39 +21,40 @@ if (!session?.token) {
 } else if (!canViewNGOPage) {
   renderAccessDenied()
 } else {
-  renderMyCampaignsPage()
+  renderVendorsPage()
 }
 
-async function renderMyCampaignsPage() {
+async function renderVendorsPage() {
   const content = document.createElement('div')
-  content.className = 'my-campaigns-dashboard'
+  content.className = 'my-campaigns-dashboard vendor-dashboard'
   content.innerHTML = `
     <header class="campaign-page-header">
       <div>
-        <h1>My Campaigns</h1>
-        <p>Track, manage, and grow your charitable initiatives.</p>
+        <h1>Vendors</h1>
+        <p>Track submitted vendors and Bank Islam review outcomes.</p>
       </div>
     </header>
   `
 
-  const summaryCards = createSummaryCards()
-  const table = createCampaignsTable()
+  const summaryCards = createVendorSummaryCards()
+  const table = createVendorsTable()
   content.append(summaryCards, table)
 
   renderAppShell({
     mount: shell,
     session,
-    activeKey: 'my-campaigns',
+    activeKey: 'submit-vendor',
     content,
+    searchPlaceholder: 'Search vendors, services...',
   })
 
   try {
-    const campaigns = await getNGOCampaigns(session.token)
-    updateSummaryCards(summaryCards, campaigns)
-    renderCampaignRows(table, campaigns)
-    bindCampaignTableControls(table, campaigns)
+    const vendors = await getNGOVendors(session.token)
+    updateVendorSummaryCards(summaryCards, vendors)
+    renderVendorRows(table, vendors)
+    bindVendorTableControls(table, vendors)
   } catch (error) {
-    renderCampaignError(table, error.message)
+    renderVendorError(table, error.message)
   }
 }
 
@@ -65,7 +69,7 @@ function renderAccessDenied() {
   renderAppShell({
     mount: shell,
     session,
-    activeKey: 'my-campaigns',
+    activeKey: 'submit-vendor',
     content: panel,
   })
 }

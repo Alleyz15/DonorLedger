@@ -1,18 +1,21 @@
-const statusFilters = ['all', 'active', 'completed', 'flagged', 'pending', 'draft']
-const filterLabels = {
-  all: 'All Status',
-  active: 'Active',
-  completed: 'Completed',
-  flagged: 'Flagged',
-  pending: 'Under Review',
-  draft: 'Draft',
-}
+const statusFilters = [
+  { value: 'all', label: 'All Status' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'VERIFIED', label: 'Verified' },
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'UNDER_REVIEW', label: 'Under Review' },
+  { value: 'FROZEN', label: 'Frozen' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'COMPLETED', label: 'Completed' },
+]
 const pageSize = 5
 
 export function createCampaignsTable() {
   const section = document.createElement('section')
   section.className = 'campaigns-panel'
   section.dataset.filterStatus = 'all'
+  section.dataset.page = '1'
   section.innerHTML = `
     <div class="campaigns-panel-header">
       <div class="campaigns-title-group">
@@ -27,12 +30,14 @@ export function createCampaignsTable() {
         <label class="campaign-status-filter">
           <span>Status</span>
           <select data-campaign-filter>
-            ${statusFilters.map((key) => `<option value="${key}">${filterLabels[key]}</option>`).join('')}
+            ${statusFilters
+              .map((filter) => `<option value="${filter.value}">${filter.label}</option>`)
+              .join('')}
           </select>
         </label>
         <a class="campaigns-primary-action" href="./start-campaign.html">
           <span aria-hidden="true">+</span>
-          Start New Campaign
+          New Campaign
         </a>
       </div>
     </div>
@@ -40,12 +45,12 @@ export function createCampaignsTable() {
       <table class="campaigns-table">
         <thead>
           <tr>
-            <th>Campaign Name</th>
+            <th>Campaign</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Raise Target</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody data-campaign-rows>
@@ -57,7 +62,7 @@ export function createCampaignsTable() {
     </div>
     <footer class="campaigns-pagination">
       <span data-campaign-page-summary>Page 1 of 1 - 0 campaigns total</span>
-      <div>
+      <div data-pagination-buttons>
         <button type="button" disabled>&lt;</button>
         <button class="is-active" type="button">1</button>
         <button type="button" disabled>&gt;</button>
@@ -71,10 +76,25 @@ export function bindCampaignTableControls(table, campaigns) {
   const search = table.querySelector('[data-campaign-search]')
   const filter = table.querySelector('[data-campaign-filter]')
 
-  search?.addEventListener('input', () => renderCampaignRows(table, campaigns))
+  search?.addEventListener('input', () => {
+    table.dataset.page = '1'
+    renderCampaignRows(table, campaigns)
+  })
+
   filter?.addEventListener('change', () => {
     table.dataset.filterStatus = filter.value || 'all'
+    table.dataset.page = '1'
     renderCampaignRows(table, campaigns)
+  })
+
+  table.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-page-btn]')
+    if (!button) return
+    const page = Number(button.dataset.pageBtn)
+    if (!Number.isNaN(page)) {
+      table.dataset.page = String(page)
+      renderCampaignRows(table, campaigns)
+    }
   })
 }
 
@@ -83,8 +103,13 @@ export function renderCampaignRows(table, campaigns) {
   if (!rows) return
 
   const filtered = filterCampaigns(table, campaigns)
+  const currentPage = Math.max(1, Number(table.dataset.page) || 1)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const safePage = Math.min(currentPage, totalPages)
+  table.dataset.page = String(safePage)
 
-  const visible = filtered.slice(0, pageSize)
+  const start = (safePage - 1) * pageSize
+  const visible = filtered.slice(start, start + pageSize)
 
   if (!visible.length) {
     rows.innerHTML = `
@@ -92,12 +117,14 @@ export function renderCampaignRows(table, campaigns) {
         <td class="campaigns-empty-cell" colspan="6">No campaigns found.</td>
       </tr>
     `
-    updateCount(table, filtered.length, campaigns.length)
+    updateCount(table, filtered.length, campaigns.length, safePage, totalPages)
+    renderPagination(table, safePage, totalPages)
     return
   }
 
   rows.innerHTML = visible.map(renderCampaignRow).join('')
-  updateCount(table, filtered.length, campaigns.length)
+  updateCount(table, filtered.length, campaigns.length, safePage, totalPages)
+  renderPagination(table, safePage, totalPages)
 }
 
 export function renderCampaignError(table, message) {
@@ -115,10 +142,8 @@ function filterCampaigns(table, campaigns) {
   const filter = table.dataset.filterStatus || 'all'
 
   return campaigns.filter((campaign) => {
-    const statusKey = getStatusKey(campaign.status)
-    const matchesStatus = filter === 'all' || filter === statusKey
     const searchable = `${campaign.name || ''} ${campaign.causeType || ''}`.toLowerCase()
-    return matchesStatus && searchable.includes(query)
+    return (filter === 'all' || campaign.status === filter) && searchable.includes(query)
   })
 }
 
@@ -154,33 +179,14 @@ function renderCampaignRow(campaign) {
           <span style="width: ${progress}%"></span>
         </div>
       </td>
-      <td>${renderStatusSelect(campaign.status, label, statusClass)}</td>
+      <td>${renderStatusChip(label, statusClass)}</td>
       <td>${renderCampaignAction(campaign)}</td>
     </tr>
   `
 }
 
-function renderStatusSelect(status, label, statusClass) {
-  const options = [
-    ['ACTIVE', 'Active'],
-    ['UNDER_REVIEW', 'Under Review'],
-    ['DRAFT', 'Draft'],
-    ['COMPLETED', 'Completed'],
-    ['FROZEN', 'Flagged'],
-    ['REJECTED', 'Rejected'],
-  ]
-  const normalized = ['APPROVED', 'VERIFIED'].includes(status) ? 'ACTIVE' : status
-  const optionHtml = options
-    .map(([value, text]) => (
-      `<option value="${value}"${value === normalized ? ' selected' : ''}>${text}</option>`
-    ))
-    .join('')
-
-  return `
-    <select class="campaign-status-select ${statusClass}" aria-label="Campaign status" disabled>
-      ${optionHtml || `<option>${escapeHtml(label)}</option>`}
-    </select>
-  `
+function renderStatusChip(label, statusClass) {
+  return `<span class="campaign-status-chip ${statusClass}">${escapeHtml(label)}</span>`
 }
 
 function renderCampaignAction(campaign) {
@@ -195,7 +201,7 @@ function renderCampaignAction(campaign) {
   }
 
   if (campaign.status === 'UNDER_REVIEW') {
-    return '<span class="campaign-action-pending">Awaiting Bank Islam approval</span>'
+    return '<span class="campaign-action-pending">Awaiting approval</span>'
   }
 
   if (campaign.status === 'FROZEN') {
@@ -210,7 +216,10 @@ function renderCampaignAction(campaign) {
     `
   }
 
-  if (['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) && availableAmount <= 0) {
+  if (
+    ['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) &&
+    availableAmount <= 0
+  ) {
     return '<span class="campaign-action-empty">Fully Released</span>'
   }
 
@@ -220,15 +229,17 @@ function renderCampaignAction(campaign) {
 function getCampaignStatusMeta(status) {
   switch (status) {
     case 'ACTIVE':
-    case 'APPROVED':
-    case 'VERIFIED':
       return { label: 'Active', statusClass: 'is-active' }
+    case 'APPROVED':
+      return { label: 'Approved', statusClass: 'is-active' }
+    case 'VERIFIED':
+      return { label: 'Verified', statusClass: 'is-active' }
     case 'DRAFT':
       return { label: 'Draft', statusClass: 'is-draft' }
     case 'UNDER_REVIEW':
       return { label: 'Under Review', statusClass: 'is-pending' }
     case 'FROZEN':
-      return { label: 'Flagged', statusClass: 'is-frozen' }
+      return { label: 'Frozen', statusClass: 'is-frozen' }
     case 'REJECTED':
       return { label: 'Rejected', statusClass: 'is-rejected' }
     case 'COMPLETED':
@@ -238,22 +249,41 @@ function getCampaignStatusMeta(status) {
   }
 }
 
-function getStatusKey(status) {
-  if (['ACTIVE', 'APPROVED', 'VERIFIED'].includes(status)) return 'active'
-  if (status === 'COMPLETED') return 'completed'
-  if (['FROZEN', 'REJECTED'].includes(status)) return 'flagged'
-  if (status === 'UNDER_REVIEW') return 'pending'
-  if (status === 'DRAFT') return 'draft'
-  return 'all'
-}
-
-function updateCount(table, visibleCount, totalCount) {
+function updateCount(table, visibleCount, totalCount, currentPage, totalPages) {
   const count = table.querySelector('[data-campaign-count]')
   const pageSummary = table.querySelector('[data-campaign-page-summary]')
-  const shown = Math.min(visibleCount, pageSize)
-  const pages = Math.max(1, Math.ceil(visibleCount / pageSize))
+  const shown = visibleCount === 0
+    ? 0
+    : Math.min(visibleCount - (currentPage - 1) * pageSize, pageSize)
   if (count) count.textContent = `Showing ${shown} of ${visibleCount} campaigns`
-  if (pageSummary) pageSummary.textContent = `Page 1 of ${pages} - ${totalCount} campaigns total`
+  if (pageSummary) {
+    pageSummary.textContent = `Page ${currentPage} of ${totalPages} - ${totalCount} campaigns total`
+  }
+}
+
+function renderPagination(table, currentPage, totalPages) {
+  const container = table.querySelector('[data-pagination-buttons]')
+  if (!container) return
+
+  let html = `<button type="button" ${currentPage <= 1 ? 'disabled' : ''} data-page-btn="${currentPage - 1}">&lt;</button>`
+
+  for (const page of getPaginationRange(currentPage, totalPages)) {
+    if (page === '...') {
+      html += '<button type="button" disabled style="opacity:.4;">...</button>'
+    } else {
+      html += `<button type="button" ${page === currentPage ? 'class="is-active"' : ''} data-page-btn="${page}">${page}</button>`
+    }
+  }
+
+  html += `<button type="button" ${currentPage >= totalPages ? 'disabled' : ''} data-page-btn="${currentPage + 1}">&gt;</button>`
+  container.innerHTML = html
+}
+
+function getPaginationRange(current, total) {
+  if (total <= 5) return Array.from({ length: total }, (_, index) => index + 1)
+  if (current <= 3) return [1, 2, 3, '...', total]
+  if (current >= total - 2) return [1, '...', total - 2, total - 1, total]
+  return [1, '...', current, '...', total]
 }
 
 function getInitial(value) {

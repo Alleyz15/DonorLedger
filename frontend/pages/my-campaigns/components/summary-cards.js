@@ -1,13 +1,34 @@
 const summaryItems = [
-  { key: 'total', label: 'Total Campaigns', icon: 'grid', meta: 'All campaign applications' },
-  { key: 'active', label: 'Active Campaigns', icon: 'pulse', meta: 'Live and receiving donations' },
-  { key: 'completed', label: 'Completed Campaigns', icon: 'check', meta: 'Finished fundraising cycles' },
-  { key: 'flagged', label: 'Flagged Campaigns', icon: 'flag', meta: 'Requires attention' },
+  {
+    key: 'total',
+    label: 'Total Campaigns',
+    icon: 'grid',
+    meta: 'All campaign applications',
+  },
+  {
+    key: 'active',
+    label: 'Active Campaigns',
+    icon: 'pulse',
+    meta: 'Live and receiving donations',
+  },
+  {
+    key: 'completed',
+    label: 'Completed',
+    icon: 'check',
+    meta: 'Finished fundraising cycles',
+  },
+  {
+    key: 'flagged',
+    label: 'Flagged',
+    icon: 'flag',
+    meta: 'Requires your attention',
+  },
 ]
 
 export function createSummaryCards() {
   const section = document.createElement('section')
   section.className = 'campaign-summary-grid'
+  section.setAttribute('aria-label', 'Campaign statistics')
   section.innerHTML = summaryItems
     .map(
       (item) => `
@@ -37,6 +58,20 @@ export function updateSummaryCards(container, campaigns) {
 
   Object.entries(counts).forEach(([key, value]) => {
     const element = container.querySelector(`[data-summary="${key}"]`)
-    if (element) element.textContent = String(value)
+    if (element) animateCount(element, value)
   })
+}
+
+function animateCount(element, target) {
+  const duration = 600
+  const start = performance.now()
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 3)
+    element.textContent = String(Math.round(target * eased))
+    if (progress < 1) requestAnimationFrame(tick)
+  }
+
+  requestAnimationFrame(tick)
 }

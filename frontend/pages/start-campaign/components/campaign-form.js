@@ -4,24 +4,24 @@ export function createCampaignForm() {
   form.noValidate = true
   form.innerHTML = `
     <header class="start-campaign-header">
-      <h1>Start a New Campaign</h1>
-      <p>
-        Fuel your mission with transparency. Fill in the details below to launch your next
-        social impact initiative on the blockchain-backed DonorLedger platform.
-      </p>
+      <div class="start-campaign-header-icon" aria-hidden="true"></div>
+      <div class="start-campaign-header-text">
+        <h1>Start a New Campaign</h1>
+        <p>Launch your next social impact initiative on the blockchain-backed DonorLedger platform.</p>
+      </div>
     </header>
 
     <section class="start-campaign-section">
-      <h2><span aria-hidden="true"></span>1. Campaign Basics</h2>
+      <h2><span class="section-num" aria-hidden="true">1</span>Campaign Basics</h2>
       <div class="start-campaign-stack">
         <label class="field">
           <span>Campaign Title</span>
-          <input name="name" type="text" placeholder="e.g. Clean Water Initiative 2024" required />
+          <input name="name" type="text" placeholder="e.g. Clean Water Initiative 2025" required />
         </label>
         <label class="field">
           <span>Cause Type / Category</span>
           <select name="causeType" required>
-            <option value="">Select Category</option>
+            <option value="">Select category...</option>
             <option value="Poverty Alleviation">Poverty Alleviation</option>
             <option value="Disaster Relief">Disaster Relief</option>
             <option value="Food Aid">Food Aid</option>
@@ -34,20 +34,22 @@ export function createCampaignForm() {
           <span>Detailed Description</span>
           <textarea
             name="description"
-            rows="6"
-            placeholder="Tell the heart-moving story of why this campaign exists..."
+            rows="5"
+            placeholder="Tell the story of why this campaign exists and how funds will create impact..."
             required
           ></textarea>
         </label>
       </div>
     </section>
 
+    <hr class="section-divider" />
+
     <section class="start-campaign-section">
-      <h2><span aria-hidden="true"></span>2. Financial Goals</h2>
+      <h2><span class="section-num" aria-hidden="true">2</span>Financial Goals</h2>
       <div class="start-campaign-financial-row">
         <label class="field">
           <span>Target Amount (RM)</span>
-          <input name="targetAmount" type="number" min="1" placeholder="e.g. 100,000" required />
+          <input name="targetAmount" type="number" min="1" placeholder="e.g. 100000" required />
         </label>
         <label class="field">
           <span>Campaign End Date</span>
@@ -56,13 +58,17 @@ export function createCampaignForm() {
       </div>
     </section>
 
+    <hr class="section-divider" />
+
     <section class="start-campaign-section">
-      <h2><span aria-hidden="true"></span>3. Vendors</h2>
+      <h2><span class="section-num" aria-hidden="true">3</span>Vendors</h2>
       <div data-vendors-slot></div>
     </section>
 
+    <hr class="section-divider" />
+
     <section class="start-campaign-section start-campaign-allocation-section">
-      <h2><span aria-hidden="true"></span>4. Fund Allocation</h2>
+      <h2><span class="section-num" aria-hidden="true">4</span>Fund Allocation</h2>
       <div class="start-campaign-allocation">
         <label class="field">
           <span>Direct Aid %</span>
@@ -77,20 +83,29 @@ export function createCampaignForm() {
           <input name="adminPercent" type="number" value="10" min="0" max="100" />
         </label>
       </div>
-      <p class="start-campaign-total">
-        Total Allocation: <strong data-allocation-total>100% / 100%</strong>
-      </p>
+      <div class="allocation-bar-wrap">
+        <div class="allocation-bar-track">
+          <div class="allocation-bar-fill" data-allocation-bar></div>
+        </div>
+        <p class="start-campaign-total">
+          Total: <strong data-allocation-total>100%</strong> / 100%
+        </p>
+      </div>
     </section>
 
-    <section class="transparency-tips">
-      <h2><span aria-hidden="true"></span>Transparency Tips</h2>
-      <p><span aria-hidden="true"></span>Clear budgets and vendor choices help Bank Islam review your campaign faster.</p>
-      <p><span aria-hidden="true"></span>Keep all evidence ready before submitting disbursement requests later.</p>
-    </section>
+    <div class="transparency-tips">
+      <h2><span class="tip-icon" aria-hidden="true"></span>Transparency Tips</h2>
+      <p><span class="tip-dot" aria-hidden="true"></span>Clear budgets and vendor details help Bank Islam review your campaign faster.</p>
+      <p><span class="tip-dot" aria-hidden="true"></span>Keep all evidence ready before submitting disbursement requests later.</p>
+    </div>
 
-    <button class="start-campaign-submit" type="submit">Submit for Bank Review</button>
-    <button class="start-campaign-exit" type="button">Save Draft &amp; Exit</button>
+    <div class="start-campaign-actions">
+      <button class="start-campaign-submit" type="submit">Submit for Bank Review</button>
+      <button class="start-campaign-exit" type="button">Save Draft &amp; Exit</button>
+    </div>
+
     <div class="form-status" role="status" aria-live="polite"></div>
+
     <p class="start-campaign-terms">
       By submitting, you agree to DonorLedger's
       <a href="#terms">Institutional Integrity Terms</a>.
@@ -132,11 +147,22 @@ export function bindAllocationTotal(form) {
     form.querySelector('input[name="adminPercent"]'),
   ].filter(Boolean)
   const totalElement = form.querySelector('[data-allocation-total]')
+  const barFill = form.querySelector('[data-allocation-bar]')
 
   const update = () => {
     const total = getAllocationTotal(inputs)
-    totalElement.textContent = `${total}% / 100%`
-    totalElement.classList.toggle('is-invalid', total !== 100)
+    const clampedTotal = Math.min(total, 100)
+    const isInvalid = total !== 100
+
+    if (totalElement) {
+      totalElement.textContent = `${total}%`
+      totalElement.classList.toggle('is-invalid', isInvalid)
+    }
+
+    if (barFill) {
+      barFill.style.width = `${clampedTotal}%`
+      barFill.classList.toggle('is-invalid', isInvalid)
+    }
   }
 
   inputs.forEach((input) => input.addEventListener('input', update))
