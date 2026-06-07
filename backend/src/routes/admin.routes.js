@@ -279,6 +279,46 @@ router.get('/evidence/pending', async (req, res, next) => {
   }
 })
 
+router.get('/campaign/:id', async (req, res, next) => {
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: req.params.id },
+      include: {
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            riskTier: true,
+            status: true,
+          },
+        },
+        vendors: {
+          select: {
+            id: true,
+            name: true,
+            serviceType: true,
+            status: true,
+            walletAddress: true,
+          },
+        },
+      },
+    })
+    if (!campaign) {
+      const err = new Error('Campaign not found')
+      err.status = 404
+      throw err
+    }
+    res.json({
+      ...campaign,
+      targetAmount: Number(campaign.targetAmount),
+      raisedAmount: Number(campaign.raisedAmount),
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.get('/campaigns', async (req, res, next) => {
   try {
     const campaigns = await prisma.campaign.findMany({
@@ -351,8 +391,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
-        const err = new Error('Only pending or under-review campaign applications can be approved')
+      if (campaign.status !== 'UNDER_REVIEW') {
+        const err = new Error('Only campaigns submitted for review can be approved')
         err.status = 409
         throw err
       }
@@ -436,8 +476,8 @@ router.post(
         err.status = 404
         throw err
       }
-      if (!['DRAFT', 'UNDER_REVIEW'].includes(campaign.status)) {
-        const err = new Error('Only pending or under-review campaign applications can be rejected')
+      if (campaign.status !== 'UNDER_REVIEW') {
+        const err = new Error('Only campaigns submitted for review can be rejected')
         err.status = 409
         throw err
       }

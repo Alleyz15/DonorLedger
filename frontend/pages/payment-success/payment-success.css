@@ -150,3 +150,72 @@
 .payment-success-state.is-error {
   color: #b91c1c;
 }
+
+/* ── Blockchain tracker callout ── */
+.payment-success-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: -8px 0 20px;
+  text-align: center;
+}
+
+.payment-tx-link {
+  color: #0d9488;
+  font-family: monospace;
+  font-size: 13px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.payment-tx-link:hover { text-decoration: underline; }
+
+.payment-tracker-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.payment-tracker-callout-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.payment-tracker-callout strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 4px;
+}
+
+.payment-tracker-callout p {
+  font-size: 13px;
+  color: #166534;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.payment-tracker-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  border-radius: 12px;
+  background: #065f46;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-top: 4px;
+}
+.payment-tracker-button:hover { background: #047857; }

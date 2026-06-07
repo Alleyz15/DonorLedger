@@ -125,6 +125,13 @@ router.post(
         // Do NOT set campaign status to COMPLETED here — the campaign may
         // still be collecting donations until its end date. Delivery
         // confirmation closes out one evidence package, not the whole campaign.
+
+        // Mark all APPROVED evidence for this campaign as CONFIRMED so the
+        // "Confirm Beneficiary Receipt" button does not reappear on refresh.
+        await prisma.evidence.updateMany({
+          where: { campaignId, status: 'APPROVED' },
+          data: { status: 'CONFIRMED' },
+        })
       }
 
       res.json({

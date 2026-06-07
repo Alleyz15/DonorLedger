@@ -232,6 +232,7 @@ enum EvidenceStatus {
   PENDING_AI       // Bull job queued — Gemini has not finished
   PENDING_REVIEW   // Gemini returned, Bank Islam needs to decide
   APPROVED         // Bank Islam called approveDisbursement()
+  CONFIRMED        // Beneficiary confirmed receipt via Bank Islam SMS
   REJECTED         // Bank Islam called rejectDisbursement()
   AUTO_FROZEN      // AI > 85 — pauseCampaign() fired automatically
 }

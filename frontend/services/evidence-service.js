@@ -8,7 +8,7 @@ const evidenceFields = [
   'recipientConfirm',
 ]
 
-export function submitEvidenceForReview(payload) {
+export function submitEvidenceForReview(payload, token) {
   const formData = new FormData()
   formData.set('campaignId', payload.campaignId)
   formData.set('vendorId', payload.vendorId)
@@ -21,5 +21,7 @@ export function submitEvidenceForReview(payload) {
     }
   })
 
-  return apiFormRequest('/evidence/submit', formData)
+  return apiFormRequest('/evidence/submit', formData, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
 }

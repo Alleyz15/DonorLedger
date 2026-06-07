@@ -1,6 +1,11 @@
-export function renderPaymentForm({ campaign, session }) {
-  const donorName = session?.user?.name || ''
+export function renderPaymentForm({ campaign, session, vendors = [] }) {
+  const donorName  = session?.user?.name  || ''
   const donorEmail = session?.user?.email || ''
+  const vendorOptions = vendors.length
+    ? vendors.map(v =>
+        `<option value="${escapeHtml(v.id)}">${escapeHtml(v.name)} — ${escapeHtml(v.serviceType || '')}</option>`
+      ).join('')
+    : '<option value="">No vendors linked yet</option>'
   return `
     <form class="payment-layout" novalidate>
       <section class="payment-personal-card">
@@ -47,9 +52,17 @@ export function renderPaymentForm({ campaign, session }) {
           </div>
         </section>
 
+        <label class="payment-field" style="margin-bottom:12px;">
+          <span>Earmark Your Donation To</span>
+          <select name="vendorId" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font:inherit;font-size:14px;">
+            ${vendorOptions}
+          </select>
+          <small style="color:#94a3b8;font-size:11px;margin-top:4px;display:block;">Your donation will be earmarked to this vendor on-chain.</small>
+        </label>
+
         <label class="payment-amount-field">
           <span>Donation Amount (RM)</span>
-          <strong>RM <input name="amount" type="number" min="1" step="0.01" value="1220.80" /></strong>
+          <strong>RM <input name="amount" type="number" min="1" step="0.01" value="50" /></strong>
         </label>
         <p class="payment-ledger-note">Every cent is tracked via our public blockchain ledger.</p>
 

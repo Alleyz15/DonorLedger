@@ -104,9 +104,9 @@ function renderStatus(status) {
 }
 
 function getStatusLabel(status) {
-  if (status === 'PENDING_KYC') return 'PENDING_KYC'
-  if (status === 'APPROVED') return 'APPROVED'
-  if (status === 'REJECTED') return 'REJECTED'
+  if (status === 'PENDING_KYC') return 'Pending KYC'
+  if (status === 'APPROVED') return 'Approved'
+  if (status === 'REJECTED') return 'Rejected'
   return String(status || '-').replaceAll('_', ' ')
 }
 

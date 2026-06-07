@@ -105,10 +105,13 @@ function renderAlertCard(alert) {
     scoreBadge = `<span class="admin-alerts-score ${scoreClass}">AI Score: ${score}/100</span>`
   }
 
+  const sevLabel = alert.severity === 'CRITICAL' ? '🔴 CRITICAL'
+    : alert.severity === 'WARNING' ? '🟠 WARNING' : '🔵 INFO'
+
   return `
     <article class="admin-alerts-card ${sevClass}">
       <div class="admin-alerts-card-top">
-        <span class="admin-alerts-card-severity ${sevClass}">${escapeHtml(alert.severity)}</span>
+        <span class="admin-alerts-card-severity ${sevClass}">${sevLabel}</span>
         <span class="admin-alerts-card-time">${formatDate(alert.createdAt)}</span>
       </div>
 
