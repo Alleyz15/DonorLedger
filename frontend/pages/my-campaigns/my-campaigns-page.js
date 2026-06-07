@@ -6,7 +6,7 @@ import {
   createCampaignsTable,
   renderCampaignError,
   renderCampaignRows,
-} from './components/campaigns-table.js?v=9'
+} from './components/campaigns-table.js?v=10'
 import { createSummaryCards, updateSummaryCards } from './components/summary-cards.js'
 
 const session = getSession()
