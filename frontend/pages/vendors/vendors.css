@@ -1,0 +1,34 @@
+.vendor-dashboard .campaign-summary-card:last-child::before {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+
+.vendor-dashboard .summary-icon-flag {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.vendors-table {
+  min-width: 940px;
+}
+
+.vendor-name-text {
+  display: block;
+  color: var(--neutral-900);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.vendor-service-cell,
+.vendor-reason-cell {
+  color: var(--neutral-600);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.vendor-reason-cell {
+  display: inline-block;
+  max-width: 220px;
+  color: var(--neutral-500);
+  line-height: 1.4;
+}
