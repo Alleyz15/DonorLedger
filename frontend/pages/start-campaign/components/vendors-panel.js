@@ -3,9 +3,9 @@ export function createVendorsPanel() {
   section.className = 'vendors-panel'
   section.innerHTML = `
     <label class="field">
-      <span>Approved Vendors</span>
+      <span>Approved Vendor</span>
       <select name="vendorId" data-vendors-list required>
-        <option value="">Select from Approved List</option>
+        <option value="">Loading vendors...</option>
       </select>
     </label>
   `
@@ -21,7 +21,7 @@ export function renderVendors(panel, vendors) {
     return
   }
 
-  list.innerHTML = '<option value="">Select from Approved List</option>'
+  list.innerHTML = '<option value="">Select an approved vendor...</option>'
   vendors.forEach((vendor) => {
     const option = document.createElement('option')
     option.value = vendor.id
