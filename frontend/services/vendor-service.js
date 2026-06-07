@@ -1,4 +1,12 @@
-import { apiFormRequest } from './api-client.js'
+import { apiFormRequest, apiRequest } from './api-client.js'
+
+export function getNGOVendors(token) {
+  return apiRequest('/ngo/vendors', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
 
 export function submitVendorForReview(payload) {
   const formData = new FormData()

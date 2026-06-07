@@ -54,7 +54,7 @@ async function submitVendor(event, form) {
   try {
     await submitVendorForReview(payload)
     setFormStatus(statusElement, 'Vendor submitted for review.', 'success')
-    window.setTimeout(() => { window.location.href = './my-campaigns.html' }, 900)
+    window.setTimeout(() => { window.location.href = './vendors.html' }, 900)
   } catch (error) {
     setFormStatus(statusElement, error.message, 'error')
   } finally {

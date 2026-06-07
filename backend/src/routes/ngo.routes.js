@@ -427,6 +427,8 @@ router.get('/vendors', requireNGO, async (req, res, next) => {
         walletAddress: true,
         status: true,
         createdAt: true,
+        approvedAt: true,
+        rejectedReason: true,
       },
     })
 
