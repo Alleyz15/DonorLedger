@@ -74,6 +74,34 @@ function serializeEvidence(evidence) {
   }
 }
 
+function sumEvidenceAmount(evidence, statuses) {
+  return evidence
+    .filter((item) => statuses.includes(item.status))
+    .reduce((sum, item) => sum + Number(item.amount), 0)
+}
+
+function buildCampaignClaimSummary(campaign) {
+  const evidence = campaign.evidence || []
+  const totalReceived = Number(campaign.raisedAmount || 0)
+  const approvedClaimAmount = sumEvidenceAmount(evidence, ['APPROVED', 'CONFIRMED'])
+  const pendingClaimAmount = sumEvidenceAmount(evidence, ['PENDING_REVIEW', 'AUTO_FROZEN'])
+  const rejectedClaimAmount = sumEvidenceAmount(evidence, ['REJECTED'])
+  const reservedAmount = approvedClaimAmount + pendingClaimAmount
+  const availableAmount = Math.max(totalReceived - reservedAmount, 0)
+
+  return {
+    totalReceived,
+    approvedClaimAmount,
+    pendingClaimAmount,
+    rejectedClaimAmount,
+    reservedAmount,
+    availableAmount,
+    pendingEvidenceCount: evidence.filter((item) =>
+      ['PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+    ).length,
+  }
+}
+
 const registerSchema = {
   name: { type: 'string', required: true, min: 2, max: 200 },
   registrationNum: { type: 'string', required: true, min: 3, max: 50 },
@@ -447,6 +475,12 @@ router.get('/campaigns/:id', requireNGO, async (req, res, next) => {
         endDate: true,
         status: true,
         createdAt: true,
+        evidence: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
       },
     })
 
@@ -456,10 +490,17 @@ router.get('/campaigns/:id', requireNGO, async (req, res, next) => {
       throw err
     }
 
+    const claimSummary = buildCampaignClaimSummary(campaign)
+    const { evidence, ...campaignData } = campaign
+
     res.json({
-      ...campaign,
+      ...campaignData,
       targetAmount: Number(campaign.targetAmount),
       raisedAmount: Number(campaign.raisedAmount),
+      claimSummary,
+      reservedAmount: claimSummary.reservedAmount,
+      availableAmount: claimSummary.availableAmount,
+      pendingEvidenceCount: claimSummary.pendingEvidenceCount,
     })
   } catch (e) {
     next(e)
