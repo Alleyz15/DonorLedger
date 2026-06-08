@@ -348,7 +348,7 @@ router.get('/campaigns', requireNGO, async (req, res, next) => {
           .filter((item) => item.status !== 'REJECTED')
           .reduce((sum, item) => sum + Number(item.amount), 0)
         const pendingEvidenceCount = c.evidence.filter((item) =>
-          ['PENDING_AI', 'PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+          ['PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
         ).length
         const raisedAmount = Number(c.raisedAmount)
         const { evidence, ...campaign } = c
