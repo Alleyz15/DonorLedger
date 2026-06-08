@@ -47,9 +47,7 @@ export function createSummaryCards() {
 export function updateSummaryCards(container, campaigns) {
   const counts = {
     total: campaigns.length,
-    active: campaigns.filter((campaign) =>
-      ['ACTIVE', 'APPROVED', 'VERIFIED'].includes(campaign.status)
-    ).length,
+    active: campaigns.filter((campaign) => campaign.status === 'ACTIVE').length,
     completed: campaigns.filter((campaign) => campaign.status === 'COMPLETED').length,
     flagged: campaigns.filter((campaign) =>
       ['FROZEN', 'REJECTED'].includes(campaign.status)

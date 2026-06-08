@@ -1,8 +1,6 @@
 const statusFilters = [
   { value: 'all', label: 'All Status' },
   { value: 'ACTIVE', label: 'Active' },
-  { value: 'APPROVED', label: 'Approved' },
-  { value: 'VERIFIED', label: 'Verified' },
   { value: 'DRAFT', label: 'Draft' },
   { value: 'UNDER_REVIEW', label: 'Under Review' },
   { value: 'FROZEN', label: 'Frozen' },
@@ -159,9 +157,9 @@ function renderCampaignRow(campaign) {
         <div class="campaign-title-cell">
           <span class="campaign-logo-placeholder" aria-hidden="true">${escapeHtml(getInitial(campaign.name))}</span>
           <div>
-            <a class="campaign-name-link" href="./ngo-campaign-detail.html?id=${encodeURIComponent(campaign.id)}">
+            <span class="campaign-name-text">
               ${escapeHtml(campaign.name)}
-            </a>
+            </span>
             <span>${escapeHtml(campaign.causeType || 'Campaign')}</span>
           </div>
         </div>
@@ -191,49 +189,53 @@ function renderStatusChip(label, statusClass) {
 
 function renderCampaignAction(campaign) {
   const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
+  const detailsButton = `
+    <a class="campaign-action-button is-secondary" href="./ngo-campaign-detail.html?id=${encodeURIComponent(campaign.id)}">
+      View Details
+    </a>
+  `
 
   if (campaign.status === 'DRAFT') {
     return `
-      <a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">
-        Edit Draft
-      </a>
+      <div class="campaign-row-actions">
+        <a class="campaign-action-button" href="./start-campaign.html?campaignId=${encodeURIComponent(campaign.id)}">
+          Edit Draft
+        </a>
+        ${detailsButton}
+      </div>
     `
   }
 
   if (campaign.status === 'UNDER_REVIEW') {
-    return '<span class="campaign-action-pending">Awaiting approval</span>'
+    return `<div class="campaign-row-actions">${detailsButton}</div>`
   }
 
   if (campaign.status === 'FROZEN') {
-    return '<span class="campaign-action-frozen">Campaign frozen</span>'
+    return `<div class="campaign-row-actions">${detailsButton}</div>`
   }
 
-  if (['VERIFIED', 'ACTIVE', 'APPROVED'].includes(campaign.status) && availableAmount > 0) {
+  if (campaign.status === 'ACTIVE' && availableAmount > 0) {
     return `
-      <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
-        Submit Evidence
-      </a>
+      <div class="campaign-row-actions">
+        <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
+          Submit Evidence
+        </a>
+        ${detailsButton}
+      </div>
     `
   }
 
-  if (
-    ['VERIFIED', 'ACTIVE', 'APPROVED', 'COMPLETED'].includes(campaign.status) &&
-    availableAmount <= 0
-  ) {
-    return '<span class="campaign-action-empty">Fully Released</span>'
+  if (campaign.status === 'ACTIVE' && availableAmount <= 0) {
+    return `<div class="campaign-row-actions">${detailsButton}</div>`
   }
 
-  return '<span class="campaign-action-empty">-</span>'
+  return `<div class="campaign-row-actions">${detailsButton}</div>`
 }
 
 function getCampaignStatusMeta(status) {
   switch (status) {
     case 'ACTIVE':
       return { label: 'Active', statusClass: 'is-active' }
-    case 'APPROVED':
-      return { label: 'Approved', statusClass: 'is-active' }
-    case 'VERIFIED':
-      return { label: 'Verified', statusClass: 'is-active' }
     case 'DRAFT':
       return { label: 'Draft', statusClass: 'is-draft' }
     case 'UNDER_REVIEW':
