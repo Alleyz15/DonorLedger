@@ -3,8 +3,8 @@
 // POST /api/evidence/submit  (multipart form upload — 5 documents)
 //
 // Section 13 — NGO uploads the 5-document package, we hash the bundle,
-// submit it on-chain, queue Gemini analysis. The HTTP response returns
-// IMMEDIATELY after the on-chain submit; AI analysis runs async via Bull.
+// submit it on-chain, queue Gemini analysis, and send it to Bank Islam
+// review immediately. AI analysis runs async via Bull.
 
 import { Router } from 'express'
 import prisma from '../config/database.js'
@@ -152,7 +152,7 @@ router.post(
           invoice: filePaths.invoice,
           deliveryProof: filePaths.deliveryProof,
           recipientConfirm: filePaths.recipientConfirm,
-          status: 'PENDING_AI',
+          status: 'PENDING_REVIEW',
         },
       })
 
@@ -178,7 +178,7 @@ router.post(
         onChainId,
         txHash,
         status: evidence.status,
-        message: 'Evidence submitted. AI analysis in progress.',
+        message: 'Evidence submitted for Bank Islam review.',
       })
     } catch (e) {
       next(e)
