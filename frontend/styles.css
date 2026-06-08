@@ -6,6 +6,8 @@
 @import './pages/register-ngo/register-ngo.css';
 @import './pages/my-campaigns/my-campaigns.css';
 @import './pages/vendors/vendors.css';
+@import './pages/document-management/document-management.css';
+@import './pages/evidence-detail/evidence-detail.css?v=2';
 @import './pages/start-campaign/start-campaign.css';
 @import './pages/submit-vendor/submit-vendor.css';
 @import './pages/submit-evidence/submit-evidence.css';

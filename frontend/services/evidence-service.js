@@ -12,6 +12,7 @@ export function submitEvidenceForReview(payload, token) {
   const formData = new FormData()
   formData.set('campaignId', payload.campaignId)
   formData.set('vendorId', payload.vendorId)
+  formData.set('title', payload.title)
   formData.set('category', payload.category)
   formData.set('amount', payload.amount)
 

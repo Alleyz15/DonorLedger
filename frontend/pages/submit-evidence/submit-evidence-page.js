@@ -41,6 +41,10 @@ async function renderSubmitEvidencePage() {
       </div>
 
       <div class="evidence-grid">
+        <label class="field evidence-title-field">
+          <span>Title</span>
+          <input name="title" type="text" maxlength="200" placeholder="e.g. Medical supplies reimbursement" required />
+        </label>
         <label class="field">
           <span>Approved Vendor</span>
           <select name="vendorId" required>
@@ -124,6 +128,7 @@ async function submitEvidence(event) {
   const payload = {
     campaignId,
     vendorId: String(formData.get('vendorId') || ''),
+    title: String(formData.get('title') || '').trim(),
     category: String(formData.get('category') || ''),
     amount: String(formData.get('amount') || ''),
     ssmDoc: formData.get('ssmDoc'),
@@ -133,8 +138,8 @@ async function submitEvidence(event) {
     recipientConfirm: formData.get('recipientConfirm'),
   }
 
-  if (!payload.campaignId || !payload.vendorId || !payload.category || !payload.amount) {
-    setFormStatus(status, 'Campaign, vendor, category and amount are required.', 'error')
+  if (!payload.campaignId || !payload.vendorId || !payload.title || !payload.category || !payload.amount) {
+    setFormStatus(status, 'Campaign, title, vendor, category and amount are required.', 'error')
     return
   }
   if (!evidenceFields.every((field) => payload[field] instanceof File && payload[field].size > 0)) {

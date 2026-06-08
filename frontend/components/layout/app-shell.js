@@ -23,7 +23,7 @@ const roleMenus = {
   ORGANIZER: [
     { label: 'My Campaigns',        href: './my-campaigns.html',  activeKey: 'my-campaigns' },
     { label: 'Vendor',              href: './vendors.html',       activeKey: 'submit-vendor' },
-    { label: 'Document Management', href: '#',                    activeKey: 'document-management', disabled: true },
+    { label: 'Document Management', href: './document-management.html', activeKey: 'document-management' },
   ],
   BANK_ADMIN: [
     { label: 'Dashboard',        href: './admin-dashboard.html', activeKey: 'admin-dashboard' },
