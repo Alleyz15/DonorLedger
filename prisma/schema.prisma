@@ -246,6 +246,7 @@ model Evidence {
   vendorId           String
   vendor             Vendor         @relation(fields: [vendorId], references: [id])
 
+  title              String?
   category           String         // "aid" | "logistics" | "admin"
   amount             Decimal        @db.Decimal(18, 2)
 

@@ -29,11 +29,17 @@ router.post(
   storageService.uploader.fields(fields),
   async (req, res, next) => {
     try {
-      const { campaignId, vendorId, category, amount } = req.body
-      if (!campaignId || !vendorId || !category || !amount) {
+      const { campaignId, vendorId, category, amount, title } = req.body
+      const evidenceTitle = String(title || '').trim()
+      if (!campaignId || !vendorId || !category || !amount || !evidenceTitle) {
         const err = new Error(
-          'campaignId, vendorId, category and amount are required'
+          'campaignId, vendorId, category, amount and title are required'
         )
+        err.status = 400
+        throw err
+      }
+      if (evidenceTitle.length > 200) {
+        const err = new Error('title must be 200 characters or fewer')
         err.status = 400
         throw err
       }
@@ -143,6 +149,7 @@ router.post(
         data: {
           campaignId,
           vendorId,
+          title: evidenceTitle,
           category,
           amount: requestedAmount,
           onChainId,
@@ -157,11 +164,17 @@ router.post(
       })
 
       // Push Gemini analysis off the HTTP thread (Section 5 — Bull/Redis)
-      await aiAnalysisQueue.add(
-        'analyse-disbursement',
-        { evidenceId: evidence.id },
-        { jobId: `evidence-${evidence.id}` }
-      )
+      try {
+        await aiAnalysisQueue.add(
+          'analyse-disbursement',
+          { evidenceId: evidence.id },
+          { jobId: `evidence-${evidence.id}` }
+        )
+      } catch (queueError) {
+        console.warn(
+          `[evidence] AI analysis queue unavailable for evidence ${evidence.id}: ${queueError.message}`
+        )
+      }
 
       // Section 13 — Bank Islam dashboard gets a notification of the new
       // evidence submission immediately (before AI finishes).
@@ -177,6 +190,7 @@ router.post(
         evidenceId: evidence.id,
         onChainId,
         txHash,
+        title: evidence.title,
         status: evidence.status,
         message: 'Evidence submitted for Bank Islam review.',
       })
