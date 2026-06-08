@@ -188,7 +188,7 @@ function renderStatusChip(label, statusClass) {
 }
 
 function renderCampaignAction(campaign) {
-  const availableAmount = Number(campaign.availableAmount ?? campaign.raisedAmount ?? 0)
+  const availableAmount = Number(campaign.availableAmount ?? 0)
   const detailsButton = `
     <a class="campaign-action-button is-secondary" href="./ngo-campaign-detail.html?id=${encodeURIComponent(campaign.id)}">
       View Details
@@ -218,14 +218,14 @@ function renderCampaignAction(campaign) {
     return `
       <div class="campaign-row-actions">
         <a class="campaign-action-button" href="./submit-evidence.html?campaignId=${encodeURIComponent(campaign.id)}">
-          Submit Evidence
+          Submit Disbursement Evidence
         </a>
         ${detailsButton}
       </div>
     `
   }
 
-  if (campaign.status === 'ACTIVE' && availableAmount <= 0) {
+  if (campaign.status === 'ACTIVE') {
     return `<div class="campaign-row-actions">${detailsButton}</div>`
   }
 

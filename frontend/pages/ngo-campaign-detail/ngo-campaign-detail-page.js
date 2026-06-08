@@ -88,17 +88,6 @@ function renderDetail(c) {
         </section>
       ` : ''}
 
-      ${c.status === 'ACTIVE' ? `
-        <div class="ngo-detail-actions-card">
-          <a class="ngo-detail-btn" href="./submit-evidence.html?campaignId=${encodeURIComponent(c.id)}">
-            Submit Disbursement Evidence
-          </a>
-          <a class="ngo-detail-btn is-secondary" href="./submit-vendor.html">
-            Register New Vendor
-          </a>
-        </div>
-      ` : ''}
-
     </div>
   `
 }

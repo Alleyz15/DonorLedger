@@ -152,34 +152,6 @@
 .ngo-detail-desc { font-size: 14px; line-height: 1.75; color: #475569; margin: 0; }
 
 /* ── Actions card ── */
-.ngo-detail-actions-card {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 16px;
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  grid-column: 1 / -1;
-}
-
-.ngo-detail-btn {
-  display: inline-flex;
-  align-items: center;
-  height: 44px;
-  padding: 0 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  background: #065f46;
-  color: #fff;
-}
-.ngo-detail-btn:hover { background: #047857; }
-.ngo-detail-btn.is-secondary { background: #fff; color: #065f46; border: 1.5px solid #bbf7d0; }
-.ngo-detail-btn.is-secondary:hover { background: #f0fdf4; }
-
 /* ── State ── */
 .ngo-detail-empty { color: #94a3b8; font-size: 13px; margin: 0; }
 .ngo-detail-state { padding: 64px; text-align: center; color: #94a3b8; font-size: 16px; font-weight: 600; }
