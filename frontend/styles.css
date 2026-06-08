@@ -50,9 +50,6 @@
 .ngo-detail-alloc-bar .is-admin    { background:#f59e0b; }
 .ngo-detail-alloc-note { font-size:11px; color:#94a3b8; margin-top:8px; }
 .ngo-detail-desc { font-size:14px; line-height:1.7; color:#475569; }
-.ngo-detail-actions-card { background:#f0fdf4; border-color:#bbf7d0; }
-.ngo-detail-action-btn { display:inline-block; padding:10px 20px; background:#0d9488; color:#fff; border-radius:8px; font-weight:700; font-size:14px; text-decoration:none; margin-right:12px; }
-.ngo-detail-action-btn.is-secondary { background:#fff; color:#0d9488; border:1.5px solid #0d9488; }
 .ngo-detail-state { padding:48px; text-align:center; color:#94a3b8; font-size:16px; font-weight:600; }
 .ngo-detail-state.is-error { color:#ef4444; }
 
