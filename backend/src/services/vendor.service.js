@@ -23,6 +23,16 @@ export async function submitVendor({
     err.status = 403
     throw err
   }
+
+  // Section 12 — shell vendor prevention: vendor wallet cannot match the
+  // NGO's own wallet. If they match, donated funds released to the "vendor"
+  // would flow straight back to the NGO — the core shell vendor fraud pattern.
+  if (ngo.walletAddress && walletAddress === ngo.walletAddress) {
+    const err = new Error('Vendor wallet address cannot match the NGO wallet address — shell vendor detected')
+    err.status = 400
+    throw err
+  }
+
   try {
     return await prisma.vendor.create({
       data: {
