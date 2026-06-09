@@ -1,7 +1,13 @@
 import { renderAppShell } from '../../components/layout/app-shell.js'
 import { getSession } from '../../services/auth-service.js'
 import { getActiveCampaigns } from '../../services/campaign-service.js'
-import { renderCampaignCards } from './components/campaign-card.js?v=3'
+import { createDonorSummaryCards, updateDonorSummaryCards } from './components/donor-summary-cards.js'
+import {
+  createDonorCampaignsGrid,
+  renderDonorCampaignRows,
+  bindDonorTableControls,
+  renderDonorCampaignError,
+} from './components/donor-campaigns-grid.js'
 
 const session = getSession()
 const shell = document.querySelector('#app-shell')
@@ -15,18 +21,13 @@ if (!session?.token) {
   renderDonorCampaignsPage()
 }
 
-function renderDonorCampaignsPage() {
+async function renderDonorCampaignsPage() {
   const content = document.createElement('div')
-  content.className = 'donor-campaign-page'
-  content.innerHTML = `
-    <header class="donor-page-heading">
-      <h1>Active Campaigns</h1>
-      <button class="donor-filter-button" type="button"><span aria-hidden="true"></span>Filter</button>
-    </header>
-    <section class="donor-campaign-grid" data-campaign-grid>
-      <p class="donor-empty-state">Loading campaigns...</p>
-    </section>
-  `
+  content.className = 'donor-dashboard'
+
+  const summaryCards = createDonorSummaryCards()
+  const grid = createDonorCampaignsGrid()
+  content.append(summaryCards, grid)
 
   renderAppShell({
     mount: shell,
@@ -37,36 +38,24 @@ function renderDonorCampaignsPage() {
     content,
   })
 
-  loadCampaigns(content)
-}
-
-async function loadCampaigns(content) {
-  const grid = content.querySelector('[data-campaign-grid]')
   try {
     const campaigns = await getActiveCampaigns()
-    grid.innerHTML = renderCampaignCards(campaigns)
+    updateDonorSummaryCards(summaryCards, campaigns)
+    renderDonorCampaignRows(grid, campaigns)
+    bindDonorTableControls(grid, campaigns)
   } catch (error) {
-    grid.innerHTML = `<p class="donor-empty-state is-error">${escapeHtml(error.message)}</p>`
+    renderDonorCampaignError(grid, error.message)
   }
 }
 
 function renderAccessDenied() {
   const panel = document.createElement('section')
-  panel.className = 'donor-campaign-page'
-  panel.innerHTML = '<p class="donor-empty-state">This page is only available for donor accounts.</p>'
+  panel.className = 'donor-dashboard'
+  panel.innerHTML = '<p class="donor-empty-cell" style="padding:48px;text-align:center;color:#64748b;font-size:16px;">This page is only available for donor accounts.</p>'
   renderAppShell({
     mount: shell,
     session,
     activeKey: 'donor-home',
     content: panel,
   })
-}
-
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
 }

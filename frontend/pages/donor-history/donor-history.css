@@ -39,11 +39,19 @@
 
 .donor-history-card > span {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
   margin-bottom: 14px;
   border-radius: 50%;
   background: #a7f3d0;
+  color: #064e3b;
+}
+
+.donor-history-card > span svg {
+  width: 20px;
+  height: 20px;
 }
 
 .donor-history-card p {
