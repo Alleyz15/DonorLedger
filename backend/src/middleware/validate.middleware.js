@@ -51,6 +51,8 @@ function checkField(value, rule, name) {
     case 'address':
       if (typeof value !== 'string' || !ADDRESS_RE.test(value))
         return `${name} must be a 0x-prefixed Ethereum address`
+      if (value === '0x0000000000000000000000000000000000000000')
+        return `${name} cannot be the zero address`
       break
   }
 
