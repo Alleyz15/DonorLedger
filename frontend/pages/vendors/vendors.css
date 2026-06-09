@@ -32,3 +32,36 @@
   color: var(--neutral-500);
   line-height: 1.4;
 }
+
+.vendor-startup-error {
+  width: min(560px, calc(100% - 32px));
+  margin: 80px auto;
+  padding: 28px;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, .08);
+  font-family: "DM Sans", sans-serif;
+}
+
+.vendor-startup-error h1 {
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.vendor-startup-error p {
+  margin: 0 0 18px;
+  color: #b91c1c;
+}
+
+.vendor-startup-error a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 16px;
+  background: #059669;
+  color: #fff;
+  font-weight: 700;
+}
