@@ -16,6 +16,92 @@ import { checkPassword, hashPassword } from '../utils/password.utils.js'
 
 const router = Router()
 
+function toUploadUrl(absPath) {
+  if (!absPath) return null
+  const normalized = absPath.replace(/\\/g, '/')
+  const marker = '/uploads/'
+  const index = normalized.lastIndexOf(marker)
+  return index >= 0 ? normalized.slice(index) : null
+}
+
+function getEvidenceProcessAt(evidence) {
+  if (['APPROVED', 'CONFIRMED'].includes(evidence.status)) {
+    return evidence.approvedAt
+  }
+  if (['REJECTED', 'AUTO_FROZEN'].includes(evidence.status)) {
+    return evidence.updatedAt
+  }
+  return null
+}
+
+function getEvidenceDocuments(evidence) {
+  const docs = [
+    ['ssmDoc', 'SSM Document', evidence.ssmDoc],
+    ['serviceAgreement', 'Service Agreement', evidence.serviceAgreement],
+    ['invoice', 'Invoice', evidence.invoice],
+    ['deliveryProof', 'Delivery Proof', evidence.deliveryProof],
+    ['recipientConfirm', 'Recipient Confirmation', evidence.recipientConfirm],
+  ]
+
+  return docs
+    .map(([key, label, path]) => ({
+      key,
+      label,
+      name: path ? path.replace(/\\/g, '/').split('/').pop() : null,
+      url: toUploadUrl(path),
+    }))
+    .filter((doc) => doc.url)
+}
+
+function serializeEvidence(evidence) {
+  return {
+    id: evidence.id,
+    title: evidence.title || null,
+    campaignId: evidence.campaignId,
+    campaignName: evidence.campaign?.name || 'Campaign',
+    vendorId: evidence.vendorId,
+    vendorName: evidence.vendor?.name || 'Vendor',
+    vendorServiceType: evidence.vendor?.serviceType || null,
+    category: evidence.category,
+    amount: Number(evidence.amount),
+    status: evidence.status,
+    submittedAt: evidence.createdAt,
+    processAt: getEvidenceProcessAt(evidence),
+    approvedAt: evidence.approvedAt,
+    rejectedReason: evidence.rejectedReason,
+    packageHash: evidence.packageHash,
+    documents: getEvidenceDocuments(evidence),
+  }
+}
+
+function sumEvidenceAmount(evidence, statuses) {
+  return evidence
+    .filter((item) => statuses.includes(item.status))
+    .reduce((sum, item) => sum + Number(item.amount), 0)
+}
+
+function buildCampaignClaimSummary(campaign) {
+  const evidence = campaign.evidence || []
+  const totalReceived = Number(campaign.raisedAmount || 0)
+  const approvedClaimAmount = sumEvidenceAmount(evidence, ['APPROVED', 'CONFIRMED'])
+  const pendingClaimAmount = sumEvidenceAmount(evidence, ['PENDING_REVIEW', 'AUTO_FROZEN'])
+  const rejectedClaimAmount = sumEvidenceAmount(evidence, ['REJECTED'])
+  const reservedAmount = approvedClaimAmount + pendingClaimAmount
+  const availableAmount = Math.max(totalReceived - reservedAmount, 0)
+
+  return {
+    totalReceived,
+    approvedClaimAmount,
+    pendingClaimAmount,
+    rejectedClaimAmount,
+    reservedAmount,
+    availableAmount,
+    pendingEvidenceCount: evidence.filter((item) =>
+      ['PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+    ).length,
+  }
+}
+
 const registerSchema = {
   name: { type: 'string', required: true, min: 2, max: 200 },
   registrationNum: { type: 'string', required: true, min: 3, max: 50 },
@@ -348,7 +434,7 @@ router.get('/campaigns', requireNGO, async (req, res, next) => {
           .filter((item) => item.status !== 'REJECTED')
           .reduce((sum, item) => sum + Number(item.amount), 0)
         const pendingEvidenceCount = c.evidence.filter((item) =>
-          ['PENDING_AI', 'PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
+          ['PENDING_REVIEW', 'AUTO_FROZEN'].includes(item.status)
         ).length
         const raisedAmount = Number(c.raisedAmount)
         const { evidence, ...campaign } = c
@@ -389,6 +475,12 @@ router.get('/campaigns/:id', requireNGO, async (req, res, next) => {
         endDate: true,
         status: true,
         createdAt: true,
+        evidence: {
+          select: {
+            status: true,
+            amount: true,
+          },
+        },
       },
     })
 
@@ -398,11 +490,66 @@ router.get('/campaigns/:id', requireNGO, async (req, res, next) => {
       throw err
     }
 
+    const claimSummary = buildCampaignClaimSummary(campaign)
+    const { evidence, ...campaignData } = campaign
+
     res.json({
-      ...campaign,
+      ...campaignData,
       targetAmount: Number(campaign.targetAmount),
       raisedAmount: Number(campaign.raisedAmount),
+      claimSummary,
+      reservedAmount: claimSummary.reservedAmount,
+      availableAmount: claimSummary.availableAmount,
+      pendingEvidenceCount: claimSummary.pendingEvidenceCount,
     })
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/evidence', requireNGO, async (req, res, next) => {
+  try {
+    const evidence = await prisma.evidence.findMany({
+      where: {
+        campaign: {
+          ngoId: req.ngo.sub,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        campaign: { select: { id: true, name: true } },
+        vendor: { select: { id: true, name: true, serviceType: true } },
+      },
+    })
+
+    res.json(evidence.map(serializeEvidence))
+  } catch (e) {
+    next(e)
+  }
+})
+
+router.get('/evidence/:id', requireNGO, async (req, res, next) => {
+  try {
+    const evidence = await prisma.evidence.findFirst({
+      where: {
+        id: req.params.id,
+        campaign: {
+          ngoId: req.ngo.sub,
+        },
+      },
+      include: {
+        campaign: { select: { id: true, name: true } },
+        vendor: { select: { id: true, name: true, serviceType: true } },
+      },
+    })
+
+    if (!evidence) {
+      const err = new Error('Evidence not found')
+      err.status = 404
+      throw err
+    }
+
+    res.json(serializeEvidence(evidence))
   } catch (e) {
     next(e)
   }

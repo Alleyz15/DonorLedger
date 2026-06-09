@@ -229,8 +229,7 @@ model Donation {
 // ---------------------------------------------------------------------------
 
 enum EvidenceStatus {
-  PENDING_AI       // Bull job queued — Gemini has not finished
-  PENDING_REVIEW   // Gemini returned, Bank Islam needs to decide
+  PENDING_REVIEW   // NGO submitted evidence; Bank Islam can review while AI analysis runs
   APPROVED         // Bank Islam called approveDisbursement()
   CONFIRMED        // Beneficiary confirmed receipt via Bank Islam SMS
   REJECTED         // Bank Islam called rejectDisbursement()
@@ -247,6 +246,7 @@ model Evidence {
   vendorId           String
   vendor             Vendor         @relation(fields: [vendorId], references: [id])
 
+  title              String?
   category           String         // "aid" | "logistics" | "admin"
   amount             Decimal        @db.Decimal(18, 2)
 
@@ -259,7 +259,7 @@ model Evidence {
   recipientConfirm   String?
   packageHash        String         // SHA-256 of the bundle
 
-  status             EvidenceStatus @default(PENDING_AI)
+  status             EvidenceStatus @default(PENDING_REVIEW)
 
   // AI analysis output (Section 14)
   aiConfidenceScore  Int?

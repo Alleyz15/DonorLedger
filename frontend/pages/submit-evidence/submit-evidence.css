@@ -12,7 +12,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  padding: 30px 34px 18px;
+  padding: 26px 34px 16px;
   border-bottom: 1px solid #dbe2ea;
 }
 
@@ -53,10 +53,10 @@
 }
 
 .evidence-body {
-  padding: 30px 34px 34px;
+  padding: 24px 34px 30px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* ── AI Gate Warning ── */
@@ -169,15 +169,30 @@
 .evidence-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
+}
+
+.evidence-card .field {
+  display: grid;
+  gap: 8px;
+}
+
+.evidence-card .field span {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.evidence-title-field {
+  grid-column: 1 / -1;
 }
 
 .evidence-card .field input,
 .evidence-card .field select {
-  min-height: 48px;
+  min-height: 46px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 11px 14px;
   background: #f8fafc;
   color: #111827;
   font: inherit;
@@ -186,7 +201,7 @@
 .evidence-upload-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
 .evidence-upload {
@@ -195,7 +210,7 @@
   gap: 8px;
   border: 1px dashed #94a3b8;
   border-radius: 10px;
-  padding: 18px;
+  padding: 16px 18px;
   background: #fbfbff;
   text-align: center;
   cursor: pointer;
@@ -242,7 +257,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 14px;
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 .evidence-actions a,

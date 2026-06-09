@@ -410,11 +410,32 @@
   box-shadow: 0 1px 3px rgba(5,150,105,.3), 0 0 0 0 rgba(16,185,129,.3);
 }
 
+.campaign-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.campaign-action-button.is-secondary {
+  border: 1px solid var(--g-100);
+  background: var(--g-25);
+  color: var(--g-700);
+  box-shadow: none;
+}
+
 .campaigns-primary-action:hover,
 .campaign-action-button:hover {
   background: var(--g-600);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(5,150,105,.35);
+}
+
+.campaign-action-button.is-secondary:hover {
+  border-color: var(--g-300);
+  background: var(--g-50);
+  color: var(--g-800);
+  box-shadow: 0 2px 8px rgba(5,150,105,.14);
 }
 
 .campaigns-primary-action:active,
@@ -519,7 +540,15 @@
 
 .campaign-name-link:hover { color: var(--g-600); }
 
-.campaign-title-cell > div > span {
+.campaign-name-text {
+  display: block;
+  color: var(--neutral-900);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.campaign-title-cell > div > span:not(.campaign-name-text) {
   display: block;
   margin-top: 3px;
   color: var(--neutral-400);
@@ -615,8 +644,7 @@
 }
 /* ─── Row action states ──────────────────────────────────────── */
 .campaign-action-pending,
-.campaign-action-frozen,
-.campaign-action-empty {
+.campaign-action-frozen {
   display: inline-block;
   color: var(--neutral-400);
   font-size: 12px;
@@ -625,7 +653,6 @@
 }
 
 .campaign-action-frozen { color: #dc2626; }
-.campaign-action-empty  { color: var(--neutral-300); }
 
 /* ─── Loading / empty / error states ────────────────────────── */
 .campaigns-loading-cell,

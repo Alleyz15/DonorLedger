@@ -290,7 +290,8 @@ export async function submitEvidence({
 }) {
   // NGO portal action — but on-chain it's the server wallet that submits
   // (donor-friendly UX: NGO never holds wallet keys).
-  const tx = await getCampaign(campaignAddress).submitEvidence(
+  const campaign = getCampaign(campaignAddress)
+  const tx = await campaign.submitEvidence(
     packageHash,
     category,
     ringgitToWei(amount),
@@ -301,9 +302,10 @@ export async function submitEvidence({
   // Parse EvidenceSubmitted event to extract evidenceId.
   // Use topic hash matching first (robust across chains including Monad),
   // then fall back to full iface.parseLog.
-  const iface = getCampaign(campaignAddress).interface
+  const iface = campaign.interface
   const eventFragment = iface.getEvent('EvidenceSubmitted')
-  const topicHash = eventFragment ? iface.getEventTopic('EvidenceSubmitted') : null
+  const topicHash =
+    eventFragment?.topicHash || ethers.id('EvidenceSubmitted(uint256,string,uint256)')
 
   for (const log of receipt.logs) {
     try {
@@ -324,7 +326,6 @@ export async function submitEvidence({
   // Last resort: try to read evidenceId directly from the contract state
   // (evidenceList.length - 1 is the last submitted id)
   try {
-    const campaign = getCampaign(campaignAddress)
     const count = await campaign.evidenceCount()
     if (count > 0n) {
       return { txHash: receipt.hash, evidenceId: Number(count) - 1 }

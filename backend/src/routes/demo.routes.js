@@ -195,7 +195,7 @@ router.post(
           amount: fraudulentAmount,
           onChainId,
           packageHash,
-          status: 'PENDING_AI',
+          status: 'PENDING_REVIEW',
         },
       })
 
