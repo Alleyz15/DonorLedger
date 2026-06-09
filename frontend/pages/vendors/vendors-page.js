@@ -1,27 +1,33 @@
-import { renderAppShell } from '../../components/layout/app-shell.js'
-import { getSession } from '../../services/auth-service.js'
-import { getNGOVendors } from '../../services/vendor-service.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260609-vendors'
+import { getSession } from '../../services/auth-service.js?v=20260609-vendors'
+import { getNGOVendors } from '../../services/vendor-service.js?v=20260609-vendors'
 import {
   createVendorSummaryCards,
   updateVendorSummaryCards,
-} from './components/vendor-summary-cards.js'
+} from './components/vendor-summary-cards.js?v=20260609-vendors'
 import {
   bindVendorTableControls,
   createVendorsTable,
   renderVendorError,
   renderVendorRows,
-} from './components/vendors-table.js'
+} from './components/vendors-table.js?v=20260609-vendors'
 
-const session = getSession()
 const shell = document.querySelector('#app-shell')
-const canViewNGOPage = session?.token && ['ORGANIZER', 'NGO'].includes(session.role)
+let session
 
-if (!session?.token) {
-  window.location.href = './login.html'
-} else if (!canViewNGOPage) {
-  renderAccessDenied()
-} else {
-  renderVendorsPage()
+try {
+  session = getSession()
+  const canViewNGOPage = session?.token && ['ORGANIZER', 'NGO'].includes(session.role)
+
+  if (!session?.token) {
+    window.location.href = './login.html'
+  } else if (!canViewNGOPage) {
+    renderAccessDenied()
+  } else {
+    renderVendorsPage()
+  }
+} catch (error) {
+  renderStartupError(error)
 }
 
 async function renderVendorsPage() {
@@ -72,4 +78,25 @@ function renderAccessDenied() {
     activeKey: 'submit-vendor',
     content: panel,
   })
+}
+
+function renderStartupError(error) {
+  if (!shell) return
+
+  shell.innerHTML = `
+    <section class="vendor-startup-error">
+      <h1>Vendor page could not start</h1>
+      <p>${escapeHtml(error?.message || 'Unknown browser error')}</p>
+      <a href="./my-campaigns.html">Back to My Campaigns</a>
+    </section>
+  `
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
 }
