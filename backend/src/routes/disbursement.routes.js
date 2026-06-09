@@ -37,6 +37,18 @@ router.post(
         err.status = 409
         throw err
       }
+      if (['REJECTED', 'AUTO_FROZEN'].includes(evidence.status)) {
+        const err = new Error(`Cannot approve evidence with status ${evidence.status}`)
+        err.status = 409
+        throw err
+      }
+      // Section 14 — AI auto-freeze locks the campaign. Bank Islam must
+      // unfreeze via /admin/campaign/:id/unfreeze before approving disbursements.
+      if (evidence.campaign.status === 'FROZEN') {
+        const err = new Error('Campaign is frozen — unfreeze it before approving disbursements')
+        err.status = 409
+        throw err
+      }
       // Section 8 — Bank Islam wallet signs the approval on-chain.
       // In demo mode (no deployed contract), skip the chain call and use a
       // placeholder tx hash so the rest of the approval flow works normally.
@@ -110,6 +122,11 @@ router.post(
         err.status = 404
         throw err
       }
+      if (['APPROVED', 'REJECTED', 'CONFIRMED'].includes(evidence.status)) {
+        const err = new Error(`Cannot reject evidence with status ${evidence.status}`)
+        err.status = 409
+        throw err
+      }
 
       let txHash = 'demo-tx-' + Date.now()
       if (evidence.campaign.contractAddress && evidence.onChainId !== null) {
@@ -145,32 +162,7 @@ router.post(
   }
 )
 
-router.post(
-  '/unpause',
-  requireRole('SUPER_ADMIN'),
-  validate({ campaignId: { type: 'string', required: true } }),
-  async (req, res, next) => {
-    try {
-      const campaign = await prisma.campaign.findUnique({
-        where: { id: req.body.campaignId },
-      })
-      if (!campaign) {
-        const err = new Error('Campaign not found')
-        err.status = 404
-        throw err
-      }
-      const { txHash } = await contractService.unpauseCampaign(
-        campaign.contractAddress
-      )
-      await prisma.campaign.update({
-        where: { id: campaign.id },
-        data: { status: 'ACTIVE', pausedReason: null },
-      })
-      res.json({ campaignId: campaign.id, txHash, status: 'ACTIVE' })
-    } catch (e) {
-      next(e)
-    }
-  }
-)
+// Unfreeze/unpause lives in admin.routes.js POST /admin/campaign/:id/unfreeze
+// (SUPER_ADMIN only). Removed duplicate here to avoid confusion.
 
 export default router
