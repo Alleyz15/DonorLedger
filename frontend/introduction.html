@@ -4,6 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DonorLedger</title>
+    <script>
+      ;(function redirectAuthenticatedUser() {
+        try {
+          var rawSession = localStorage.getItem('donorledger.auth')
+          if (!rawSession) return
+
+          var session = JSON.parse(rawSession)
+          if (!session || !session.token) return
+
+          var role = session.role === 'NGO' ? 'ORGANIZER' : session.role
+          var roleHomes = {
+            DONOR: './donor-campaigns.html',
+            ORGANIZER: './my-campaigns.html',
+            BANK_ADMIN: './admin-dashboard.html',
+          }
+          var destination = roleHomes[role]
+
+          if (destination) {
+            window.location.replace(destination)
+          }
+        } catch (_error) {
+          localStorage.removeItem('donorledger.auth')
+        }
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -37,7 +62,7 @@
           </p>
 
           <div class="hero-actions">
-            <a class="button button-primary" href="./login.html">Join Us As Donor</a>
+            <a class="button button-primary" href="./login.html">Join Us</a>
             <a class="button button-secondary" href="./login.html?role=ngo">
               Join Us As Organizer
             </a>
