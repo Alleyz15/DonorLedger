@@ -229,7 +229,13 @@ router.get('/alerts', async (req, res, next) => {
       orderBy: { createdAt: 'desc' },
       take: 100,
       include: {
-        campaign: { select: { id: true, name: true } },
+        campaign: {
+          select: {
+            id: true,
+            name: true,
+            ngo: { select: { id: true, name: true } },
+          },
+        },
         evidence: { select: { id: true, category: true, amount: true } },
       },
     })

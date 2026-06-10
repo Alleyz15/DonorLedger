@@ -11,7 +11,7 @@
 // The AI market price analysis (priceAnalysis field) is shown here so
 // reviewers can immediately see if an NGO is over-charging for supplies.
 
-import { renderAppShell } from '../../components/layout/app-shell.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260610-alert-popover'
 import { getSession } from '../../services/auth-service.js'
 import { getAdminEvidence, approveDisbursement, rejectDisbursement } from '../../services/admin-service.js'
 import { API_BASE_URL } from '../../config/api-config.js'

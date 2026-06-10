@@ -1,5 +1,6 @@
 // ── Icons ──────────────────────────────────────────────────────────────
 import { clearSession } from '../../services/auth-service.js'
+import { getAdminAlerts } from '../../services/admin-service.js'
 
 const ICONS = {
   'my-campaigns': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>`,
@@ -27,7 +28,6 @@ const roleMenus = {
   ],
   BANK_ADMIN: [
     { label: 'Dashboard',        href: './admin-dashboard.html', activeKey: 'admin-dashboard' },
-    { label: 'Alerts',           href: './admin-alerts.html',    activeKey: 'admin-alerts' },
     { label: 'NGOs',             href: './admin-ngos.html',      activeKey: 'admin-ngos' },
     { label: 'Vendors',          href: './admin-vendors.html',   activeKey: 'admin-vendors' },
     { label: 'Campaigns',        href: './admin-campaigns.html', activeKey: 'admin-campaigns' },
@@ -83,6 +83,7 @@ export function renderAppShell({
         </label>
 
         <div class="app-header-end">
+          ${renderHeaderActions(role, activeKey)}
           <div class="app-user" data-user-menu>
             <div class="app-user-info">
               <strong>${escapeHtml(displayName)}</strong>
@@ -109,6 +110,7 @@ export function renderAppShell({
   mount.querySelector('.app-content')?.append(content)
 
   bindUserMenu(mount)
+  bindAdminNotifications(mount, session, role)
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -133,6 +135,40 @@ function renderMenu(role, activeKey) {
 
 function getMenu(role)           { return roleMenus[role] || [] }
 function normalizeRole(role)     { return role === 'NGO' ? 'ORGANIZER' : role }
+
+function renderHeaderActions(role, activeKey) {
+  if (role !== 'BANK_ADMIN') return ''
+
+  return `
+    <div class="app-notification" data-admin-notifications>
+      <button class="app-header-icon-button" type="button" title="Notifications" aria-label="Open notifications" aria-expanded="false" data-notification-toggle>
+        ${ICONS['admin-alerts']}
+        <span class="app-notification-dot" data-notification-dot hidden></span>
+      </button>
+      <section class="app-notification-panel" aria-label="Notifications" aria-hidden="true">
+        <header class="app-notification-header">
+          <h2>Notifications</h2>
+        </header>
+        <div class="app-notification-tabs" role="tablist" aria-label="Notification severity">
+          ${renderNotificationTab('CRITICAL', 'Critical', true)}
+          ${renderNotificationTab('WARNING', 'Warning')}
+          ${renderNotificationTab('INFO', 'Info')}
+        </div>
+        <div class="app-notification-list" data-notification-list>
+          <p class="app-notification-state">Loading notifications...</p>
+        </div>
+      </section>
+    </div>
+  `
+}
+
+function renderNotificationTab(value, label, active = false) {
+  return `
+    <button class="app-notification-tab${active ? ' is-active' : ''}" type="button" role="tab" aria-selected="${active}" data-notification-tab="${value}">
+      ${escapeHtml(label)}
+    </button>
+  `
+}
 
 function getRoleHome(role) {
   if (role === 'BANK_ADMIN') return './admin-dashboard.html'
@@ -172,6 +208,114 @@ function bindUserMenu(mount) {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') setOpen(false)
   })
+}
+
+function bindAdminNotifications(mount, session, role) {
+  if (role !== 'BANK_ADMIN') return
+
+  const root = mount.querySelector('[data-admin-notifications]')
+  const toggle = root?.querySelector('[data-notification-toggle]')
+  const panel = root?.querySelector('.app-notification-panel')
+  const dot = root?.querySelector('[data-notification-dot]')
+  const list = root?.querySelector('[data-notification-list]')
+  const tabs = Array.from(root?.querySelectorAll('[data-notification-tab]') || [])
+  if (!root || !toggle || !panel || !list || !tabs.length) return
+
+  let alerts = []
+  let activeSeverity = 'CRITICAL'
+  let loaded = false
+
+  const setOpen = (isOpen) => {
+    root.classList.toggle('is-open', isOpen)
+    toggle.setAttribute('aria-expanded', String(isOpen))
+    panel.setAttribute('aria-hidden', String(!isOpen))
+    if (isOpen && !loaded) syncAlerts({ showLoading: true })
+  }
+
+  const render = () => {
+    const filtered = alerts.filter((alert) => alert.severity === activeSeverity)
+    if (!filtered.length) {
+      list.innerHTML = `<p class="app-notification-state">No ${activeSeverity.toLowerCase()} notifications.</p>`
+      return
+    }
+
+    list.innerHTML = filtered.slice(0, 8).map(renderNotificationItem).join('')
+  }
+
+  const syncAlerts = async ({ showLoading = false } = {}) => {
+    loaded = true
+    if (showLoading) {
+      list.innerHTML = '<p class="app-notification-state">Loading notifications...</p>'
+    }
+
+    try {
+      alerts = await getAdminAlerts(session.token)
+      const hasUnread = alerts.some((alert) => !alert.delivered)
+      if (dot) dot.hidden = !hasUnread
+      if (showLoading || root.classList.contains('is-open')) render()
+    } catch (error) {
+      if (showLoading) {
+        list.innerHTML = `<p class="app-notification-state is-error">${escapeHtml(error.message)}</p>`
+      }
+    }
+  }
+
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation()
+    setOpen(!root.classList.contains('is-open'))
+  })
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      activeSeverity = tab.dataset.notificationTab
+      tabs.forEach((item) => {
+        const isActive = item === tab
+        item.classList.toggle('is-active', isActive)
+        item.setAttribute('aria-selected', String(isActive))
+      })
+      render()
+    })
+  })
+
+  document.addEventListener('click', (event) => {
+    if (!root.contains(event.target)) setOpen(false)
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false)
+  })
+
+  syncAlerts({ showLoading: true })
+  window.setInterval(() => syncAlerts(), 30000)
+}
+
+function renderNotificationItem(alert) {
+  const organization = alert.campaign?.ngo?.name || 'Organization'
+  const initial = getInitials(organization).charAt(0) || 'O'
+
+  return `
+    <article class="app-notification-item">
+      <span class="app-notification-avatar" aria-hidden="true">${escapeHtml(initial)}</span>
+      <div class="app-notification-body">
+        <div class="app-notification-item-top">
+          <strong>${escapeHtml(organization)}</strong>
+          <time>${formatNotificationDate(alert.createdAt)}</time>
+        </div>
+        <p>${escapeHtml(alert.message)}</p>
+      </div>
+    </article>
+  `
+}
+
+function formatNotificationDate(value) {
+  if (!value) return '-'
+  return new Intl.DateTimeFormat('en-MY', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
 }
 
 function getRoleLabel(role) {

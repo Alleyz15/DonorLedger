@@ -4,7 +4,7 @@
 // Pulls stats from /admin/campaigns and /admin/alerts — no new backend
 // endpoints needed. Derives NGO and campaign counts from existing data.
 
-import { renderAppShell } from '../../components/layout/app-shell.js?v=20260609-logout-welcome'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260610-alert-popover'
 import { getSession } from '../../services/auth-service.js'
 import { getAdminCampaigns, getAdminAlerts } from '../../services/admin-service.js'
 
@@ -45,7 +45,6 @@ function renderDashboard() {
       <section class="admin-dashboard-panel">
         <header class="admin-dashboard-panel-header">
           <h2>Recent Alerts</h2>
-          <a class="admin-dashboard-panel-link" href="./admin-alerts.html">View all →</a>
         </header>
         <ul class="admin-dashboard-alert-list" data-alert-list>
           <li class="admin-dashboard-empty">Loading alerts...</li>

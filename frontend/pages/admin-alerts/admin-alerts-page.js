@@ -5,7 +5,7 @@
 //
 // Donors never see this page. Scores are for Bank Islam eyes only.
 
-import { renderAppShell } from '../../components/layout/app-shell.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260610-alert-popover'
 import { getSession } from '../../services/auth-service.js'
 import { getAdminAlerts } from '../../services/admin-service.js'
 
@@ -91,6 +91,8 @@ function renderList(content) {
 }
 
 function renderAlertCard(alert) {
+  alert = { ...alert, evidence: null }
+
   const sevClass = alert.severity === 'CRITICAL' ? 'is-critical'
     : alert.severity === 'WARNING' ? 'is-warning' : 'is-info'
 

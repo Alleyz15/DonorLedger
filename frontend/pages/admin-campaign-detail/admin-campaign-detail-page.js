@@ -1,4 +1,4 @@
-import { renderAppShell } from '../../components/layout/app-shell.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260610-alert-popover'
 import { getSession } from '../../services/auth-service.js'
 import { getAdminCampaignDetail, approveCampaign, rejectCampaign } from '../../services/admin-service.js'
 
