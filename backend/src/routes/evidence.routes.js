@@ -182,7 +182,7 @@ router.post(
         campaignId,
         evidenceId: evidence.id,
         severity: 'INFO',
-        message: `New disbursement evidence submitted (${category}, RM${amount})`,
+        message: `New disbursement evidence has been submitted for the ${category.charAt(0).toUpperCase() + category.slice(1)} category, amounting to RM${amount}.`,
         payload: { txHash, onChainId },
       })
 
