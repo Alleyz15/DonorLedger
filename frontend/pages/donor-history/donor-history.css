@@ -628,3 +628,216 @@
     flex-direction: column;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Donation Statement (PDF export) — invoice-style but kept light and friendly.
+   Rendered off-screen at a fixed A4 width, then snapshotted to PDF.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.donor-statement {
+  width: 794px;
+  padding: 0;
+  background: #ffffff;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #0f172a;
+}
+
+.donor-statement-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 36px 48px;
+  background: #064e3b;
+  color: #ffffff;
+}
+
+.donor-statement-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.donor-statement-logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.donor-statement-tagline {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a7f3d0;
+}
+
+.donor-statement-meta {
+  text-align: right;
+}
+
+.donor-statement-meta h1 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.donor-statement-meta p {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #d1fae5;
+}
+
+.donor-statement-meta strong {
+  color: #ffffff;
+}
+
+.donor-statement-parties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 28px 48px 0;
+}
+
+.donor-statement-parties div {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #f8fafc;
+}
+
+.donor-statement-parties span {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.donor-statement-parties strong {
+  display: block;
+  color: #052e23;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.donor-statement-parties p {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.donor-statement-table {
+  width: calc(100% - 96px);
+  margin: 24px 48px 0;
+  border-collapse: collapse;
+}
+
+.donor-statement-table th {
+  padding: 10px 12px;
+  border-bottom: 2px solid #064e3b;
+  color: #064e3b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.donor-statement-table th:last-child,
+.donor-statement-table td:last-child,
+.donor-statement-table tfoot td:last-child {
+  text-align: right;
+}
+
+.donor-statement-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+.donor-statement-table td strong {
+  display: block;
+  color: #052e23;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.donor-statement-table td span {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.donor-statement-table tfoot td {
+  padding: 14px 12px;
+  border-bottom: none;
+  background: #ecfdf5;
+  color: #052e23;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.donor-statement-table tfoot td:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.donor-statement-table tfoot td:last-child {
+  border-radius: 0 10px 10px 0;
+  color: #064e3b;
+  font-size: 16px;
+}
+
+.donor-statement-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 24px 48px 0;
+}
+
+.donor-statement-status div {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.donor-statement-status span {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.donor-statement-status strong {
+  color: #052e23;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.donor-statement-status code {
+  color: #064e3b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.donor-statement-footer {
+  margin: 28px 0 0;
+  padding: 20px 48px 36px;
+  border-top: 1px solid #edf2f7;
+}
+
+.donor-statement-footer p {
+  margin: 0 0 6px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.donor-statement-small {
+  color: #94a3b8 !important;
+  font-size: 10px !important;
+}

@@ -161,8 +161,8 @@ async function handleReceiptClick(event) {
     return
   }
 
-  // Per-donation "Export Statement" — downloads a CSV containing only this
-  // single donation's row, not the donor's entire history.
+  // Per-donation "Export Statement" — downloads a PDF containing only this
+  // single donation, not the donor's entire history.
   const exportButton = event.target.closest('[data-export-hash]')
   if (exportButton) {
     const donation = donationHistory?.donations?.find(
@@ -172,7 +172,17 @@ async function handleReceiptClick(event) {
       alert('Donation could not be found for export.')
       return
     }
-    exportDonationCSV(donation)
+    const originalLabel = exportButton.textContent
+    exportButton.disabled = true
+    exportButton.textContent = 'Preparing...'
+    try {
+      await exportDonationPDF(donation)
+    } catch (error) {
+      alert(error.message || 'Statement could not be generated.')
+    } finally {
+      exportButton.disabled = false
+      exportButton.textContent = originalLabel
+    }
     return
   }
 
@@ -405,51 +415,142 @@ function getCampaignStatusMeta(status) {
   return { label: status || '—', color: '#94a3b8' }
 }
 
-// ── CSV Export ──────────────────────────────────────────────────────────────
-// Generates a statement CSV for a single donation and triggers a browser
-// download. The Transaction Hash column is the key differentiator — no
-// other Malaysian charity platform can provide an immutable on-chain
-// reference per donation.
-function exportDonationCSV(donation) {
-  const headers = [
-    'Date',
-    'Campaign',
-    'NGO',
-    'Cause',
-    'Amount (RM)',
-    'Status',
-    'Transaction Hash',
-  ]
+// ── PDF Export ──────────────────────────────────────────────────────────────
+// Generates a one-page "donation statement" — invoice-style but kept light
+// and friendly — for a single donation, and downloads it as a PDF. Uses the
+// same data fields that previously went into the CSV (date, campaign, NGO,
+// cause, amount, status, transaction hash). The Transaction Hash row is the
+// key differentiator — no other Malaysian charity platform can provide an
+// immutable on-chain reference per donation.
+async function exportDonationPDF(donation) {
+  if (!window.html2canvas || !window.jspdf) {
+    throw new Error('Statement tools are still loading — please try again in a moment.')
+  }
 
-  const row = [
-    formatDateFull(donation.createdAt),
-    donation.campaignName || '—',
-    donation.ngoName || '—',
-    formatCause(donation.causeType || '—'),
-    Number(donation.amount || 0).toFixed(2),
-    donation.campaignStatus || 'Active',
-    donation.txHash || 'Pending',
-  ]
+  const ref = buildStatementRef(donation)
+  const node = document.createElement('div')
+  node.innerHTML = renderStatementTemplate(donation, ref)
+  const statement = node.firstElementChild
 
-  const csv = [headers, row]
-    .map((line) => line.map(csvCell).join(','))
-    .join('\r\n')
+  // Render off-screen at a fixed A4-ish width so the snapshot is consistent
+  // regardless of the viewport size of the page underneath it.
+  statement.style.position = 'fixed'
+  statement.style.top = '0'
+  statement.style.left = '-10000px'
+  document.body.appendChild(statement)
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url  = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href     = url
-  const datePart = new Date(donation.createdAt).toISOString().slice(0, 10)
-  const refPart  = formatHash(donation.txHash).replace(/[^a-zA-Z0-9]/g, '')
-  link.download = `DonorLedger-Statement-${datePart}-${refPart || 'pending'}.csv`
-  link.click()
-  URL.revokeObjectURL(url)
+  try {
+    const canvas = await window.html2canvas(statement, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+    })
+
+    const { jsPDF } = window.jspdf
+    const pdf = new jsPDF('p', 'pt', 'a4')
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const imgHeight = (canvas.height * pageWidth) / canvas.width
+    const renderHeight = Math.min(imgHeight, pageHeight)
+
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, renderHeight)
+
+    const datePart = new Date(donation.createdAt).toISOString().slice(0, 10)
+    pdf.save(`DonorLedger-Statement-${datePart}-${ref}.pdf`)
+  } finally {
+    statement.remove()
+  }
 }
 
-// Wraps a cell value in quotes and escapes internal quotes for CSV safety.
-function csvCell(value) {
-  const str = String(value ?? '').replaceAll('"', '""')
-  return `"${str}"`
+// Short, human-friendly statement reference derived from the tx hash (or
+// donor hash if the transaction hasn't confirmed yet).
+function buildStatementRef(donation) {
+  const source = donation.txHash || donation.donorHash || ''
+  const clean = String(source).replace(/^0x/i, '').slice(0, 8).toUpperCase()
+  return clean || 'PENDING'
+}
+
+// Invoice-style statement, kept visually light: a colored header band for
+// brand identity, a clean line-item table for the donation itself, and a
+// simple blockchain reference block instead of dense legal boilerplate.
+function renderStatementTemplate(donation, ref) {
+  const donorName = session?.user?.name || session?.user?.email || 'Valued Donor'
+  const donorEmail = session?.user?.email || '—'
+  const status = formatCause(donation.campaignStatus || 'Active')
+  const amount = formatMoney(donation.amount)
+
+  return `
+    <div class="donor-statement">
+      <header class="donor-statement-header">
+        <div class="donor-statement-brand">
+          <span class="donor-statement-logo">DonorLedger</span>
+          <span class="donor-statement-tagline">Blockchain-Verified Giving</span>
+        </div>
+        <div class="donor-statement-meta">
+          <h1>Donation Statement</h1>
+          <p>Statement No. <strong>${escapeHtml(ref)}</strong></p>
+          <p>Date Issued: ${escapeHtml(formatDateFull(new Date()))}</p>
+        </div>
+      </header>
+
+      <section class="donor-statement-parties">
+        <div>
+          <span>Donor</span>
+          <strong>${escapeHtml(donorName)}</strong>
+          <p>${escapeHtml(donorEmail)}</p>
+        </div>
+        <div>
+          <span>Recipient Organization</span>
+          <strong>${escapeHtml(donation.ngoName || '—')}</strong>
+          <p>${escapeHtml(donation.campaignName || '—')}</p>
+        </div>
+      </section>
+
+      <table class="donor-statement-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Cause</th>
+            <th>Date</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>${escapeHtml(donation.campaignName || '—')}</strong>
+              <span>Donation via DuitNow</span>
+            </td>
+            <td>${escapeHtml(formatCause(donation.causeType))}</td>
+            <td>${escapeHtml(formatDateFull(donation.createdAt))}</td>
+            <td>${escapeHtml(amount)}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">Total Donated</td>
+            <td>${escapeHtml(amount)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <section class="donor-statement-status">
+        <div>
+          <span>Status</span>
+          <strong>${escapeHtml(status)}</strong>
+        </div>
+        <div>
+          <span>Blockchain Reference</span>
+          <code>${escapeHtml(formatHash(donation.txHash))}</code>
+        </div>
+      </section>
+
+      <footer class="donor-statement-footer">
+        <p>Thank you for your contribution. Every ringgit is held by Bank Islam in escrow and tracked on-chain until it reaches a verified recipient.</p>
+        <p class="donor-statement-small">This statement was generated by DonorLedger and reflects an immutable on-chain donation record.</p>
+      </footer>
+    </div>
+  `
 }
 
 function formatDateFull(value) {
