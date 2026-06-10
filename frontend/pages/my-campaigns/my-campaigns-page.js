@@ -1,4 +1,4 @@
-import { renderAppShell } from '../../components/layout/app-shell.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260609-logout-welcome'
 import { getNGOCampaigns } from '../../services/campaign-service.js'
 import { getSession } from '../../services/auth-service.js'
 import {

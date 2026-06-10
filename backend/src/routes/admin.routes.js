@@ -72,6 +72,8 @@ router.post(
   validate({ reason: { type: 'string', required: true, min: 3 } }),
   async (req, res, next) => {
     try {
+      // revokedReason is reused for rejection reason — schema has one field
+      // for both REJECTED and REVOKED states. The status field disambiguates.
       const ngo = await prisma.nGO.update({
         where: { id: req.params.id },
         data: {
@@ -89,7 +91,7 @@ router.post(
 
 router.post(
   '/ngo/:id/renew',
-  requireRole('KYC_REVIEWER', 'SUPER_ADMIN'),
+  requireRole('SUPER_ADMIN'),
   async (req, res, next) => {
     try {
       const ngo = await kycService.renewNGOCredential({
@@ -279,46 +281,8 @@ router.get('/evidence/pending', async (req, res, next) => {
   }
 })
 
-router.get('/campaign/:id', async (req, res, next) => {
-  try {
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: req.params.id },
-      include: {
-        ngo: {
-          select: {
-            id: true,
-            name: true,
-            registrationNum: true,
-            riskTier: true,
-            status: true,
-          },
-        },
-        vendors: {
-          select: {
-            id: true,
-            name: true,
-            serviceType: true,
-            status: true,
-            walletAddress: true,
-          },
-        },
-      },
-    })
-    if (!campaign) {
-      const err = new Error('Campaign not found')
-      err.status = 404
-      throw err
-    }
-    res.json({
-      ...campaign,
-      targetAmount: Number(campaign.targetAmount),
-      raisedAmount: Number(campaign.raisedAmount),
-    })
-  } catch (e) {
-    next(e)
-  }
-})
-
+// Specific routes MUST come before /campaign/:id — Express matches top-down.
+// /campaign/pending would be swallowed by /:id if placed after it (id="pending" → 404).
 router.get('/campaigns', async (req, res, next) => {
   try {
     const campaigns = await prisma.campaign.findMany({
@@ -377,6 +341,46 @@ router.get('/campaign/pending', async (req, res, next) => {
   }
 })
 
+router.get('/campaign/:id', async (req, res, next) => {
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: req.params.id },
+      include: {
+        ngo: {
+          select: {
+            id: true,
+            name: true,
+            registrationNum: true,
+            riskTier: true,
+            status: true,
+          },
+        },
+        vendors: {
+          select: {
+            id: true,
+            name: true,
+            serviceType: true,
+            status: true,
+            walletAddress: true,
+          },
+        },
+      },
+    })
+    if (!campaign) {
+      const err = new Error('Campaign not found')
+      err.status = 404
+      throw err
+    }
+    res.json({
+      ...campaign,
+      targetAmount: Number(campaign.targetAmount),
+      raisedAmount: Number(campaign.raisedAmount),
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
 router.post(
   '/campaign/:id/approve',
   requireRole('SUPER_ADMIN'),
@@ -398,6 +402,16 @@ router.post(
       }
       if (campaign.ngo.status !== 'APPROVED') {
         const err = new Error('NGO must be approved before campaign approval')
+        err.status = 400
+        throw err
+      }
+
+      // Guard against placeholder wallets generated when NGO registered
+      // without providing a real address (kyc.service.js createInternalAuditAddress).
+      // A placeholder deployed as ngoWalletAddress means nobody controls
+      // that identity on-chain — block approval until a real wallet is set.
+      if (!campaign.ngo.walletAddress || campaign.ngo.walletAddress === '0x0000000000000000000000000000000000000000') {
+        const err = new Error('NGO does not have a valid wallet address — update before approving campaign')
         err.status = 400
         throw err
       }
@@ -550,25 +564,17 @@ router.get('/ngo/pending', async (req, res, next) => {
     const ngos = await prisma.nGO.findMany({
       where: { status: 'PENDING_KYC' },
       orderBy: { createdAt: 'desc' },
-    })
-    res.json(ngos)
-  } catch (e) {
-    next(e)
-  }
-})
-
-router.get('/ngos', async (req, res, next) => {
-  try {
-    const ngos = await prisma.nGO.findMany({
-      orderBy: { createdAt: 'desc' },
+      // Explicit select — never return passwordHash to any API consumer
       select: {
         id: true,
         name: true,
         registrationNum: true,
         contactEmail: true,
+        contactPhone: true,
+        walletAddress: true,
         riskTier: true,
         status: true,
-        kycApprovedAt: true,
+        kycNotes: true,
         createdAt: true,
       },
     })
@@ -577,5 +583,9 @@ router.get('/ngos', async (req, res, next) => {
     next(e)
   }
 })
+
+// Duplicate GET /ngos removed — the full-detail version at line 162 is the
+// correct one. This minimal version was dead code (Express always matched
+// the first /ngos route above it).
 
 export default router

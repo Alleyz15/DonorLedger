@@ -60,7 +60,7 @@ export function renderAppShell({
 
   mount.innerHTML = `
     <aside class="app-sidebar">
-      <a class="app-brand" href="./introduction.html" aria-label="DonorLedger home">
+      <a class="app-brand" href="${getRoleHome(role)}" aria-label="DonorLedger home">
         <span class="app-brand-mark">D</span>
         <span class="app-brand-name">Donor<em>Ledger</em></span>
       </a>
@@ -134,6 +134,13 @@ function renderMenu(role, activeKey) {
 function getMenu(role)           { return roleMenus[role] || [] }
 function normalizeRole(role)     { return role === 'NGO' ? 'ORGANIZER' : role }
 
+function getRoleHome(role) {
+  if (role === 'BANK_ADMIN') return './admin-dashboard.html'
+  if (role === 'ORGANIZER')  return './my-campaigns.html'
+  if (role === 'DONOR')      return './donor-campaigns.html'
+  return './introduction.html'
+}
+
 function bindUserMenu(mount) {
   const userMenu = mount.querySelector('[data-user-menu]')
   const avatarButton = userMenu?.querySelector('.app-avatar')
@@ -155,7 +162,7 @@ function bindUserMenu(mount) {
 
   logoutButton.addEventListener('click', () => {
     clearSession()
-    window.location.href = './login.html'
+    window.location.replace('./introduction.html')
   })
 
   document.addEventListener('click', (event) => {

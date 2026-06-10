@@ -4,6 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login | DonorLedger</title>
+    <script>
+      ;(function redirectAppLogoutToWelcome() {
+        if (localStorage.getItem('donorledger.auth')) return
+        if (!document.referrer) return
+
+        try {
+          var referrer = new URL(document.referrer)
+          if (referrer.origin !== window.location.origin) return
+
+          var publicPages = [
+            '/',
+            '/introduction.html',
+            '/login.html',
+            '/sign-up.html',
+            '/register-ngo.html',
+          ]
+
+          if (!publicPages.includes(referrer.pathname)) {
+            window.location.replace('./introduction.html')
+          }
+        } catch (_error) {
+          // Keep the login page available when the referrer cannot be parsed.
+        }
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

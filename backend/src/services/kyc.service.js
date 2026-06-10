@@ -74,6 +74,11 @@ export async function submitNGOApplication(applicant) {
     data: {
       name: applicant.name,
       registrationNum: applicant.registrationNum,
+      // Section 11 — wallet address is required for on-chain identity.
+      // If not provided at registration, a placeholder is generated so the
+      // record can be saved. Bank Islam must update it before approval —
+      // approveNGO() will fail if the address is still a placeholder
+      // (no real wallet = no on-chain credential can be issued).
       walletAddress: applicant.walletAddress || createInternalAuditAddress(),
       contactEmail: applicant.contactEmail,
       contactPhone: applicant.contactPhone,
