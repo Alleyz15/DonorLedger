@@ -149,6 +149,29 @@
   font-weight: 700;
 }
 
+.admin-audit-ledger-note {
+  margin: 0;
+  padding: 16px 28px 0;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-audit-tx-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: monospace;
+  text-decoration: none;
+}
+
+.admin-audit-tx-link:hover {
+  text-decoration: underline;
+}
+
 /* empty */
 .admin-audit-empty {
   padding: 60px 28px;

@@ -245,6 +245,65 @@ router.get('/alerts', async (req, res, next) => {
   }
 })
 
+// GET /admin/ledger — raw on-chain records (donations + campaign deployments).
+// This is the literal blockchain proof behind the audit page: every entry
+// here links to a real Sepolia transaction. Donor identity stays hashed —
+// only donorHash (not email) is shown, matching the on-chain record.
+router.get('/ledger', async (req, res, next) => {
+  try {
+    const [donations, campaigns] = await Promise.all([
+      prisma.donation.findMany({
+        where: { txHash: { not: null } },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        select: {
+          id: true,
+          donorHash: true,
+          amount: true,
+          txHash: true,
+          createdAt: true,
+          campaign: { select: { id: true, name: true } },
+        },
+      }),
+      prisma.campaign.findMany({
+        where: { deployTxHash: { not: null } },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          contractAddress: true,
+          deployTxHash: true,
+          createdAt: true,
+        },
+      }),
+    ])
+
+    const ledger = [
+      ...donations.map((d) => ({
+        type: 'DONATION',
+        id: d.id,
+        amount: Number(d.amount),
+        donorHash: d.donorHash,
+        campaignName: d.campaign?.name || null,
+        txHash: d.txHash,
+        createdAt: d.createdAt,
+      })),
+      ...campaigns.map((c) => ({
+        type: 'CAMPAIGN_DEPLOY',
+        id: c.id,
+        campaignName: c.name,
+        contractAddress: c.contractAddress,
+        txHash: c.deployTxHash,
+        createdAt: c.createdAt,
+      })),
+    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+    res.json(ledger)
+  } catch (e) {
+    next(e)
+  }
+})
+
 // Convert an absolute upload path (stored in DB) to a browser-accessible URL.
 // e.g. "D:\...\uploads\invoices\file.pdf" → "/uploads/invoices/file.pdf"
 function toUploadUrl(absPath) {

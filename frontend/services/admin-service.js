@@ -105,6 +105,12 @@ export function getAdminAlerts(token) {
   })
 }
 
+export function getAdminLedger(token) {
+  return apiRequest('/admin/ledger', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
 export function getAdminEvidence(token) {
   return apiRequest('/admin/evidence/pending', {
     headers: { Authorization: `Bearer ${token}` },
