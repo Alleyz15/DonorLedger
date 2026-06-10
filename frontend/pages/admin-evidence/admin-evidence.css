@@ -4,14 +4,14 @@
 }
 
 .admin-evidence-shell .app-content {
-  padding: 48px 50px;
+  padding: 28px 28px 40px;
 }
 
 .admin-evidence-page {
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  max-width: 1468px;
+  gap: 24px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -26,7 +26,7 @@
 .admin-evidence-hero h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 42px;
+  font-size: 28px;
   line-height: 1.1;
   font-weight: 800;
 }
@@ -34,7 +34,7 @@
 .admin-evidence-hero p {
   margin: 12px 0 0;
   color: #667085;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 /* ── Summary badges ── */

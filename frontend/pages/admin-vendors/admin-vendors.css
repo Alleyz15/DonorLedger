@@ -5,14 +5,14 @@
 }
 
 .admin-vendor-shell .app-content {
-  padding: 48px 50px;
+  padding: 28px 28px 40px;
 }
 
 .admin-vendor-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  max-width: 1180px;
+  gap: 24px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -26,7 +26,7 @@
 .admin-vendor-hero h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 42px;
+  font-size: 28px;
   line-height: 1.1;
   font-weight: 800;
 }
@@ -34,22 +34,22 @@
 .admin-vendor-hero p {
   margin: 12px 0 0;
   color: #667085;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 .admin-vendor-queue-button {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   border: 0;
   border-radius: 10px;
-  padding: 0 24px;
+  padding: 0 20px;
   background: #065f46;
   color: #ffffff;
   font: inherit;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }

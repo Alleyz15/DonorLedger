@@ -4,14 +4,14 @@
 }
 
 .admin-campaign-shell .app-content {
-  padding: 48px 50px;
+  padding: 28px 28px 40px;
 }
 
 .admin-campaign-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  max-width: 1468px;
+  gap: 24px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -25,7 +25,7 @@
 .admin-campaign-dashboard .admin-review-hero h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 42px;
+  font-size: 28px;
   line-height: 1.1;
   font-weight: 800;
 }
@@ -33,18 +33,18 @@
 .admin-campaign-dashboard .admin-review-hero p {
   margin: 12px 0 0;
   color: #667085;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 .admin-campaign-dashboard .admin-review-queue-button {
-  min-height: 56px;
+  min-height: 36px;
   border: 0;
   border-radius: 10px;
-  padding: 0 28px;
+  padding: 0 20px;
   background: #065f46;
   color: #ffffff;
   font: inherit;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -56,10 +56,10 @@
 }
 
 .admin-campaign-summary-card {
-  min-height: 150px;
+  min-height: 120px;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 28px;
+  padding: 20px;
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }

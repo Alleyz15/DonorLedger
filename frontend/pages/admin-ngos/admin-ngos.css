@@ -5,14 +5,14 @@
 }
 
 .admin-ngo-shell .app-content {
-  padding: 48px 50px;
+  padding: 28px 28px 40px;
 }
 
 .admin-ngo-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  max-width: 1468px;
+  gap: 24px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -26,7 +26,7 @@
 .admin-review-hero h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 42px;
+  font-size: 28px;
   line-height: 1.1;
   font-weight: 800;
 }
@@ -34,18 +34,18 @@
 .admin-review-hero p {
   margin: 12px 0 0;
   color: #667085;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 .admin-review-queue-button {
-  min-height: 56px;
+  min-height: 36px;
   border: 0;
   border-radius: 10px;
-  padding: 0 28px;
+  padding: 0 20px;
   background: #065f46;
   color: #ffffff;
   font: inherit;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -53,22 +53,22 @@
 .admin-ngo-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 32px;
+  gap: 24px;
 }
 
 .admin-ngo-summary-card {
-  min-height: 210px;
+  min-height: 150px;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 34px;
+  padding: 20px;
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .admin-summary-icon {
   display: inline-flex;
-  width: 66px;
-  height: 66px;
+  width: 48px;
+  height: 48px;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
@@ -77,7 +77,7 @@
 
 .admin-summary-icon::before {
   color: #34d399;
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 800;
 }
 
@@ -98,16 +98,16 @@
 }
 
 .admin-ngo-summary-card h2 {
-  margin: 28px 0 12px;
+  margin: 16px 0 8px;
   color: #3b4541;
-  font-size: 22px;
+  font-size: 14px;
   line-height: 1.25;
   font-weight: 500;
 }
 
 .admin-ngo-summary-card strong {
   color: #0f172a;
-  font-size: 42px;
+  font-size: 28px;
   line-height: 1;
   font-weight: 800;
 }
@@ -124,40 +124,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 24px;
+  gap: 16px;
+  padding: 16px 20px;
 }
 
 .admin-ngo-panel-header > div {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 }
 
 .admin-tool-button {
-  min-height: 52px;
+  min-height: 36px;
   border: 1px solid #bcc8c0;
   border-radius: 10px;
-  padding: 0 24px;
+  padding: 0 16px;
   background: #ffffff;
   color: #3b4541;
   font: inherit;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .admin-primary-action {
   display: inline-flex;
-  min-height: 56px;
+  min-height: 36px;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   border: 0;
   border-radius: 10px;
-  padding: 0 28px;
+  padding: 0 20px;
   background: #3fd0a0;
   color: #ffffff;
   font: inherit;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -181,14 +181,14 @@
 
 .admin-ngo-table th,
 .admin-ngo-table td {
-  padding: 28px 32px;
+  padding: 14px 16px;
   border-bottom: 1px solid #bcc8c0;
   text-align: left;
 }
 
 .admin-ngo-table th {
   color: #3b4541;
-  font-size: 16px;
+  font-size: 10.5px;
   line-height: 1.15;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -197,18 +197,18 @@
 
 .admin-ngo-table td {
   color: #3b4541;
-  font-size: 18px;
+  font-size: 13px;
 }
 
 .admin-ngo-name-cell {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .admin-ngo-logo {
-  width: 52px;
-  height: 52px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   background: #0f172a;
 }
@@ -220,23 +220,23 @@
 
 .admin-ngo-name-cell strong {
   color: #0f172a;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .admin-ngo-name-cell span {
   margin-top: 4px;
   color: #626f69;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .admin-status-pill {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 26px;
   align-items: center;
   border-radius: 999px;
-  padding: 0 18px;
-  font-size: 14px;
+  padding: 0 12px;
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -273,28 +273,28 @@
 }
 
 .admin-verify-button {
-  min-height: 58px;
-  padding: 0 24px;
+  min-height: 36px;
+  padding: 0 16px;
   background: #3fd0a0;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .admin-reject-button {
-  min-height: 48px;
+  min-height: 32px;
   border: 1px solid #bcc8c0;
-  padding: 0 18px;
+  padding: 0 12px;
   background: #ffffff;
   color: #ef4444;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .admin-details-button {
-  min-height: 44px;
-  padding: 0 20px;
+  min-height: 30px;
+  padding: 0 14px;
   background: #ecfdf5;
   color: #34d399;
-  font-size: 15px;
+  font-size: 12px;
 }
 
 .admin-ngo-loading-cell,
@@ -311,24 +311,24 @@
 
 .admin-ngo-pagination {
   display: flex;
-  min-height: 88px;
+  min-height: 56px;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 20px;
   background: #eef2ff;
   color: #3b4541;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .admin-ngo-pagination div {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .admin-ngo-pagination button {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: #ffffff;
