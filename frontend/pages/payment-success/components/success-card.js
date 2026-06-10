@@ -58,7 +58,7 @@ export function renderSuccessCard(payment) {
             <strong>Track Your Donation on the Blockchain</strong>
             <p>
               Your personal donor tracker shows every step your money takes —
-              from receipt to vendor payment to beneficiary confirmation.
+              from receipt to fund release to beneficiary confirmation.
               This data is on-chain and cannot be altered.
             </p>
           </div>
