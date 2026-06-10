@@ -37,7 +37,6 @@ function renderAdminCampaignPage() {
         <h1>Manage Campaigns</h1>
         <p>Approve or reject NGO campaign applications before they go live.</p>
       </div>
-      <button class="admin-review-queue-button" type="button">Open Review Queue</button>
     </section>
   `
 
@@ -53,9 +52,6 @@ function renderAdminCampaignPage() {
     content,
   })
 
-  content.querySelector('.admin-review-queue-button')?.addEventListener('click', () => {
-    table.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  })
   table.addEventListener('click', (event) => handleCampaignAction(event, table, summary))
   loadCampaigns(table, summary)
 }

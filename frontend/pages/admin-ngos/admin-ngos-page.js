@@ -32,7 +32,6 @@ function renderAdminNGOPage() {
         <h1>Manage NGOs</h1>
         <p>Review NGO KYC applications and manage verified organizations.</p>
       </div>
-      <button class="admin-review-queue-button" type="button">Open Review Queue</button>
     </section>
   `
   const summary = createAdminNGOSummary()
@@ -46,9 +45,6 @@ function renderAdminNGOPage() {
     content,
   })
 
-  content.querySelector('.admin-review-queue-button')?.addEventListener('click', () => {
-    table.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  })
   table.addEventListener('click', (event) => handleTableAction(event, table, summary))
   loadNGOs(table, summary)
 }

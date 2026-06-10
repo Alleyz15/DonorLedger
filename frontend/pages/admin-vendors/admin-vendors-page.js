@@ -40,10 +40,6 @@ function renderAdminVendorPage() {
         <h1>Manage Vendors</h1>
         <p>Review vendor KYC submissions and approve vendors eligible for fund release.</p>
       </div>
-      <button class="admin-vendor-queue-button" type="button">
-        <span aria-hidden="true"></span>
-        Open Review Queue
-      </button>
     </section>
   `
 
@@ -60,9 +56,6 @@ function renderAdminVendorPage() {
     content,
   })
 
-  content.querySelector('.admin-vendor-queue-button')?.addEventListener('click', () => {
-    table.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  })
   table.addEventListener('click', (event) => handleTableAction(event, table, summary))
 
   // The drawer is appended to document.body (outside #app-shell), so we must

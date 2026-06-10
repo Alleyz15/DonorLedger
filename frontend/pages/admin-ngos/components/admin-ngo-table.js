@@ -7,9 +7,6 @@ export function createAdminNGOTable() {
         <button class="admin-tool-button" type="button">Filter</button>
         <button class="admin-tool-button" type="button">Sort By: Date</button>
       </div>
-      <button class="admin-primary-action" type="button" disabled>
-        Open Review Queue
-      </button>
     </div>
     <div class="admin-ngo-table-wrap">
       <table class="admin-ngo-table">
