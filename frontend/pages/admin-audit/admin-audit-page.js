@@ -7,7 +7,7 @@
 // record that nobody can delete or alter because the key events are also
 // anchored on-chain via Bank Islam's signatures.
 
-import { renderAppShell } from '../../components/layout/app-shell.js'
+import { renderAppShell } from '../../components/layout/app-shell.js?v=20260610-alert-popover'
 import { getSession } from '../../services/auth-service.js'
 import { getAdminAlerts } from '../../services/admin-service.js'
 
