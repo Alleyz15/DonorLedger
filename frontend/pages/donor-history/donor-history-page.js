@@ -30,7 +30,6 @@ function renderDonorHistoryPage() {
     <section class="donor-ledger-card">
       <div class="donor-ledger-header">
         <h2>Donation Ledger</h2>
-        <button class="donor-export-button" type="button">Export Statement</button>
       </div>
       <div class="donor-ledger-table-wrap">
         <table class="donor-ledger-table">
@@ -40,10 +39,11 @@ function renderDonorHistoryPage() {
               <th>Date</th>
               <th>Amount</th>
               <th>Receipt</th>
+              <th>Statement</th>
             </tr>
           </thead>
           <tbody data-history-rows>
-            <tr><td colspan="4">Loading donation history...</td></tr>
+            <tr><td colspan="5">Loading donation history...</td></tr>
           </tbody>
         </table>
       </div>
@@ -62,16 +62,6 @@ function renderDonorHistoryPage() {
   })
 
   loadHistory(content)
-
-  // Wire Export Statement button — downloads a CSV of all donations.
-  // The on-chain tx hash column is the differentiator no other platform can offer.
-  content.querySelector('.donor-export-button')?.addEventListener('click', () => {
-    if (!donationHistory?.donations?.length) {
-      alert('No donations to export yet.')
-      return
-    }
-    exportDonationsCSV(donationHistory.donations)
-  })
 }
 
 async function loadHistory(content) {
@@ -88,7 +78,7 @@ async function loadHistory(content) {
     content.addEventListener('click', handleReceiptClick)
   } catch (error) {
     summary.innerHTML = renderSummary({ totalAmount: 0, charitiesSupported: 0, donationDiversity: [] })
-    rows.innerHTML = `<tr><td class="donor-history-error" colspan="4">${escapeHtml(error.message)}</td></tr>`
+    rows.innerHTML = `<tr><td class="donor-history-error" colspan="5">${escapeHtml(error.message)}</td></tr>`
     footer.innerHTML = ''
   }
 }
@@ -137,7 +127,7 @@ function renderSummary(summary) {
 
 function renderRows(donations) {
   if (!donations.length) {
-    return '<tr><td colspan="4">No donations recorded yet.</td></tr>'
+    return '<tr><td colspan="5">No donations recorded yet.</td></tr>'
   }
 
   return donations
@@ -153,7 +143,11 @@ function renderRows(donations) {
           <button class="donor-receipt-button" type="button" data-donor-hash="${escapeHtml(donation.donorHash || '')}">
             View Receipt
           </button>
-          <span class="donor-chain-proof">On-chain: ${escapeHtml(formatHash(donation.txHash))}</span>
+        </td>
+        <td>
+          <button class="donor-export-button" type="button" data-export-hash="${escapeHtml(donation.donorHash || '')}">
+            Export Statement
+          </button>
         </td>
       </tr>
     `)
@@ -164,6 +158,21 @@ async function handleReceiptClick(event) {
   const receiptButton = event.target.closest('[data-donor-hash]')
   if (receiptButton) {
     await openReceiptModal(receiptButton.dataset.donorHash)
+    return
+  }
+
+  // Per-donation "Export Statement" — downloads a CSV containing only this
+  // single donation's row, not the donor's entire history.
+  const exportButton = event.target.closest('[data-export-hash]')
+  if (exportButton) {
+    const donation = donationHistory?.donations?.find(
+      (item) => item.donorHash === exportButton.dataset.exportHash
+    )
+    if (!donation) {
+      alert('Donation could not be found for export.')
+      return
+    }
+    exportDonationCSV(donation)
     return
   }
 
@@ -284,13 +293,11 @@ function renderReceipt(receipt, donation) {
         <div class="donor-receipt-flow-steps">
           ${renderFlowStep(receipt, 'RECEIVED',    '1', 'You', 'Paid via DuitNow', 'Your payment was received by Bank Islam.')}
           ${renderFlowConnector(receipt, 'RECEIVED')}
-          ${renderFlowStep(receipt, 'ALLOCATED',   '2', 'Bank Islam', 'Escrow Locked', 'Bank Islam locked your funds in the smart contract. Allocation rules are now immutable.')}
+          ${renderFlowStep(receipt, 'ALLOCATED',   '2', 'Bank Islam', 'Escrow Locked', 'Bank Islam locks your funds in escrow, earmarked for a verified vendor, while the NGO prepares evidence for release.')}
           ${renderFlowConnector(receipt, 'ALLOCATED')}
           ${renderFlowStep(receipt, 'RELEASED',    '3', 'NGO → Vendor', 'Funds Released', 'NGO submitted verified evidence. Bank Islam approved and released funds directly to the vendor.')}
           ${renderFlowConnector(receipt, 'RELEASED')}
-          ${renderFlowStep(receipt, 'CONFIRMED',   '4', 'Beneficiary', 'Delivery Confirmed', 'Bank Islam received independent confirmation from the beneficiary that aid was delivered.')}
-          ${renderFlowConnector(receipt, 'CONFIRMED')}
-          ${renderFlowStep(receipt, 'COMPLETED',   '5', 'Complete', 'Full Cycle Done', 'Your donation completed the full accountability loop. Impact verified on-chain.')}
+          ${renderFlowStep(receipt, 'COMPLETED',   '4', 'Beneficiary', 'Full Cycle Done', 'Bank Islam received independent confirmation from the beneficiary that aid was delivered. Your donation completed the full accountability loop, verified on-chain.')}
         </div>
       </section>
 
@@ -335,8 +342,7 @@ const WAITING_LABEL = {
   RECEIVED:  null, // step 1 is always done immediately after donation
   ALLOCATED: 'Waiting for Bank Islam to lock your funds in escrow',
   RELEASED:  'Waiting for NGO to submit evidence and Bank Islam to approve disbursement',
-  CONFIRMED: 'Waiting for Bank Islam to confirm delivery directly with the beneficiary',
-  COMPLETED: 'Waiting for Bank Islam to close the accountability loop',
+  COMPLETED: 'Waiting for Bank Islam to confirm delivery directly with the beneficiary',
 }
 
 function renderFlowStep(receipt, milestone, stepNum, actor, title, description) {
@@ -351,7 +357,7 @@ function renderFlowStep(receipt, milestone, stepNum, actor, title, description) 
   // (status back to ACTIVE), steps revert to pending so the donor knows
   // things are moving again — even though the on-chain UNDER_REVIEW entry
   // is permanent (blockchain immutability is the point).
-  if (!reached && isFrozen && isUnderReview && ['RELEASED', 'CONFIRMED', 'COMPLETED'].includes(milestone)) {
+  if (!reached && isFrozen && isUnderReview && ['RELEASED', 'COMPLETED'].includes(milestone)) {
     state = 'frozen'
   }
 
@@ -363,6 +369,12 @@ function renderFlowStep(receipt, milestone, stepNum, actor, title, description) 
 
   const waitingLabel = state === 'pending' ? WAITING_LABEL[milestone] : null
 
+  // Section 14 — neutral evidence-review note shown only on step 3 while
+  // it is still pending. Never shows the word "rejected" to donors.
+  const evidenceNote = state === 'pending' && milestone === 'RELEASED'
+    ? receipt.evidenceNote
+    : null
+
   return `
     <div class="donor-flow-step ${stateClass}">
       <div class="donor-flow-step-icon">${escapeHtml(icon)}</div>
@@ -373,6 +385,7 @@ function renderFlowStep(receipt, milestone, stepNum, actor, title, description) 
         ${reached ? `<span class="donor-flow-step-time">${escapeHtml(reached.at)}</span>` : ''}
         ${state === 'frozen' ? '<span class="donor-flow-step-frozen">⚠ Paused — under Bank Islam review</span>' : ''}
         ${waitingLabel ? `<span class="donor-flow-step-waiting">⏳ ${escapeHtml(waitingLabel)}</span>` : ''}
+        ${evidenceNote ? `<span class="donor-flow-step-note">ℹ ${escapeHtml(evidenceNote)}</span>` : ''}
       </div>
     </div>
   `
@@ -393,10 +406,11 @@ function getCampaignStatusMeta(status) {
 }
 
 // ── CSV Export ──────────────────────────────────────────────────────────────
-// Generates a donor statement CSV and triggers a browser download.
-// The Transaction Hash column is the key differentiator — no other Malaysian
-// charity platform can provide an immutable on-chain reference per donation.
-function exportDonationsCSV(donations) {
+// Generates a statement CSV for a single donation and triggers a browser
+// download. The Transaction Hash column is the key differentiator — no
+// other Malaysian charity platform can provide an immutable on-chain
+// reference per donation.
+function exportDonationCSV(donation) {
   const headers = [
     'Date',
     'Campaign',
@@ -407,25 +421,27 @@ function exportDonationsCSV(donations) {
     'Transaction Hash',
   ]
 
-  const rows = donations.map((d) => [
-    formatDateFull(d.createdAt),
-    d.campaignName || '—',
-    d.ngoName || '—',
-    formatCause(d.causeType || '—'),
-    Number(d.amount || 0).toFixed(2),
-    d.campaignStatus || 'Active',
-    d.txHash || 'Pending',
-  ])
+  const row = [
+    formatDateFull(donation.createdAt),
+    donation.campaignName || '—',
+    donation.ngoName || '—',
+    formatCause(donation.causeType || '—'),
+    Number(donation.amount || 0).toFixed(2),
+    donation.campaignStatus || 'Active',
+    donation.txHash || 'Pending',
+  ]
 
-  const csv = [headers, ...rows]
-    .map((row) => row.map(csvCell).join(','))
+  const csv = [headers, row]
+    .map((line) => line.map(csvCell).join(','))
     .join('\r\n')
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url  = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href     = url
-  link.download = `DonorLedger-Statement-${new Date().toISOString().slice(0, 10)}.csv`
+  const datePart = new Date(donation.createdAt).toISOString().slice(0, 10)
+  const refPart  = formatHash(donation.txHash).replace(/[^a-zA-Z0-9]/g, '')
+  link.download = `DonorLedger-Statement-${datePart}-${refPart || 'pending'}.csv`
   link.click()
   URL.revokeObjectURL(url)
 }

@@ -196,7 +196,8 @@ function startAiWorker() {
           },
         })
 
-        // Donor-facing update — plain language only (Section 14)
+        // Campaign is now actually paused on-chain — donor-facing update,
+        // plain language only (Section 14)
         const donations = await prisma.donation.findMany({
           where: { campaignId: evidence.campaignId },
           select: { donorHash: true },
@@ -205,8 +206,8 @@ function startAiWorker() {
           try {
             await contractService.updateDonorMilestone({
               donorHash: d.donorHash,
-              milestone: 'UNDER_REVIEW',
-              description: DONOR_MILESTONE_TEXT.UNDER_REVIEW,
+              milestone: 'FROZEN',
+              description: DONOR_MILESTONE_TEXT.FROZEN,
             })
           } catch (e) {
             console.warn('[ai-worker] tracker update failed:', e.message)

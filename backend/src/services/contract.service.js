@@ -420,6 +420,43 @@ export async function getCampaignProgress(campaignAddress) {
   }
 }
 
+// ----- Donation verification (Section 6 — donor receipt integrity) ------
+
+/**
+ * Cross-checks a donation's stored ringgit amount against the
+ * DonationReceived event emitted on-chain for its transaction hash.
+ * Returns:
+ *   true  — on-chain amount matches the Postgres amount
+ *   false — on-chain amount does NOT match (flag for the donor/Bank Islam)
+ *   null  — could not verify (no txHash, tx not found, or read failed)
+ */
+export async function verifyDonationAmount(txHash, expectedAmount) {
+  if (!txHash) return null
+  try {
+    const receipt = await provider.getTransactionReceipt(txHash)
+    if (!receipt) return null
+
+    const abi = loadABI('Campaign')
+    const iface = new ethers.Interface(abi)
+
+    for (const log of receipt.logs) {
+      try {
+        const parsed = iface.parseLog({ topics: [...log.topics], data: log.data })
+        if (parsed && parsed.name === 'DonationReceived') {
+          const onChainAmount = weiToRinggit(parsed.args.amount)
+          return Math.abs(onChainAmount - Number(expectedAmount)) < 0.01
+        }
+      } catch {
+        // not the event we're looking for — skip
+      }
+    }
+    return null
+  } catch (e) {
+    console.warn('[contract] verifyDonationAmount failed:', e.message)
+    return null
+  }
+}
+
 // ----- Read helpers -----------------------------------------------------
 
 export async function readCampaignTotals(campaignAddress) {
@@ -459,6 +496,8 @@ export default {
   updateDonorMilestone,
   getDonorJourney,
   getCampaignProgress,
+  // verification
+  verifyDonationAmount,
   // reads
   readCampaignTotals,
 }

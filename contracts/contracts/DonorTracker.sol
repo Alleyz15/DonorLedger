@@ -12,9 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  *         no vendor addresses.
  *
  * Owner is the server wallet (SERVER_WALLET_PRIVATE_KEY). The backend
- * calls updateMilestone() whenever fund status changes — RECEIVED right
- * after the donation, RELEASED after Bank Islam approves a disbursement,
- * UNDER_REVIEW when AI auto-freeze fires, etc.
+ * calls updateMilestone() whenever fund status changes — RECEIVED and
+ * ALLOCATED right after the donation, RELEASED after Bank Islam approves a
+ * disbursement, FROZEN when AI auto-freeze fires, COMPLETED once the
+ * beneficiary confirms receipt, etc.
  *
  * Why this is its own contract — it lets MACC, auditors, and donors read
  * the public log without touching the financial enforcement contract.
