@@ -170,8 +170,26 @@ router.get('/ngos', async (req, res, next) => {
         name: true,
         registrationNum: true,
         contactEmail: true,
+        contactPhone: true,
+        walletAddress: true,
         riskTier: true,
         status: true,
+
+        // Section 11 — full registration application package, surfaced in
+        // the admin "View Details" drawer for Bank Islam KYC review.
+        registrationType: true,
+        registeredAddress: true,
+        directors: true,
+        bankAccount: true,
+        bankName: true,
+        causeType: true,
+        description: true,
+        aidPercent: true,
+        logisticsPercent: true,
+        adminPercent: true,
+        registrationDoc: true,
+        financialDoc: true,
+
         kycNotes: true,
         kycApprovedAt: true,
         onChainExpiry: true,
@@ -180,7 +198,15 @@ router.get('/ngos', async (req, res, next) => {
         _count: { select: { campaigns: true } },
       },
     })
-    res.json(ngos)
+    // registrationDoc/financialDoc are stored as paths relative to uploads/
+    // (e.g. "ngo-registration/123-abc.pdf") — convert to browser-accessible URLs.
+    res.json(
+      ngos.map((ngo) => ({
+        ...ngo,
+        registrationDoc: ngo.registrationDoc ? `/uploads/${ngo.registrationDoc}` : null,
+        financialDoc: ngo.financialDoc ? `/uploads/${ngo.financialDoc}` : null,
+      }))
+    )
   } catch (e) {
     next(e)
   }

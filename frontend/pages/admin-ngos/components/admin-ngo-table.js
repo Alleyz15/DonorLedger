@@ -104,11 +104,14 @@ function renderActions(ngo) {
         <button class="admin-reject-button" type="button" data-action="reject" data-ngo-id="${escapeHtml(ngo.id)}">
           Reject
         </button>
+        <button class="admin-details-button" type="button" data-action="view" data-ngo-id="${escapeHtml(ngo.id)}">
+          View Details
+        </button>
       </div>
     `
   }
 
-  return '<button class="admin-details-button" type="button" disabled>View Details</button>'
+  return `<button class="admin-details-button" type="button" data-action="view" data-ngo-id="${escapeHtml(ngo.id)}">View Details</button>`
 }
 
 function getStatusLabel(ngo) {

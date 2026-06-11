@@ -21,6 +21,7 @@ const CATEGORIES = [
   'vendor-registration',
   'recipient-confirm',
   'ssm',
+  'ngo-registration',
 ]
 
 // Ensure upload subdirectories exist
@@ -64,6 +65,36 @@ export const uploader = multer({
   },
 })
 
+// Section 11 — NGO registration package (SSM/ROS certificate + audited
+// financial statement). Always lands in uploads/ngo-registration/
+// regardless of fieldname, since this form is not a "category" picker.
+const ngoRegistrationStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    const dir = path.resolve(env.uploads.dir, 'ngo-registration')
+    cb(null, dir)
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).slice(0, 8)
+    const stamp = Date.now()
+    const rand = Math.random().toString(36).slice(2, 10)
+    cb(null, `${stamp}-${rand}${ext}`)
+  },
+})
+
+export const ngoRegistrationUploader = multer({
+  storage: ngoRegistrationStorage,
+  limits: { fileSize: env.uploads.maxBytes },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['.pdf', '.png', '.jpg', '.jpeg']
+    const ext = path.extname(file.originalname).toLowerCase()
+    if (!allowed.includes(ext)) {
+      cb(new Error(`File type ${ext} not allowed`))
+      return
+    }
+    cb(null, true)
+  },
+})
+
 /** Return the absolute path stored on disk, normalised for the DB. */
 export function relativeUploadPath(absPath) {
   return path.relative(path.resolve(env.uploads.dir), absPath).replace(/\\/g, '/')
@@ -74,4 +105,4 @@ export async function hashUploadedFile(filePath) {
   return hashFile(filePath)
 }
 
-export default { uploader, relativeUploadPath, hashUploadedFile }
+export default { uploader, ngoRegistrationUploader, relativeUploadPath, hashUploadedFile }

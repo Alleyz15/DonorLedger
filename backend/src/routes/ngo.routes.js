@@ -13,6 +13,7 @@ import kycService from '../services/kyc.service.js'
 import { requireNGO, signNGOToken } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { checkPassword, hashPassword } from '../utils/password.utils.js'
+import storageService from '../services/storage.service.js'
 
 const router = Router()
 
@@ -123,24 +124,78 @@ const campaignSchema = {
   endDate: { type: 'string', required: true },
 }
 
-router.post('/register', validate(registerSchema), async (req, res, next) => {
-  try {
-    const { password, ...application } = req.body
-    const ngo = await kycService.submitNGOApplication({
-      ...application,
-      passwordHash: password ? hashPassword(password) : undefined,
-    })
-    res.status(201).json({
-      id: ngo.id,
-      status: ngo.status,
-      riskTier: ngo.riskTier,
-      message:
-        'Application received. Bank Islam will complete KYC verification.',
-    })
-  } catch (e) {
-    next(e)
+router.post(
+  '/register',
+  // Section 11 — registration form ships as multipart/form-data so the
+  // SSM/ROS certificate and audited financial statement can be attached
+  // alongside the rest of the application package.
+  storageService.ngoRegistrationUploader.fields([
+    { name: 'registrationDoc', maxCount: 1 },
+    { name: 'financialDoc', maxCount: 1 },
+  ]),
+  validate(registerSchema),
+  async (req, res, next) => {
+    try {
+      const { password, ...application } = req.body
+
+      // Board of directors — Director 1 fields are unsuffixed
+      // (directorName/directorMyKad), additional directors are numbered
+      // (directorName2/directorMyKad2, ...).
+      const directors = []
+      if (application.directorName || application.directorMyKad) {
+        directors.push({
+          name: application.directorName || '',
+          mykad: application.directorMyKad || '',
+        })
+      }
+      let directorIndex = 2
+      while (
+        application[`directorName${directorIndex}`] ||
+        application[`directorMyKad${directorIndex}`]
+      ) {
+        directors.push({
+          name: application[`directorName${directorIndex}`] || '',
+          mykad: application[`directorMyKad${directorIndex}`] || '',
+        })
+        directorIndex += 1
+      }
+
+      const ngo = await kycService.submitNGOApplication({
+        name: application.name,
+        registrationNum: application.registrationNum,
+        walletAddress: application.walletAddress || undefined,
+        contactEmail: application.contactEmail,
+        contactPhone: application.contactPhone,
+        passwordHash: password ? hashPassword(password) : undefined,
+        registrationType: application.registrationType,
+        registeredAddress: application.registeredAddress,
+        directors,
+        bankAccount: application.bankAccount,
+        bankName: application.bankName,
+        causeType: application.causeType,
+        description: application.description,
+        aidPercent: application.aidPercent !== undefined ? Number(application.aidPercent) : undefined,
+        logisticsPercent: application.logisticsPercent !== undefined ? Number(application.logisticsPercent) : undefined,
+        adminPercent: application.adminPercent !== undefined ? Number(application.adminPercent) : undefined,
+        registrationDoc: req.files?.registrationDoc?.[0]
+          ? storageService.relativeUploadPath(req.files.registrationDoc[0].path)
+          : undefined,
+        financialDoc: req.files?.financialDoc?.[0]
+          ? storageService.relativeUploadPath(req.files.financialDoc[0].path)
+          : undefined,
+      })
+      res.status(201).json({
+        id: ngo.id,
+        status: ngo.status,
+        riskTier: ngo.riskTier,
+        message:
+          'Application received. Bank Islam will complete KYC verification.',
+      })
+    } catch (e) {
+      next(e)
+    }
   }
-})
+)
 
 router.post(
   '/login',
