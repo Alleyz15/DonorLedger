@@ -1,8 +1,5 @@
-import { apiRequest } from './api-client.js'
+import { apiFormRequest } from './api-client.js'
 
-export function registerNGO(payload) {
-  return apiRequest('/ngo/register', {
-    method: 'POST',
-    body: payload,
-  })
+export function registerNGO(formData) {
+  return apiFormRequest('/ngo/register', formData, { method: 'POST' })
 }

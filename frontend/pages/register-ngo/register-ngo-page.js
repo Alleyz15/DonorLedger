@@ -61,14 +61,18 @@ form?.addEventListener('submit', async (event) => {
   event.preventDefault()
 
   const formData = new FormData(form)
-  const payload = {
+
+  // The form does not collect a contact email/phone yet — generate a
+  // placeholder email so the NGO record can be created. Bank Islam can
+  // update contact details during KYC review.
+  formData.set('contactEmail', buildPlaceholderEmail(formData))
+  formData.set('contactPhone', '')
+
+  const validationMessage = validateNGORegistrationForm({
     name: String(formData.get('name') || '').trim(),
     registrationNum: String(formData.get('registrationNum') || '').trim(),
-    contactEmail: buildPlaceholderEmail(formData),
-    contactPhone: '',
-  }
-
-  const validationMessage = validateNGORegistrationForm(payload)
+    contactEmail: String(formData.get('contactEmail') || '').trim(),
+  })
   if (validationMessage) {
     setFormStatus(statusElement, validationMessage, 'error')
     focusSection('organisation')
@@ -86,7 +90,7 @@ form?.addEventListener('submit', async (event) => {
   setFormStatus(statusElement, 'Submitting NGO application...', 'loading')
 
   try {
-    const result = await registerNGO(payload)
+    const result = await registerNGO(formData)
     setFormStatus(statusElement, 'Application submitted. Continue to signup.', 'success')
     const params = new URLSearchParams({
       ngoId: result.id,

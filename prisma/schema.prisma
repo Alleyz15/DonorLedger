@@ -49,6 +49,20 @@ model NGO {
   riskTier        RiskTier   @default(MEDIUM)
   status          NGOStatus  @default(PENDING_KYC)
 
+  // NGO registration form — Section 11 application package
+  registrationType  String?    // "ROS" | "SSM"
+  registeredAddress String?    @db.Text
+  directors         Json?      // [{ name, mykad }, ...] — Director 1 is required
+  bankAccount       String?    // PDPA: not on-chain
+  bankName          String?
+  causeType         String?    // primary category selected at registration
+  description       String?    @db.Text // mission statement
+  aidPercent        Int?       // proposed fund allocation — Section 11
+  logisticsPercent  Int?
+  adminPercent      Int?
+  registrationDoc   String?    // uploads/ngo-registration/... SSM/ROS certificate
+  financialDoc      String?    // uploads/ngo-registration/... audited financial statement
+
   // Bank Islam KYC audit trail (Section 11)
   kycNotes        String?    @db.Text
   kycApprovedBy   String?    // Bank Islam admin user id

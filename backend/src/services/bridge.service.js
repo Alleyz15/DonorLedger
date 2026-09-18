@@ -57,14 +57,25 @@ export async function processDuitNowPayment({
   })
 
   // Section 6 Layer 2 — Step 1: donor's payment received by Bank Islam.
-  // ALLOCATED (step 2) is derived automatically from RECEIVED in the
-  // tracker API — Bank Islam's escrow lock is an inherent property of
-  // Campaign.donate() landing on-chain, not a separate transaction.
   try {
     await contractService.updateDonorMilestone({
       donorHash,
       milestone: 'RECEIVED',
       description: DONOR_MILESTONE_TEXT.RECEIVED,
+    })
+  } catch (e) {
+    console.error('[bridge] tracker update failed:', e.message)
+  }
+
+  // Step 2 — Bank Islam's escrow lock. This is written as its own on-chain
+  // record immediately after RECEIVED: Campaign.donate() landing on-chain
+  // IS the escrow lock, so we record it as a real, separately-timestamped
+  // milestone rather than implying it on the tracker page.
+  try {
+    await contractService.updateDonorMilestone({
+      donorHash,
+      milestone: 'ALLOCATED',
+      description: DONOR_MILESTONE_TEXT.ALLOCATED,
     })
   } catch (e) {
     console.error('[bridge] tracker update failed:', e.message)

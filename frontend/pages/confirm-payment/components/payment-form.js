@@ -1,11 +1,6 @@
-export function renderPaymentForm({ campaign, session, vendors = [] }) {
+export function renderPaymentForm({ campaign, session }) {
   const donorName  = session?.user?.name  || ''
   const donorEmail = session?.user?.email || ''
-  const vendorOptions = vendors.length
-    ? vendors.map(v =>
-        `<option value="${escapeHtml(v.id)}">${escapeHtml(v.name)} — ${escapeHtml(v.serviceType || '')}</option>`
-      ).join('')
-    : '<option value="">No vendors linked yet</option>'
   return `
     <form class="payment-layout" novalidate>
       <section class="payment-personal-card">
@@ -52,14 +47,6 @@ export function renderPaymentForm({ campaign, session, vendors = [] }) {
           </div>
         </section>
 
-        <label class="payment-field" style="margin-bottom:12px;">
-          <span>Earmark Your Donation To</span>
-          <select name="vendorId" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font:inherit;font-size:14px;">
-            ${vendorOptions}
-          </select>
-          <small style="color:#94a3b8;font-size:11px;margin-top:4px;display:block;">Your donation will be earmarked to this vendor on-chain.</small>
-        </label>
-
         <label class="payment-amount-field">
           <span>Donation Amount (RM)</span>
           <strong>RM <input name="amount" type="number" min="1" step="0.01" value="50" /></strong>
@@ -69,14 +56,6 @@ export function renderPaymentForm({ campaign, session, vendors = [] }) {
         <section class="payment-summary">
           <h3>Donation Summary</h3>
           <dl>
-            <div>
-              <dt>Subtotal</dt>
-              <dd data-payment-subtotal>RM1,120.00</dd>
-            </div>
-            <div>
-              <dt>Platform Fee (Optional)</dt>
-              <dd data-payment-fee>RM100.80</dd>
-            </div>
             <div class="payment-total-row">
               <dt>Total Amount</dt>
               <dd data-payment-total>RM1,220.80</dd>
@@ -100,16 +79,11 @@ export function readPaymentPayload(form, campaignId) {
 
 export function bindPaymentSummary(form) {
   const amountInput = form.querySelector('input[name="amount"]')
-  const subtotal = form.querySelector('[data-payment-subtotal]')
-  const fee = form.querySelector('[data-payment-fee]')
   const total = form.querySelector('[data-payment-total]')
-  if (!amountInput || !subtotal || !fee || !total) return
+  if (!amountInput || !total) return
 
   const update = () => {
     const amount = Number(amountInput.value || 0)
-    const subtotalAmount = amount / 1.09
-    subtotal.textContent = formatRinggit(subtotalAmount)
-    fee.textContent = formatRinggit(amount - subtotalAmount)
     total.textContent = formatRinggit(amount)
   }
 

@@ -86,6 +86,20 @@ export async function submitNGOApplication(applicant) {
       riskTier,
       status: 'PENDING_KYC',
       kycNotes: JSON.stringify({ stage1: screen }),
+
+      // Section 11 — full registration application package
+      registrationType: applicant.registrationType || null,
+      registeredAddress: applicant.registeredAddress || null,
+      directors: applicant.directors?.length ? applicant.directors : undefined,
+      bankAccount: applicant.bankAccount || null,
+      bankName: applicant.bankName || null,
+      causeType: applicant.causeType || null,
+      description: applicant.description || null,
+      aidPercent: applicant.aidPercent,
+      logisticsPercent: applicant.logisticsPercent,
+      adminPercent: applicant.adminPercent,
+      registrationDoc: applicant.registrationDoc || null,
+      financialDoc: applicant.financialDoc || null,
     },
   })
 }

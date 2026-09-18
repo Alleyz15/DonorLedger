@@ -61,12 +61,10 @@ router.post(
 // Section 13 — Bank Islam directly SMS-confirms the beneficiary. In the
 // demo we auto-return YES after a configurable delay.
 //
-// Milestone chain fired here (Section 6 Layer 2):
-//   CONFIRMED — beneficiary replied YES to Bank Islam's SMS.
-//   COMPLETED — full accountability loop closed. The donor's journey is done.
-//
-// Both fire here because the same Bank Islam action that receives the SMS
-// confirmation also closes out the campaign step.
+// Milestone fired here (Section 6 Layer 2):
+//   COMPLETED — beneficiary replied YES to Bank Islam's SMS, closing the
+//   donor's journey. (We do not write a separate "Confirmed" milestone —
+//   the SMS reply and the journey closing are the same event to the donor.)
 router.post(
   '/recipient-confirm',
   validate({
@@ -105,13 +103,8 @@ router.post(
 
         for (const d of donations) {
           try {
-            // Step 4 — beneficiary confirmed receipt directly with Bank Islam
-            await contractService.updateDonorMilestone({
-              donorHash: d.donorHash,
-              milestone: 'CONFIRMED',
-              description: DONOR_MILESTONE_TEXT.CONFIRMED,
-            })
-            // Step 5 — full accountability loop closed
+            // Beneficiary confirmed receipt directly with Bank Islam — this
+            // closes the donor's journey, recorded as COMPLETED.
             await contractService.updateDonorMilestone({
               donorHash: d.donorHash,
               milestone: 'COMPLETED',
@@ -138,7 +131,7 @@ router.post(
         campaignId,
         recipientReply: 'YES',
         confirmedAt,
-        milestonesUpdated: campaignId ? ['CONFIRMED', 'COMPLETED'] : [],
+        milestonesUpdated: campaignId ? ['COMPLETED'] : [],
         message:
           'Recipient SMS confirmation received by Bank Islam (independent of NGO). Donor trackers updated to COMPLETED.',
       })
@@ -246,7 +239,8 @@ router.post(
         },
       })
 
-      // Update donor-facing trackers to "UNDER_REVIEW" (plain language)
+      // Campaign is now actually paused on-chain — update donor-facing
+      // trackers to "FROZEN" (plain language)
       const donations = await prisma.donation.findMany({
         where: { campaignId: campaign.id },
         select: { donorHash: true },
@@ -255,8 +249,8 @@ router.post(
         try {
           await contractService.updateDonorMilestone({
             donorHash: d.donorHash,
-            milestone: 'UNDER_REVIEW',
-            description: DONOR_MILESTONE_TEXT.UNDER_REVIEW,
+            milestone: 'FROZEN',
+            description: DONOR_MILESTONE_TEXT.FROZEN,
           })
         } catch (e) {
           console.warn('[demo] tracker update failed:', e.message)

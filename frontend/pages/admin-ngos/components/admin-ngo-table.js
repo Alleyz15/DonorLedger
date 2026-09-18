@@ -7,9 +7,6 @@ export function createAdminNGOTable() {
         <button class="admin-tool-button" type="button">Filter</button>
         <button class="admin-tool-button" type="button">Sort By: Date</button>
       </div>
-      <button class="admin-primary-action" type="button" disabled>
-        Open Review Queue
-      </button>
     </div>
     <div class="admin-ngo-table-wrap">
       <table class="admin-ngo-table">
@@ -107,11 +104,14 @@ function renderActions(ngo) {
         <button class="admin-reject-button" type="button" data-action="reject" data-ngo-id="${escapeHtml(ngo.id)}">
           Reject
         </button>
+        <button class="admin-details-button" type="button" data-action="view" data-ngo-id="${escapeHtml(ngo.id)}">
+          View Details
+        </button>
       </div>
     `
   }
 
-  return '<button class="admin-details-button" type="button" disabled>View Details</button>'
+  return `<button class="admin-details-button" type="button" data-action="view" data-ngo-id="${escapeHtml(ngo.id)}">View Details</button>`
 }
 
 function getStatusLabel(ngo) {

@@ -170,8 +170,26 @@ router.get('/ngos', async (req, res, next) => {
         name: true,
         registrationNum: true,
         contactEmail: true,
+        contactPhone: true,
+        walletAddress: true,
         riskTier: true,
         status: true,
+
+        // Section 11 — full registration application package, surfaced in
+        // the admin "View Details" drawer for Bank Islam KYC review.
+        registrationType: true,
+        registeredAddress: true,
+        directors: true,
+        bankAccount: true,
+        bankName: true,
+        causeType: true,
+        description: true,
+        aidPercent: true,
+        logisticsPercent: true,
+        adminPercent: true,
+        registrationDoc: true,
+        financialDoc: true,
+
         kycNotes: true,
         kycApprovedAt: true,
         onChainExpiry: true,
@@ -180,7 +198,15 @@ router.get('/ngos', async (req, res, next) => {
         _count: { select: { campaigns: true } },
       },
     })
-    res.json(ngos)
+    // registrationDoc/financialDoc are stored as paths relative to uploads/
+    // (e.g. "ngo-registration/123-abc.pdf") — convert to browser-accessible URLs.
+    res.json(
+      ngos.map((ngo) => ({
+        ...ngo,
+        registrationDoc: ngo.registrationDoc ? `/uploads/${ngo.registrationDoc}` : null,
+        financialDoc: ngo.financialDoc ? `/uploads/${ngo.financialDoc}` : null,
+      }))
+    )
   } catch (e) {
     next(e)
   }
@@ -240,6 +266,65 @@ router.get('/alerts', async (req, res, next) => {
       },
     })
     res.json(alerts)
+  } catch (e) {
+    next(e)
+  }
+})
+
+// GET /admin/ledger — raw on-chain records (donations + campaign deployments).
+// This is the literal blockchain proof behind the audit page: every entry
+// here links to a real Sepolia transaction. Donor identity stays hashed —
+// only donorHash (not email) is shown, matching the on-chain record.
+router.get('/ledger', async (req, res, next) => {
+  try {
+    const [donations, campaigns] = await Promise.all([
+      prisma.donation.findMany({
+        where: { txHash: { not: null } },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        select: {
+          id: true,
+          donorHash: true,
+          amount: true,
+          txHash: true,
+          createdAt: true,
+          campaign: { select: { id: true, name: true } },
+        },
+      }),
+      prisma.campaign.findMany({
+        where: { deployTxHash: { not: null } },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          contractAddress: true,
+          deployTxHash: true,
+          createdAt: true,
+        },
+      }),
+    ])
+
+    const ledger = [
+      ...donations.map((d) => ({
+        type: 'DONATION',
+        id: d.id,
+        amount: Number(d.amount),
+        donorHash: d.donorHash,
+        campaignName: d.campaign?.name || null,
+        txHash: d.txHash,
+        createdAt: d.createdAt,
+      })),
+      ...campaigns.map((c) => ({
+        type: 'CAMPAIGN_DEPLOY',
+        id: c.id,
+        campaignName: c.name,
+        contractAddress: c.contractAddress,
+        txHash: c.deployTxHash,
+        createdAt: c.createdAt,
+      })),
+    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+    res.json(ledger)
   } catch (e) {
     next(e)
   }

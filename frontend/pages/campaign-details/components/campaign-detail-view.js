@@ -10,14 +10,22 @@ export function renderCampaignDetail(campaign) {
 
   return `
     <section class="campaign-detail-page">
-      <header class="campaign-detail-hero">
-        <div class="campaign-detail-meta">
-          <span>${escapeHtml(campaign.causeType || 'Community')}</span>
-          ${campaign.endDate ? `<time>Ends ${formatDate(campaign.endDate)}</time>` : ''}
+      <!-- ── Hero ── -->
+      <header class="campaign-hero">
+        <div class="campaign-hero-top">
+          <span class="campaign-hero-badge">${escapeHtml(campaign.causeType ? formatCause(campaign.causeType) : 'Community')}</span>
+          ${campaign.endDate ? `<time class="campaign-hero-end">Ends ${formatDate(campaign.endDate)}</time>` : ''}
         </div>
         <h1>${escapeHtml(campaign.name)}</h1>
-        <p class="campaign-detail-ngo"><span aria-hidden="true"></span>by ${escapeHtml(campaign.ngo?.name || campaign.ngoName || 'Verified NGO')}</p>
+        <p class="campaign-hero-ngo">by ${escapeHtml(campaign.ngo?.name || campaign.ngoName || 'Verified NGO')}</p>
       </header>
+
+      <!-- ── Trust badges — reinforces the platform's core differentiators ── -->
+      <div class="campaign-trust-badges">
+        <span class="campaign-trust-badge">🏦 Bank Islam Verified</span>
+        <span class="campaign-trust-badge">⛓ Blockchain Secured</span>
+        <span class="campaign-trust-badge">🤖 AI Monitored</span>
+      </div>
 
       ${goalReached ? `
         <div class="campaign-goal-reached">
@@ -26,16 +34,22 @@ export function renderCampaignDetail(campaign) {
         </div>
       ` : ''}
 
+      <!-- ── Progress card (animated counters) ── -->
       <section class="campaign-progress-card">
         <div class="campaign-progress-top">
           <div>
             <span>Total Raised</span>
-            <strong>${formatCurrency(raised)} <small>/ ${formatCurrency(target)} goal</small></strong>
+            <strong>
+              <span data-countup data-target="${raised}" data-prefix="RM ">RM 0</span>
+              <small>/ ${formatCurrency(target)} goal</small>
+            </strong>
           </div>
-          <strong class="campaign-progress-percent ${goalReached ? 'is-complete' : ''}">${percent}% Funded</strong>
+          <strong class="campaign-progress-percent ${goalReached ? 'is-complete' : ''}">
+            <span data-countup data-target="${percent}" data-suffix="%">0%</span> Funded
+          </strong>
         </div>
         <div class="campaign-progress-track">
-          <span style="width: ${percent}%" class="${goalReached ? 'is-complete' : ''}"></span>
+          <span data-progress-fill style="width: 0%" class="${goalReached ? 'is-complete' : ''}" data-width="${percent}"></span>
         </div>
         <div class="campaign-progress-stats">
           <div>
@@ -54,37 +68,64 @@ export function renderCampaignDetail(campaign) {
         </div>
       </section>
 
-      <div class="campaign-detail-grid">
-        <section class="campaign-impact-card">
-          <h2>Make an Impact Today</h2>
-          <p>${escapeHtml(campaign.description || 'Every donation to this campaign is tracked through DonorLedger for transparent reporting and donor verification.')}</p>
-          <aside>
-            <strong>Notes</strong>
-            <span>Every cent donated to this campaign is tracked on the public ledger. You can see exact fund movements to vendors, ensuring your contribution reaches those in need without compromise.</span>
-          </aside>
-          ${goalReached
-            ? `<div class="campaign-donate-button is-funded">
-                <span aria-hidden="true">🎉</span>
-                Goal Reached — Fully Funded
-               </div>`
-            : hasEnded
-              ? `<div class="campaign-donate-button is-funded" style="background:#94a3b8;">
-                  <span aria-hidden="true">🔴</span>
-                  Campaign Has Ended
-                 </div>`
-              : `<a class="campaign-donate-button" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
-                  <span aria-hidden="true"></span>
-                  Donate Now
-                 </a>`
-          }
-        </section>
+      <!-- ── Main layout: tabs + sticky donate sidebar ── -->
+      <div class="campaign-detail-layout">
+        <section class="campaign-tabs">
+          <div class="campaign-tab-buttons" role="tablist">
+            <button class="campaign-tab-btn is-active" type="button" role="tab" data-tab="overview">Overview</button>
+            <button class="campaign-tab-btn" type="button" role="tab" data-tab="vendors">Verified Vendors</button>
+          </div>
 
-        <section class="campaign-vendors-card">
-          <h2><span aria-hidden="true"></span>Verified Vendors</h2>
-          <div class="campaign-vendor-list">
-            ${renderVendors(vendors)}
+          <div class="campaign-tab-panel is-active" data-tab-panel="overview">
+            <h2>Make an Impact Today</h2>
+            <p>${escapeHtml(campaign.description || 'Every donation to this campaign is tracked through DonorLedger for transparent reporting and donor verification.')}</p>
+            <aside class="campaign-note">
+              <strong>Notes</strong>
+              <span>Every cent donated to this campaign is tracked on the public ledger. You can see exact fund movements to vendors, ensuring your contribution reaches those in need without compromise.</span>
+            </aside>
+          </div>
+
+          <div class="campaign-tab-panel" data-tab-panel="vendors" hidden>
+            <h2>Verified Vendors</h2>
+            <div class="campaign-vendor-list">
+              ${renderVendors(vendors)}
+            </div>
           </div>
         </section>
+
+        <!-- ── Sticky donate sidebar ── -->
+        <aside class="campaign-detail-sidebar">
+          <div class="campaign-donate-card">
+            <span>Support This Campaign</span>
+            <strong>${formatCurrency(raised)} <small>raised of ${formatCurrency(target)}</small></strong>
+            <div class="campaign-progress-track campaign-progress-track--mini">
+              <span style="width: ${percent}%" class="${goalReached ? 'is-complete' : ''}"></span>
+            </div>
+
+            <ul class="campaign-donate-points">
+              <li><span aria-hidden="true">🔒</span>Funds are locked in Bank Islam escrow until release</li>
+              <li><span aria-hidden="true">📄</span>NGO must submit verified evidence before payout</li>
+              <li><span aria-hidden="true">⛓</span>Every step is recorded on an immutable ledger</li>
+            </ul>
+
+            ${goalReached
+              ? `<div class="campaign-donate-button is-funded">
+                  <span aria-hidden="true">🎉</span>
+                  Goal Reached — Fully Funded
+                 </div>`
+              : hasEnded
+                ? `<div class="campaign-donate-button is-funded" style="background:#94a3b8;">
+                    <span aria-hidden="true">🔴</span>
+                    Campaign Has Ended
+                   </div>`
+                : `<a class="campaign-donate-button is-pulsing" href="./confirm-payment.html?campaignId=${encodeURIComponent(campaign.id)}">
+                    <span aria-hidden="true"></span>
+                    Donate Now
+                   </a>`
+            }
+            <p class="campaign-donate-foot">100% transparent · Bank Islam escrow · Blockchain verified</p>
+          </div>
+        </aside>
       </div>
     </section>
   `
@@ -99,17 +140,29 @@ function renderVendors(vendors) {
     .map(
       (vendor) => `
         <article class="campaign-vendor-item">
-          <strong>${escapeHtml(vendor.name)}</strong>
-          <p>${getVendorDescription(vendor)}</p>
+          <div class="campaign-vendor-icon" aria-hidden="true">${getVendorIcon(vendor.serviceType)}</div>
+          <div class="campaign-vendor-body">
+            <strong>${escapeHtml(vendor.name)}</strong>
+            ${vendor.serviceType ? `<span class="campaign-vendor-badge">${escapeHtml(formatCause(vendor.serviceType))}</span>` : ''}
+          </div>
         </article>
       `
     )
     .join('')
 }
 
-function getVendorDescription(vendor) {
-  const serviceType = String(vendor.serviceType || 'service').toLowerCase().replaceAll('_', ' ')
-  return `Approved ${serviceType} vendor for transparent campaign disbursements.`
+// Decorative icon based on the vendor's real serviceType field — purely
+// presentational, falls back to a neutral icon for unrecognised types.
+function getVendorIcon(serviceType) {
+  const type = String(serviceType || '').toLowerCase()
+  if (type.includes('food')) return '🍱'
+  if (type.includes('medical') || type.includes('health') || type.includes('clinic')) return '⚕️'
+  if (type.includes('logistic') || type.includes('transport') || type.includes('delivery')) return '🚚'
+  if (type.includes('water')) return '💧'
+  if (type.includes('shelter') || type.includes('housing')) return '🏠'
+  if (type.includes('education') || type.includes('school')) return '📚'
+  if (type.includes('clothing') || type.includes('apparel')) return '👕'
+  return '🏷️'
 }
 
 function formatCurrency(value) {
@@ -127,6 +180,12 @@ function formatDate(value) {
     day: 'numeric',
     year: 'numeric',
   }).format(new Date(value))
+}
+
+function formatCause(value) {
+  return String(value || '')
+    .replaceAll('_', ' ')
+    .replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase())
 }
 
 function getDaysLeft(value) {

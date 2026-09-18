@@ -2,81 +2,122 @@
    same shell as donor-campaigns.html. */
 
 .campaign-detail-page {
-  max-width: 860px;
-  padding: 24px 32px 40px;
+  max-width: 1320px;
+  padding: 18px 28px 24px;
+  animation: campaign-fade-in 0.4s ease both;
+}
+
+@keyframes campaign-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Hero ── */
-.campaign-detail-hero {
-  margin-bottom: 16px;
+.campaign-hero {
+  margin-bottom: 12px;
+  padding: 18px 26px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #064e3b 0%, #0d9488 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(6, 78, 59, 0.25);
 }
 
-.campaign-detail-meta {
+.campaign-hero-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-.campaign-detail-meta span {
+.campaign-hero-badge {
   display: inline-flex;
-  min-height: 22px;
+  min-height: 24px;
   align-items: center;
   border-radius: 999px;
-  background: #3fcfa0;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
   font-size: 11px;
   font-weight: 800;
-  padding: 0 12px;
+  letter-spacing: 0.03em;
 }
 
-.campaign-detail-meta time {
-  color: #64748b;
+.campaign-hero-end {
+  color: #d1fae5;
   font-size: 12px;
   font-weight: 700;
 }
 
-.campaign-detail-hero h1 {
+.campaign-hero h1 {
   margin: 0;
-  color: #064e3b;
+  color: #ffffff;
   font-size: 24px;
   line-height: 1.2;
   font-weight: 800;
 }
 
-.campaign-detail-ngo {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: 7px 0 0;
-  color: #475569;
+.campaign-hero-ngo {
+  margin: 6px 0 0;
+  color: #d1fae5;
   font-size: 13px;
   font-weight: 600;
 }
 
-.campaign-detail-ngo span {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #eaf2ff;
-  border-radius: 50%;
-  background: #064e3b;
-  flex-shrink: 0;
+/* ── Trust badges ── */
+.campaign-trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.campaign-trust-badge {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #6ee7b7;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.campaign-trust-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(6, 78, 59, 0.12);
+}
+
+/* ── Goal reached banner ── */
+.campaign-goal-reached {
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid #6ee7b7;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 /* ── Cards shared ── */
 .campaign-progress-card,
-.campaign-impact-card,
-.campaign-vendors-card {
+.campaign-tabs,
+.campaign-donate-card {
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* ── Progress card ── */
 .campaign-progress-card {
-  margin-bottom: 16px;
-  padding: 18px 22px;
+  margin-bottom: 12px;
+  padding: 14px 22px;
 }
 
 .campaign-progress-top {
@@ -119,8 +160,9 @@
 }
 
 .campaign-progress-track {
+  position: relative;
   height: 8px;
-  margin: 14px 0;
+  margin: 10px 0;
   overflow: hidden;
   border-radius: 999px;
   background: #e2e8f0;
@@ -130,8 +172,28 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #3fcfa0;
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #3fcfa0, #10b981);
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* shimmer sweep across the filled portion */
+.campaign-progress-track span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  background-size: 200% 100%;
+  animation: campaign-shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes campaign-shimmer {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 150% 0; }
+}
+
+.campaign-progress-track--mini {
+  height: 6px;
+  margin: 12px 0 16px;
 }
 
 .campaign-progress-stats {
@@ -148,7 +210,7 @@
   font-weight: 700;
 }
 
-/* Blockchain Verified chip — appears under donor count and total raised */
+/* Blockchain Verified chip — appears under donor count */
 .campaign-chain-chip {
   display: inline-flex;
   align-items: center;
@@ -164,24 +226,73 @@
   cursor: default;
 }
 
-.campaign-raised-verified {
-  color: #065f46 !important;
-}
-
-/* ── Detail grid ── */
-.campaign-detail-grid {
+/* ── Layout: tabs (main) + sticky donate sidebar ── */
+.campaign-detail-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.85fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.85fr);
+  gap: 16px;
+  align-items: stretch;
 }
 
-.campaign-impact-card,
-.campaign-vendors-card {
-  padding: 20px 22px;
+/* ── Tabs ── */
+.campaign-tabs {
+  padding: 6px 22px 18px;
 }
 
-.campaign-impact-card h2,
-.campaign-vendors-card h2 {
+.campaign-tab-buttons {
+  display: flex;
+  gap: 4px;
+  margin: 0 -22px 14px;
+  padding: 0 22px;
+  border-bottom: 1px solid #edf2f7;
+  overflow-x: auto;
+}
+
+.campaign-tab-btn {
+  position: relative;
+  min-height: 38px;
+  padding: 0 4px;
+  margin-right: 22px;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.campaign-tab-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 999px 999px 0 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.campaign-tab-btn:hover {
+  color: #064e3b;
+}
+
+.campaign-tab-btn.is-active {
+  color: #064e3b;
+}
+
+.campaign-tab-btn.is-active::after {
+  background: linear-gradient(90deg, #3fcfa0, #10b981);
+}
+
+.campaign-tab-panel {
+  animation: campaign-fade-in 0.3s ease both;
+}
+
+.campaign-tab-panel h2 {
   margin: 0;
   color: #064e3b;
   font-size: 16px;
@@ -189,37 +300,37 @@
   font-weight: 800;
 }
 
-.campaign-impact-card h2::after {
+.campaign-tab-panel h2::after {
   content: "";
   display: block;
   width: 32px;
   height: 3px;
-  margin: 10px 0 16px;
+  margin: 8px 0 12px;
   border-radius: 999px;
   background: #3fcfa0;
 }
 
-.campaign-impact-card > p {
-  margin: 0 0 16px;
+.campaign-tab-panel > p {
+  margin: 0 0 12px;
   color: #475569;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
-.campaign-impact-card aside {
-  margin-bottom: 16px;
+.campaign-note {
+  margin-bottom: 4px;
   border: 1px solid #e2e8f0;
-  border-radius: 7px;
+  border-radius: 8px;
   padding: 12px 14px;
   background: #f8fafc;
 }
 
-.campaign-impact-card aside strong,
-.campaign-impact-card aside span {
+.campaign-note strong,
+.campaign-note span {
   display: block;
 }
 
-.campaign-impact-card aside strong {
+.campaign-note strong {
   margin-bottom: 5px;
   color: #064e3b;
   font-size: 10px;
@@ -228,33 +339,185 @@
   letter-spacing: 0.06em;
 }
 
-.campaign-impact-card aside span {
+.campaign-note span {
   color: #64748b;
   font-size: 12px;
   line-height: 1.55;
 }
 
+/* ── Vendors ── */
+.campaign-vendor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campaign-vendor-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.campaign-vendor-item:hover {
+  transform: translateY(-2px);
+  border-color: #6ee7b7;
+  box-shadow: 0 6px 16px rgba(6, 78, 59, 0.08);
+}
+
+.campaign-vendor-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  font-size: 18px;
+}
+
+.campaign-vendor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campaign-vendor-item strong {
+  display: block;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.campaign-vendor-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  min-height: 20px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.campaign-vendor-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ── Sticky donate sidebar ── */
+.campaign-detail-sidebar {
+  position: sticky;
+  top: 16px;
+  align-self: stretch;
+}
+
+.campaign-donate-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 22px;
+}
+
+/* fills the gap between the progress bar and the donate button so the
+   sidebar doesn't feel like empty whitespace */
+.campaign-donate-points {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  list-style: none;
+}
+
+.campaign-donate-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.campaign-donate-points li span {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.campaign-donate-card > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.campaign-donate-card > strong {
+  display: block;
+  color: #064e3b;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.campaign-donate-card > strong small {
+  display: block;
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.campaign-donate-foot {
+  margin: 12px 0 0;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+}
+
 /* ── Donate button ── */
 .campaign-donate-button {
-  display: inline-flex;
-  min-height: 38px;
-  min-width: 140px;
+  display: flex;
+  min-height: 44px;
+  width: 100%;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #3fcfa0;
   color: #ffffff;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.15s;
 }
 
 .campaign-donate-button:hover {
   background: #34b88d;
+  transform: translateY(-1px);
 }
 
 .campaign-donate-button span {
@@ -265,49 +528,14 @@
   flex-shrink: 0;
 }
 
-/* ── Vendors card ── */
-.campaign-vendors-card h2 {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 14px;
-  font-size: 15px;
+/* gentle pulse to draw the eye to the primary CTA */
+.campaign-donate-button.is-pulsing {
+  animation: campaign-pulse 2.4s ease-in-out infinite;
 }
 
-.campaign-vendors-card h2 span {
-  width: 12px;
-  height: 12px;
-  border: 2px solid #3fcfa0;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.campaign-vendor-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.campaign-vendor-item {
-  border: 1px solid #e2e8f0;
-  border-radius: 7px;
-  padding: 12px 14px;
-  background: #f8fafc;
-}
-
-.campaign-vendor-item strong {
-  display: block;
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.campaign-vendor-item p,
-.campaign-vendor-empty {
-  margin: 4px 0 0;
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.5;
+@keyframes campaign-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(63, 207, 160, 0.45); }
+  50%      { box-shadow: 0 0 0 8px rgba(63, 207, 160, 0); }
 }
 
 /* ── State placeholder ── */
@@ -329,7 +557,11 @@
 }
 
 @media (max-width: 900px) {
-  .campaign-detail-grid {
+  .campaign-detail-layout {
     grid-template-columns: 1fr;
+  }
+
+  .campaign-detail-sidebar {
+    position: static;
   }
 }

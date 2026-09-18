@@ -63,10 +63,8 @@ export function formatPercent(ratio, digits = 0) {
  */
 export const DONOR_MILESTONE_TEXT = {
   RECEIVED: 'Your donation has been received',
-  ALLOCATED: 'Your donation has been allocated to a verified vendor',
+  ALLOCATED: 'Bank Islam has locked your donation in escrow, earmarked for a verified vendor, while the NGO prepares evidence for release',
   RELEASED: 'Funds have been released to the vendor',
-  CONFIRMED: 'The recipient has confirmed receiving the aid',
-  UNDER_REVIEW: 'Funds are paused while we investigate',
   FROZEN: 'Funds are paused while we investigate',
   COMPLETED: 'Your donation journey is complete',
 }
